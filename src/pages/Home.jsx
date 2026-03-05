@@ -148,20 +148,20 @@ export default function Home() {
           <p className="tagline text-center max-w-xl mx-auto">Our most loved dishes crafted with passion</p>
           
           <div className="mt-16 overflow-x-auto md:overflow-visible scrollbar-hide">
-            <div className="flex md:grid md:grid-cols-3 gap-6 md:gap-8 pb-4 md:pb-0" style={{scrollSnapType: 'x mandatory'}}>
+            <div className="flex md:grid md:grid-cols-3 gap-4 md:gap-8 pb-4 md:pb-0 px-4 md:px-0" style={{scrollSnapType: 'x mandatory'}}>
             {featured.map(item => (
-              <div key={item.id} className="bg-bg-section rounded-2xl overflow-hidden hover:shadow-[0_24px_64px_rgba(0,0,0,0.7)] transition-all duration-300 group min-w-[280px] md:min-w-0 flex-shrink-0" style={{scrollSnapAlign: 'start'}}>
-                <div className="relative aspect-[3/2] overflow-hidden">
+              <div key={item.id} className="bg-bg-section rounded-xl overflow-hidden hover:shadow-[0_24px_64px_rgba(0,0,0,0.7)] transition-all duration-300 group min-w-[240px] max-w-[240px] md:min-w-0 md:max-w-none flex-shrink-0" style={{scrollSnapAlign: 'start'}}>
+                <div className="relative aspect-[4/3] overflow-hidden">
                   <img src={item.img} alt={item.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                   <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-bg-section"></div>
-                  <div style={{position: 'absolute', top: '12px', right: '12px', width: '16px', height: '16px', borderRadius: '50%', backgroundColor: item.veg ? '#3D9970' : '#C0392B', border: '2px solid white', zIndex: 10}}></div>
+                  <div style={{position: 'absolute', top: '8px', right: '8px', width: '14px', height: '14px', borderRadius: '50%', backgroundColor: item.veg ? '#3D9970' : '#C0392B', border: '2px solid white', zIndex: 10}}></div>
                 </div>
-                <div className="px-5 pt-4 pb-0">
-                  <h3 className="mb-1">{item.name}</h3>
-                  <p className="text-[22px] font-bold text-gold mb-1" style={{fontFamily: 'Inter, sans-serif'}}>₹{item.price}</p>
-                  <p className="text-[13px] text-text-dim line-clamp-2 mb-4">{item.desc}</p>
+                <div className="px-4 pt-3 pb-0">
+                  <h3 className="mb-1 text-[18px] md:text-[20px] line-clamp-1" style={{fontFamily: 'Cormorant Garamond, serif', fontWeight: 600, fontStyle: 'italic'}}>{item.name}</h3>
+                  <p className="text-[20px] md:text-[22px] font-bold text-gold mb-1" style={{fontFamily: 'Inter, sans-serif'}}>₹{item.price}</p>
+                  <p className="text-[12px] text-text-dim line-clamp-2 mb-3">{item.desc}</p>
                 </div>
-                <Link to="/order" className="block w-full bg-gold text-bg-page py-3 text-center text-[13px] uppercase tracking-[2px] hover:bg-gold-bright transition-colors duration-200" style={{fontFamily: 'Inter, sans-serif', fontWeight: 700, borderRadius: 0}}>
+                <Link to="/menu" className="block w-full bg-gold text-bg-page py-2.5 text-center text-[12px] uppercase tracking-[2px] hover:bg-gold-bright transition-colors duration-200" style={{fontFamily: 'Inter, sans-serif', fontWeight: 700, borderRadius: 0}}>
                   Order Now
                 </Link>
               </div>
