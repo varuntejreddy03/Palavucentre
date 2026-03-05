@@ -1,9 +1,29 @@
 import { X, Minus, Plus, Trash2 } from 'lucide-react'
 import { useCart } from '../context/CartContext'
 import { Link } from 'react-router-dom'
+import { useState } from 'react'
+import GoogleLogin from './GoogleLogin'
 
 export default function CartDrawer({ isOpen, onClose }) {
   const { cartItems, removeFromCart, updateQuantity, total } = useCart()
+  const [showLogin, setShowLogin] = useState(false)
+  const [user, setUser] = useState(() => {
+    const saved = localStorage.getItem('user')
+    return saved ? JSON.parse(saved) : null
+  })
+
+  const handlePlaceOrder = () => {
+    if (!user) {
+      setShowLogin(true)
+    } else {
+      window.location.href = '/order'
+    }
+  }
+
+  const handleLogout = () => {
+    localStorage.removeItem('user')
+    setUser(null)
+  }
 
   if (!isOpen) return null
 
@@ -54,15 +74,28 @@ export default function CartDrawer({ isOpen, onClose }) {
               <span className="text-[16px] text-text-secondary uppercase tracking-[2px]" style={{fontFamily: 'Inter, sans-serif', fontWeight: 600}}>Subtotal</span>
               <span className="text-[28px] text-gold font-bold" style={{fontFamily: 'Inter, sans-serif'}}>₹{total}</span>
             </div>
-            <Link to="/order" onClick={onClose} className="block w-full bg-gold text-bg-page py-4 text-center rounded-lg text-[13px] uppercase tracking-[2px] font-bold hover:bg-gold-bright transition" style={{fontFamily: 'Inter, sans-serif'}}>
-              Place Order
-            </Link>
+            {user && (
+              <div className="flex items-center justify-between gap-2 mb-2 p-3 bg-bg-section rounded-lg border border-gold-dim">
+                <div className="flex items-center gap-2">
+                  <img src={user.picture} alt={user.name} className="w-8 h-8 rounded-full" />
+                  <div>
+                    <p className="text-[12px] text-text-primary font-semibold" style={{fontFamily: 'Inter, sans-serif'}}>{user.name}</p>
+                    <p className="text-[10px] text-text-dim" style={{fontFamily: 'Inter, sans-serif'}}>{user.email}</p>
+                  </div>
+                </div>
+                <button onClick={handleLogout} className="text-[10px] text-red-urgent hover:underline" style={{fontFamily: 'Inter, sans-serif'}}>Logout</button>
+              </div>
+            )}
+            <button onClick={handlePlaceOrder} className="block w-full bg-gold text-bg-page py-4 text-center rounded-lg text-[13px] uppercase tracking-[2px] font-bold hover:bg-gold-bright transition" style={{fontFamily: 'Inter, sans-serif'}}>
+              {user ? 'Proceed to Payment' : 'Sign In with Google'}
+            </button>
             <button onClick={onClose} className="block w-full text-center text-[12px] text-text-dim hover:text-gold transition underline" style={{fontFamily: 'Inter, sans-serif'}}>
               Continue Browsing
             </button>
           </div>
         )}
       </div>
+      <GoogleLogin isOpen={showLogin} onClose={() => setShowLogin(false)} onSuccess={setUser} />
     </>
   )
 }

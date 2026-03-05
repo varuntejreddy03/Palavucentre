@@ -7,7 +7,7 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
           <div>
-            <h3 className="text-[22px] text-gold mb-4" style={{fontFamily: 'Playfair Display, serif', fontWeight: 700}}>Palavu Centre</h3>
+            <h3 className="text-[18px] text-gold mb-4" style={{fontFamily: 'Playfair Display, serif', fontWeight: 700}}>Rajamahendravaram Pulav Centre</h3>
             <p className="text-text-secondary text-sm mb-2">Rooted in Konaseema, Served in Hyderabad</p>
             <p className="text-text-dim text-xs">Authentic Godavari heritage cuisine bringing traditional flavors to your table.</p>
           </div>
@@ -47,7 +47,7 @@ export default function Footer() {
         </div>
 
         <div className="bg-bg-section -mx-4 px-4 py-6 text-center text-text-dim text-sm mt-12 pt-6 border-t border-gold-dim">
-          <p>&copy; {new Date().getFullYear()} Palavu Centre. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} Rajamahendravaram Pulav Centre. All rights reserved.</p>
         </div>
       </div>
     </footer>

@@ -14,7 +14,6 @@ import AdminDashboard from './pages/admin/AdminDashboard'
 
 function AppContent() {
   const location = useLocation()
-  const hideWhatsApp = location.pathname === '/menu'
 
   return (
     <div className="min-h-screen bg-bg-page text-text-primary flex flex-col">
@@ -33,7 +32,6 @@ function AppContent() {
         </Routes>
       </main>
       <Footer />
-      {!hideWhatsApp && <WhatsAppButton />}
     </div>
   )
 }

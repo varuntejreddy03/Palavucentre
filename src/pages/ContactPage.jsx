@@ -89,7 +89,7 @@ export default function ContactPage() {
                   allowFullScreen=""
                   loading="lazy"
                   referrerPolicy="no-referrer-when-downgrade"
-                  title="Palavu Centre Location"
+                  title="Rajamahendravaram Pulav Centre Location"
                 ></iframe>
               </div>
             </div>

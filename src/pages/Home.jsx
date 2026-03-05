@@ -1,15 +1,7 @@
-import { useState, useEffect } from 'react'
+import { useState, useRef } from 'react'
 import { Link } from 'react-router-dom'
-import { UtensilsCrossed, PartyPopper, Camera, ShoppingBag, Award, Leaf, Users, Instagram } from 'lucide-react'
+import { UtensilsCrossed, PartyPopper, Camera, ShoppingBag, Award, Leaf, Users, Instagram, Play, Pause } from 'lucide-react'
 import Reviews from '../components/Reviews'
-
-const heroImages = [
-  'https://images.unsplash.com/photo-1585937421612-70a008356fbe?w=1920&q=80',
-  'https://images.unsplash.com/photo-1589302168068-964664d93dc0?w=1920&q=80',
-  'https://images.unsplash.com/photo-1574484284002-952d92456975?w=1920&q=80',
-  'https://images.unsplash.com/photo-1601050690597-df0568f70950?w=1920&q=80',
-  'https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?w=1920&q=80',
-]
 
 const featured = [
   { id: 7, name: 'Natu Kodi Biryani', desc: 'Country chicken biryani with aromatic spices', price: 350, img: 'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=600', veg: false },
@@ -18,64 +10,76 @@ const featured = [
 ]
 
 export default function Home() {
-  const [currentSlide, setCurrentSlide] = useState(0)
+  const [isPlaying, setIsPlaying] = useState(true)
+  const videoRef = useRef(null)
 
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % heroImages.length)
-    }, 4000)
-    return () => clearInterval(timer)
-  }, [])
+  const togglePlay = () => {
+    if (videoRef.current) {
+      if (isPlaying) {
+        videoRef.current.pause()
+      } else {
+        videoRef.current.play()
+      }
+      setIsPlaying(!isPlaying)
+    }
+  }
 
   return (
     <div className="animate-fadeIn">
       {/* Hero */}
-      <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-        {heroImages.map((img, idx) => (
-          <div key={idx} className={`absolute inset-0 transition-opacity duration-1000 ${idx === currentSlide ? 'opacity-100' : 'opacity-0'}`}>
-            <img src={img} alt="Hero" className="w-full h-full object-cover" />
-            <div className="absolute inset-0" style={{background: 'linear-gradient(to bottom, rgba(8,5,1,0.50) 0%, rgba(8,5,1,0.40) 30%, rgba(8,5,1,0.75) 70%, rgba(8,5,1,0.95) 100%)'}}></div>
-          </div>
-        ))}
+      <section className="relative min-h-screen flex items-center overflow-hidden bg-bg-page">
+        <div className="absolute inset-0 opacity-5" style={{backgroundImage: 'radial-gradient(circle at 2px 2px, #C9A84C 1px, transparent 0)', backgroundSize: '40px 40px'}}></div>
+        <div className="max-w-7xl mx-auto px-4 py-20 w-full relative z-10">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+            {/* Left Content */}
+            <div className="text-center lg:text-left pt-16 lg:pt-0">
+              <div className="mb-6 animate-fadeIn" style={{animationDelay: '0.1s'}}>
+                <div className="w-16 h-[1px] bg-gold mx-auto lg:mx-0 mb-6 opacity-60"></div>
+                <span className="inline-block text-[14px] uppercase tracking-[4px] text-gold-bright mb-8" style={{fontFamily: 'Inter, sans-serif', fontWeight: 500}}>Authentic Godavari Cuisine</span>
+              </div>
+              
+              <h1 className="mb-6 md:text-[42px] lg:text-[64px] leading-[1.2] animate-fadeIn" style={{fontFamily: 'Playfair Display, serif', fontWeight: 900, letterSpacing: '-0.5px', fontSize: 'clamp(28px, 8vw, 36px)', animationDelay: '0.2s'}}>Rajamahendravaram Pulav Centre</h1>
+              
+              <p className="text-[20px] md:text-[24px] mb-4 text-gold animate-fadeIn" style={{fontFamily: 'Cormorant Garamond, serif', fontStyle: 'italic', fontWeight: 400, animationDelay: '0.3s'}}>From Konaseema's Soil to Your Table</p>
+              
+              <p className="text-[14px] md:text-[16px] text-text-dim mb-10 max-w-[520px] mx-auto lg:mx-0 leading-relaxed animate-fadeIn" style={{fontFamily: 'Inter, sans-serif', fontWeight: 300, animationDelay: '0.4s'}}>
+                Experience the rich heritage of Godavari delta cuisine, crafted with traditional recipes passed down through generations
+              </p>
+              
+              <div className="flex flex-wrap gap-4 justify-center lg:justify-start items-center animate-fadeIn" style={{animationDelay: '0.5s'}}>
+                <Link to="/menu" className="group relative overflow-hidden" style={{border: '2px solid #C9A84C', background: 'transparent', color: '#C9A84C', padding: '14px 32px', borderRadius: '999px', fontFamily: 'Inter', fontWeight: 600, fontSize: '13px', letterSpacing: '2px', textTransform: 'uppercase', textDecoration: 'none', display: 'inline-block', transition: 'all 0.3s'}}>
+                  <span className="relative z-10 group-hover:text-bg-page transition-colors duration-300">Explore Menu</span>
+                  <div className="absolute inset-0 bg-gold transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></div>
+                </Link>
+                <Link to="/menu" style={{background: '#C9A84C', color: '#080501', padding: '14px 32px', borderRadius: '999px', fontFamily: 'Inter', fontWeight: 700, fontSize: '13px', letterSpacing: '2px', textTransform: 'uppercase', border: 'none', cursor: 'pointer', textDecoration: 'none', display: 'inline-block', animation: 'goldPulse 2.5s infinite'}}>
+                  Order Now
+                </Link>
+                <a href="tel:9966655997" style={{background: '#B33A3A', color: '#EDE0C4', padding: '14px 32px', borderRadius: '999px', fontFamily: 'Inter', fontWeight: 700, fontSize: '13px', letterSpacing: '2px', textTransform: 'uppercase', border: 'none', cursor: 'pointer', textDecoration: 'none', display: 'inline-block'}}>
+                  Call Now
+                </a>
+              </div>
+            </div>
 
-        <div className="relative z-10 text-center px-4 max-w-5xl mx-auto pt-20">
-          <div className="mb-6">
-            <div className="w-16 h-[1px] bg-gold mx-auto mb-6 opacity-60"></div>
-            <span className="inline-block text-[14px] uppercase tracking-[4px] text-gold-bright mb-8" style={{fontFamily: 'Inter, sans-serif', fontWeight: 500}}>Authentic Godavari Cuisine</span>
+            {/* Right Video */}
+            <div className="relative rounded-2xl overflow-hidden border-2 border-gold-dim shadow-[0_20px_60px_rgba(0,0,0,0.7)] group animate-fadeIn" style={{animationDelay: '0.3s'}}>
+              <video
+                ref={videoRef}
+                autoPlay
+                loop
+                muted
+                playsInline
+                className="w-full h-full object-cover aspect-[4/3]"
+              >
+                <source src="/Video-797.mp4" type="video/mp4" />
+              </video>
+              <button
+                onClick={togglePlay}
+                className="absolute bottom-4 right-4 w-12 h-12 bg-gold/90 hover:bg-gold rounded-full flex items-center justify-center transition-all duration-200 shadow-lg hover:scale-110"
+              >
+                {isPlaying ? <Pause className="w-5 h-5 text-bg-page" /> : <Play className="w-5 h-5 text-bg-page ml-0.5" />}
+              </button>
+            </div>
           </div>
-          
-          <h1 className="text-[72px] md:text-[96px] lg:text-[110px] leading-[0.9] mb-8" style={{fontFamily: 'Playfair Display, serif', fontWeight: 900, letterSpacing: '-2px'}}>Palavu Centre</h1>
-          
-          <p className="text-[22px] md:text-[26px] mb-4 text-gold" style={{fontFamily: 'Cormorant Garamond, serif', fontStyle: 'italic', fontWeight: 400}}>From Konaseema's Soil to Your Table</p>
-          
-          <p className="text-[14px] md:text-[16px] text-text-dim mb-12 max-w-[520px] mx-auto leading-relaxed px-4" style={{fontFamily: 'Inter, sans-serif', fontWeight: 300}}>
-            Experience the rich heritage of Godavari delta cuisine, crafted with traditional recipes passed down through generations
-          </p>
-          
-          <div className="flex flex-wrap gap-4 justify-center items-center">
-            <Link to="/menu" className="group relative overflow-hidden" style={{border: '2px solid #C9A84C', background: 'transparent', color: '#C9A84C', padding: '14px 32px', borderRadius: '999px', fontFamily: 'Inter', fontWeight: 600, fontSize: '13px', letterSpacing: '2px', textTransform: 'uppercase', textDecoration: 'none', display: 'inline-block', transition: 'all 0.3s'}}>
-              <span className="relative z-10 group-hover:text-bg-page transition-colors duration-300">Explore Menu</span>
-              <div className="absolute inset-0 bg-gold transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></div>
-            </Link>
-            <Link to="/menu" style={{background: '#C9A84C', color: '#080501', padding: '14px 32px', borderRadius: '999px', fontFamily: 'Inter', fontWeight: 700, fontSize: '13px', letterSpacing: '2px', textTransform: 'uppercase', border: 'none', cursor: 'pointer', textDecoration: 'none', display: 'inline-block', animation: 'goldPulse 2.5s infinite'}}>
-              Order Now
-            </Link>
-            <a href="tel:9966655997" style={{background: '#B33A3A', color: '#EDE0C4', padding: '14px 32px', borderRadius: '999px', fontFamily: 'Inter', fontWeight: 700, fontSize: '13px', letterSpacing: '2px', textTransform: 'uppercase', border: 'none', cursor: 'pointer', textDecoration: 'none', display: 'inline-block'}}>
-              Call Now
-            </a>
-          </div>
-        </div>
-
-        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex gap-2.5">
-          {heroImages.map((_, idx) => (
-            <button
-              key={idx}
-              onClick={() => setCurrentSlide(idx)}
-              className={`rounded-full transition-all duration-300 ${
-                idx === currentSlide ? 'bg-gold w-8 h-2' : 'bg-gold-dim/40 w-2 h-2 hover:bg-gold-dim'
-              }`}
-            />
-          ))}
         </div>
       </section>
 
@@ -116,10 +120,10 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Why Palavu Centre */}
+      {/* Why Rajamahendravaram Pulav Centre */}
       <section className="py-24 md:py-32 px-4 bg-bg-page">
         <div className="max-w-7xl mx-auto">
-          <h2 className="text-center section-title-treatment">Why Palavu Centre</h2>
+          <h2 className="text-center section-title-treatment">Why Rajamahendravaram Pulav Centre</h2>
           <p className="tagline text-center max-w-xl mx-auto">Authentic flavors rooted in tradition and heritage</p>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-16">
