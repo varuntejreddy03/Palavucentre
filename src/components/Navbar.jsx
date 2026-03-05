@@ -2,9 +2,11 @@ import { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { ShoppingCart, Menu, X } from 'lucide-react'
 import { useCart } from '../context/CartContext'
+import CartDrawer from './CartDrawer'
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
+  const [cartDrawerOpen, setCartDrawerOpen] = useState(false)
   const location = useLocation()
   const { cartItems } = useCart()
 
@@ -50,25 +52,37 @@ export default function Navbar() {
             >
               Call Now
             </button>
-            <Link to="/order" className="relative">
+            <button onClick={() => {
+              if (cartItems.length > 0) {
+                setCartDrawerOpen(true)
+              } else {
+                window.location.href = '/menu'
+              }
+            }} className="relative cursor-pointer">
               <ShoppingCart className="w-6 h-6 text-gold hover:text-gold-bright transition" />
               {cartItems.length > 0 && (
                 <span className="absolute -top-2 -right-2 bg-red-urgent text-white rounded-full w-5 h-5 flex items-center justify-center text-[10px] font-bold" style={{fontFamily: 'Inter, sans-serif'}}>
                   {cartItems.length}
                 </span>
               )}
-            </Link>
+            </button>
           </div>
 
           <div className="md:hidden flex items-center space-x-3">
-            <Link to="/menu" className="relative">
+            <button onClick={() => {
+              if (cartItems.length > 0) {
+                setCartDrawerOpen(true)
+              } else {
+                window.location.href = '/menu'
+              }
+            }} className="relative cursor-pointer">
               <ShoppingCart className="w-5 h-5 text-gold" />
               {cartItems.length > 0 && (
                 <span className="absolute -top-1.5 -right-1.5 bg-red-urgent text-white rounded-full w-4 h-4 flex items-center justify-center text-[9px] font-bold">
                   {cartItems.length}
                 </span>
               )}
-            </Link>
+            </button>
             <button onClick={() => setIsOpen(!isOpen)} className="text-gold p-1">
               {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
@@ -102,6 +116,8 @@ export default function Navbar() {
           </div>
         </div>
       )}
+
+      <CartDrawer isOpen={cartDrawerOpen} onClose={() => setCartDrawerOpen(false)} />
     </nav>
   )
 }
