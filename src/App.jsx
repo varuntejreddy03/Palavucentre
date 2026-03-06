@@ -11,6 +11,7 @@ import FranchisePage from './pages/FranchisePage'
 import ContactPage from './pages/ContactPage'
 import AdminLogin from './pages/admin/AdminLogin'
 import AdminDashboard from './pages/admin/AdminDashboard'
+import CartDrawer from './components/CartDrawer'
 
 function AppContent() {
   const location = useLocation()
@@ -18,6 +19,7 @@ function AppContent() {
   return (
     <div className="min-h-screen bg-bg-page text-text-primary flex flex-col">
       <Navbar />
+      <CartDrawer />
       <main className="flex-grow">
         <Routes>
           <Route path="/" element={<Home />} />

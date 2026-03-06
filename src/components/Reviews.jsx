@@ -53,17 +53,17 @@ export default function Reviews() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {reviews.map(review => (
-            <div key={review.id} className="bg-bg-section p-6 rounded-xl border border-gold-dim relative overflow-hidden hover:border-gold hover:-translate-y-0.5 transition-all duration-300">
-              <div className="absolute top-0 left-3 text-[80px] leading-none text-gold opacity-[0.12] pointer-events-none" style={{fontFamily: 'Playfair Display, serif'}}>&ldquo;</div>
+            <div key={review.id} className="bg-bg-section p-6 rounded-xl gold-border relative overflow-hidden hover:border-gold hover:-translate-y-0.5 transition-all duration-300">
+              <div className="absolute top-0 left-3 text-[80px] leading-none text-gold opacity-[0.12] pointer-events-none" style={{ fontFamily: 'Playfair Display, serif' }}>&ldquo;</div>
               <div className="relative z-10">
                 <div className="flex justify-between items-start mb-4">
                   <div>
-                    <h3 className="text-[18px] text-gold-bright mb-1" style={{fontFamily: 'Cormorant Garamond, serif', fontWeight: 600, fontStyle: 'italic'}}>{review.name}</h3>
-                    <p className="text-[11px] text-[#5C4F35]" style={{fontFamily: 'Inter, sans-serif'}}>{new Date(review.date).toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                    <h3 className="text-[18px] text-gold-bright mb-1" style={{ fontFamily: 'Cormorant Garamond, serif', fontWeight: 600, fontStyle: 'italic' }}>{review.name}</h3>
+                    <p className="text-[11px] text-[#5C4F35]" style={{ fontFamily: 'Inter, sans-serif' }}>{new Date(review.date).toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
                   </div>
                   <StarRating rating={review.rating} />
                 </div>
-                <p className="text-[14px] text-text-secondary leading-[1.8]" style={{fontFamily: 'Inter, sans-serif'}}>{review.text}</p>
+                <p className="text-[14px] text-text-secondary leading-[1.8]" style={{ fontFamily: 'Inter, sans-serif' }}>{review.text}</p>
               </div>
             </div>
           ))}
@@ -75,7 +75,7 @@ export default function Reviews() {
             target="_blank"
             rel="noopener noreferrer"
             className="inline-block border border-[#2E2200] text-text-secondary px-7 py-2.5 rounded-full text-[13px] uppercase tracking-[2px] font-semibold hover:border-gold hover:text-gold transition-all duration-200"
-            style={{fontFamily: 'Inter, sans-serif'}}
+            style={{ fontFamily: 'Inter, sans-serif' }}
           >
             Write a Review
           </a>

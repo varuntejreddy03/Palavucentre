@@ -24,16 +24,16 @@ export const menuData = {
     { id: 17, name: 'Pesarattu Upma', desc: 'Green gram dosa with upma combo', price: 150, img: 'https://images.unsplash.com/photo-1630383249896-424e482df921?w=400', veg: true },
   ],
   desserts: [
-    { id: 18, name: 'Pala Thalikalu', desc: 'Traditional milk sweet with cardamom', price: 90, img: 'https://images.unsplash.com/photo-1606313564200-e75d5e30476c?w=400', veg: true },
-    { id: 19, name: 'Bobbatlu', desc: 'Sweet flatbread with jaggery lentil filling', price: 80, img: 'https://images.unsplash.com/photo-1606313564200-e75d5e30476c?w=400', veg: true, bestseller: true },
-    { id: 20, name: 'Ariselu', desc: 'Traditional rice flour sweet with jaggery', price: 100, img: 'https://images.unsplash.com/photo-1606313564200-e75d5e30476c?w=400', veg: true },
-    { id: 21, name: 'Kova Kajjikayalu', desc: 'Fried dumplings with khoya filling', price: 120, img: 'https://images.unsplash.com/photo-1606313564200-e75d5e30476c?w=400', veg: true },
+    { id: 18, name: 'Pala Thalikalu', desc: 'Traditional milk sweet with cardamom', price: 90, img: 'https://images.unsplash.com/photo-1589113110374-2786355913e6?w=400', veg: true },
+    { id: 19, name: 'Bobbatlu', desc: 'Sweet flatbread with jaggery lentil filling', price: 80, img: 'https://images.unsplash.com/photo-1626128666497-ecdf23fcd750?w=400', veg: true, bestseller: true },
+    { id: 20, name: 'Ariselu', desc: 'Traditional rice flour sweet with jaggery', price: 100, img: 'https://images.unsplash.com/photo-1582719508461-905c673771fd?w=400', veg: true },
+    { id: 21, name: 'Kova Kajjikayalu', desc: 'Fried dumplings with khoya filling', price: 120, img: 'https://images.unsplash.com/photo-1621447509370-588bc3b23089?w=400', veg: true },
   ],
   beverages: [
-    { id: 22, name: 'Filter Coffee', desc: 'Traditional South Indian filter coffee', price: 50, img: 'https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=400', veg: true },
-    { id: 23, name: 'Majjiga', desc: 'Spiced buttermilk with curry leaves', price: 40, img: 'https://images.unsplash.com/photo-1623065422902-30a2d299bbe4?w=400', veg: true },
-    { id: 24, name: 'Fresh Lime Soda', desc: 'Refreshing lime soda with mint', price: 60, img: 'https://images.unsplash.com/photo-1546173159-315724a31696?w=400', veg: true },
-    { id: 25, name: 'Mango Lassi', desc: 'Creamy mango yogurt drink', price: 80, img: 'https://images.unsplash.com/photo-1623065422902-30a2d299bbe4?w=400', veg: true },
+    { id: 22, name: 'Filter Coffee', desc: 'Traditional South Indian filter coffee', price: 50, img: 'https://images.unsplash.com/photo-1544787210-2213d2426687?w=400', veg: true },
+    { id: 23, name: 'Majjiga', desc: 'Spiced buttermilk with curry leaves', price: 40, img: 'https://images.unsplash.com/photo-1600271772470-bd22aeb19409?w=400', veg: true },
+    { id: 24, name: 'Fresh Lime Soda', desc: 'Refreshing lime soda with mint', price: 60, img: 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=400', veg: true },
+    { id: 25, name: 'Mango Lassi', desc: 'Creamy mango yogurt drink', price: 80, img: 'https://images.unsplash.com/photo-1571006682858-a5c7154eaa44?w=400', veg: true },
   ],
 }
 

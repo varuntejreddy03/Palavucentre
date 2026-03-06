@@ -2,13 +2,11 @@ import { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { ShoppingCart, Menu, X } from 'lucide-react'
 import { useCart } from '../context/CartContext'
-import CartDrawer from './CartDrawer'
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
-  const [cartDrawerOpen, setCartDrawerOpen] = useState(false)
   const location = useLocation()
-  const { cartItems } = useCart()
+  const { cartItems, setCartOpen } = useCart()
 
   const navLinks = [
     { path: '/', label: 'Home' },
@@ -24,12 +22,12 @@ export default function Navbar() {
   }
 
   return (
-    <nav className="fixed w-full z-50 bg-[#080501] border-b border-[rgba(201,168,76,0.15)] shadow-[0_4px_32px_rgba(0,0,0,0.9)]">
+    <nav className="fixed w-full z-50 bg-[#1A1A1A]/80 backdrop-blur-xl border-b border-white/5 shadow-2xl">
       <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16 md:h-[70px]">
           <Link to="/" className="flex-shrink-0 max-w-[160px] h-[32px] flex flex-col justify-center">
-            <span className="font-bold text-gold-bright whitespace-nowrap" style={{fontFamily: 'Playfair Display, serif', fontSize: '15px', lineHeight: '1', fontWeight: '700', color: '#E8C96A'}}>Rajamahendravaram Pulav Centre</span>
-            <span className="text-text-dim" style={{fontFamily: 'Inter, sans-serif', fontSize: '10px', lineHeight: '1', color: '#5C4F35', marginTop: '4px'}}>Rooted in Konaseema</span>
+            <span className="font-bold text-gold-bright whitespace-nowrap" style={{ fontFamily: 'Playfair Display, serif', fontSize: '15px', lineHeight: '1', fontWeight: '700', color: '#E8C96A' }}>RajaMahendravaram PalavuCentre</span>
+            <span className="text-text-dim" style={{ fontFamily: 'Inter, sans-serif', fontSize: '10px', lineHeight: '1', color: '#5C4F35', marginTop: '4px' }}>Rooted in Konaseema</span>
           </Link>
 
           <div className="hidden md:flex items-center gap-8">
@@ -37,10 +35,9 @@ export default function Navbar() {
               <Link
                 key={link.path}
                 to={link.path}
-                className={`relative py-2 uppercase text-[11px] tracking-[3px] font-medium transition-colors duration-200 ${
-                  location.pathname === link.path ? 'text-gold pb-1 border-b-2 border-gold' : 'text-text-secondary hover:text-gold-bright'
-                }`}
-                style={{fontFamily: 'Inter, sans-serif'}}
+                className={`relative py-2 uppercase text-[11px] tracking-[3px] font-medium transition-colors duration-200 ${location.pathname === link.path ? 'text-gold pb-1 border-b-2 border-gold' : 'text-text-secondary hover:text-gold-bright'
+                  }`}
+                style={{ fontFamily: 'Inter, sans-serif' }}
               >
                 {link.label}
               </Link>
@@ -48,20 +45,20 @@ export default function Navbar() {
             <button
               onClick={handleCallNow}
               className="bg-[#B33A3A] text-[#EDE0C4] px-6 py-2.5 rounded-full uppercase text-[11px] tracking-[2px] font-semibold hover:bg-[#8B2E2E] transition-colors duration-200"
-              style={{fontFamily: 'Inter, sans-serif'}}
+              style={{ fontFamily: 'Inter, sans-serif' }}
             >
               Call Now
             </button>
             <button onClick={() => {
               if (cartItems.length > 0) {
-                setCartDrawerOpen(true)
+                setCartOpen(true)
               } else {
                 window.location.href = '/menu'
               }
             }} className="relative cursor-pointer">
               <ShoppingCart className="w-6 h-6 text-gold hover:text-gold-bright transition" />
               {cartItems.length > 0 && (
-                <span className="absolute -top-2 -right-2 bg-red-urgent text-white rounded-full w-5 h-5 flex items-center justify-center text-[10px] font-bold" style={{fontFamily: 'Inter, sans-serif'}}>
+                <span className="absolute -top-2 -right-2 bg-red-urgent text-white rounded-full w-5 h-5 flex items-center justify-center text-[10px] font-bold" style={{ fontFamily: 'Inter, sans-serif' }}>
                   {cartItems.length}
                 </span>
               )}
@@ -71,7 +68,7 @@ export default function Navbar() {
           <div className="md:hidden flex items-center space-x-3">
             <button onClick={() => {
               if (cartItems.length > 0) {
-                setCartDrawerOpen(true)
+                setCartOpen(true)
               } else {
                 window.location.href = '/menu'
               }
@@ -98,10 +95,9 @@ export default function Navbar() {
                 key={link.path}
                 to={link.path}
                 onClick={() => setIsOpen(false)}
-                className={`block py-4 px-5 text-[15px] rounded-xl border border-gold-dim/20 uppercase tracking-wider transition-all duration-300 transform hover:scale-[1.02] ${
-                  location.pathname === link.path ? 'text-gold bg-[rgba(201,168,76,0.15)] border-gold shadow-[0_0_20px_rgba(201,168,76,0.2)]' : 'text-text-primary hover:text-gold hover:bg-[rgba(201,168,76,0.08)] hover:border-gold-dim'
-                }`}
-                style={{fontFamily: 'Inter, sans-serif', fontWeight: 500, animationDelay: `${idx * 0.05}s`}}
+                className={`block py-4 px-5 text-[15px] rounded-xl border border-gold-dim/20 uppercase tracking-wider transition-all duration-300 transform hover:scale-[1.02] ${location.pathname === link.path ? 'text-gold bg-[rgba(201,168,76,0.15)] border-gold shadow-[0_0_20px_rgba(201,168,76,0.2)]' : 'text-text-primary hover:text-gold hover:bg-[rgba(201,168,76,0.08)] hover:border-gold-dim'
+                  }`}
+                style={{ fontFamily: 'Inter, sans-serif', fontWeight: 500, animationDelay: `${idx * 0.05}s` }}
               >
                 <span className="flex items-center justify-between">
                   {link.label}
@@ -112,7 +108,7 @@ export default function Navbar() {
             <button
               onClick={() => { handleCallNow(); setIsOpen(false); }}
               className="w-full mt-6 bg-gradient-to-r from-[#B33A3A] to-[#8B2E2E] text-[#EDE0C4] px-6 py-4 rounded-xl uppercase text-[13px] tracking-[2px] font-semibold shadow-lg hover:shadow-[0_0_30px_rgba(179,58,58,0.5)] transition-all duration-300 transform hover:scale-[1.02]"
-              style={{fontFamily: 'Inter, sans-serif'}}
+              style={{ fontFamily: 'Inter, sans-serif' }}
             >
               📞 Call Now
             </button>
@@ -120,7 +116,7 @@ export default function Navbar() {
         </div>
       )}
 
-      <CartDrawer isOpen={cartDrawerOpen} onClose={() => setCartDrawerOpen(false)} />
+
     </nav>
   )
 }
