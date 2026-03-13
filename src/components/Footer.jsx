@@ -7,9 +7,9 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
           <div>
-            <h3 className="text-[20px] mb-4 metallic-gold" style={{ fontFamily: 'Playfair Display, serif', fontWeight: 900 }}>Rajamahendravaram Palav Centre</h3>
-            <p className="text-text-secondary text-sm mb-2">Rooted in Konaseema, Served in Hyderabad</p>
-            <p className="text-text-dim text-xs">Authentic Godavari heritage cuisine bringing traditional flavors to your table.</p>
+            <h3 className="brand-logo-text text-[20px] mb-4">RajaMahendravaram PalavuCentre</h3>
+            <p className="text-text-secondary text-sm mb-2 font-light">Rooted in Konaseema, Served in Hyderabad</p>
+            <p className="text-text-dim text-xs font-light">Authentic Godavari heritage cuisine bringing traditional flavors to your table.</p>
           </div>
 
           <div>

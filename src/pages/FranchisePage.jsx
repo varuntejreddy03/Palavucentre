@@ -28,17 +28,17 @@ export default function FranchisePage() {
       <div className="relative h-96 overflow-hidden">
         <img src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1920" alt="Franchise" className="w-full h-full object-cover" />
         <div className="absolute inset-0 bg-earth-dark/80 flex items-center justify-center">
-          <div className="text-center">
-            <h1 className="text-5xl md:text-6xl font-bold text-turmeric mb-4">Own a Palavu Centre</h1>
-            <p className="text-xl text-gray-300">Bring authentic Godavari cuisine to your city</p>
+          <div className="text-center px-4">
+            <h1 className="text-4xl md:text-6xl font-bold text-turmeric mb-2" style={{fontFamily: 'Playfair Display, serif'}}>Own a Palavu Centre</h1>
+            <p className="text-[16px] md:text-xl text-gray-300">Bring authentic Godavari cuisine to your city</p>
           </div>
         </div>
       </div>
 
-      <div className="py-20 px-4">
+      <div className="py-8 md:py-16 px-4">
         <div className="max-w-7xl mx-auto">
-          <h2 className="text-4xl font-bold text-center mb-12 text-turmeric">Why Partner With Us?</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-20">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-6 md:mb-10 text-turmeric" style={{fontFamily: 'Playfair Display, serif'}}>Why Partner With Us?</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 mb-10 md:mb-16">
             {benefits.map((item, idx) => (
               <div key={idx} className="bg-earth-brown/50 p-8 rounded-lg hover:shadow-2xl transition transform hover:-translate-y-1">
                 <item.icon className="w-12 h-12 mb-4 text-turmeric" />
@@ -48,14 +48,14 @@ export default function FranchisePage() {
             ))}
           </div>
 
-          <div className="bg-gradient-to-br from-turmeric/20 to-earth-brown/50 p-12 rounded-lg border border-turmeric/30 mb-20 text-center">
-            <h3 className="text-3xl font-bold mb-4 text-turmeric">Investment Range</h3>
-            <p className="text-5xl font-bold text-gray-200 mb-2">₹25 - 50 Lakhs</p>
-            <p className="text-gray-400">Varies based on location and size</p>
+          <div className="bg-gradient-to-br from-turmeric/20 to-earth-brown/50 p-8 md:p-12 rounded-lg border border-turmeric/30 mb-10 md:mb-16 text-center shadow-xl">
+            <h3 className="text-2xl md:text-3xl font-bold mb-3 text-turmeric">Investment Range</h3>
+            <p className="text-4xl md:text-5xl font-bold text-gray-200 mb-1">₹25 - 50 Lakhs</p>
+            <p className="text-gray-400 text-sm md:text-base">Varies based on location and size</p>
           </div>
 
-          <h2 className="text-4xl font-bold text-center mb-12 text-turmeric">3-Step Process</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-20">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-6 md:mb-10 text-turmeric" style={{fontFamily: 'Playfair Display, serif'}}>3-Step Process</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 mb-10 md:mb-20">
             {[
               { step: '01', title: 'Apply', desc: 'Submit your franchise inquiry' },
               { step: '02', title: 'Review', desc: 'We evaluate and discuss details' },
@@ -71,7 +71,7 @@ export default function FranchisePage() {
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
             <div>
-              <h2 className="text-3xl font-bold mb-6 text-turmeric">Ready to Start?</h2>
+              <h2 className="text-3xl font-bold mb-4 text-turmeric">Ready to Start?</h2>
               <p className="text-gray-300 mb-6 text-lg">Join the Palavu Centre family and be part of preserving and sharing authentic Godavari heritage cuisine. Our proven model and comprehensive support system ensure your success.</p>
               <ul className="space-y-4">
                 {['Low initial investment', 'High ROI potential', 'Established brand recognition', 'Complete operational support'].map((item, idx) => (

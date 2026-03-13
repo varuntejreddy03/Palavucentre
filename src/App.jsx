@@ -20,6 +20,7 @@ function AppContent() {
     <div className="min-h-screen bg-bg-page text-text-primary flex flex-col">
       <Navbar />
       <CartDrawer />
+      <WhatsAppButton />
       <main className="flex-grow">
         <Routes>
           <Route path="/" element={<Home />} />

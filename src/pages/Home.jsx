@@ -1,7 +1,8 @@
 import { useState, useRef } from 'react'
 import { Link } from 'react-router-dom'
-import { UtensilsCrossed, PartyPopper, Camera, Store, Award, Leaf, Users, Instagram } from 'lucide-react'
+import { UtensilsCrossed, PartyPopper, Camera, Store, Award, Leaf, Users, Instagram, Phone, Mail, Clock, MapPin } from 'lucide-react'
 import Reviews from '../components/Reviews'
+import Contact from '../components/Contact'
 
 const featured = [
   { id: 7, name: 'Natu Kodi Biryani', desc: 'Country chicken biryani with aromatic spices', price: 350, img: 'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=600', veg: false },
@@ -14,70 +15,138 @@ export default function Home() {
   return (
     <div className="animate-fadeIn">
       {/* Hero */}
-      <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-        {/* Full-length Video Background */}
+      <section className="hero-section min-h-screen flex items-center pt-20 lg:pt-[70px] pb-12 lg:pb-0">
+        {/* Background Image with Overlay */}
         <div className="absolute inset-0 z-0">
-          <video
-            autoPlay
-            loop
-            muted
-            playsInline
+          <img 
+            src="/hero-bg.png" 
+            alt="Palavu Centre Background" 
             className="w-full h-full object-cover"
-          >
-            <source src="/Video-797.mp4" type="video/mp4" />
-          </video>
-          {/* Gradients and Overlays for Readability */}
-          <div className="absolute inset-0 bg-black/40"></div>
-          <div className="absolute inset-0 bg-gradient-to-t from-[#1A1A1A] via-transparent to-black/20"></div>
+          />
+          {/* Overlays for Readability - NEW CINEMATIC GRADIENT */}
+          <div className="absolute inset-0 z-10 mobile-overlay" style={{ background: 'linear-gradient(to right, rgba(5, 1, 0, 0.82) 0%, rgba(5, 1, 0, 0.45) 50%, rgba(5, 1, 0, 0.15) 100%)' }}></div>
+          <div className="absolute inset-0 bg-gradient-to-t from-[#050100] via-transparent to-transparent lg:hidden z-10"></div>
         </div>
 
-        <div className="max-w-7xl mx-auto px-4 py-20 w-full relative z-10">
-          <div className="flex flex-col items-center text-center max-w-4xl mx-auto">
-            <div className="mb-6 animate-fadeIn" style={{ animationDelay: '0.1s' }}>
-              <div className="w-16 h-[1px] bg-gold mx-auto mb-6 opacity-60"></div>
-              <span className="inline-block text-[14px] uppercase tracking-[6px] text-gold mb-8" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 700 }}>AUTHENTIC GODAVARI CUISINE</span>
+        <div className="max-w-7xl mx-auto w-full relative z-20">
+          <div className="flex hero-layout items-center">
+            
+            {/* Left Content Column */}
+            <div className="hero-left lg:w-[62%] lg:pl-[60px] flex flex-col items-center lg:items-start text-center lg:text-left">
+              <div className="mb-4 flex items-center gap-4" style={{ animation: 'fadeInUp 0.6s ease-out 0.2s both' }}>
+                <div className="w-1 px-[1px] h-6 bg-[#E8C84A]"></div>
+                <span className="inline-block text-[13px] md:text-[14px] uppercase tracking-[6px] text-[#E8C84A]" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 700 }}>AUTHENTIC GODAVARI CUISINE</span>
+              </div>
+
+              <h1 className="mb-4 brand-logo-hero hero-headline" style={{ animation: 'fadeInUp 0.8s ease-out both' }}>
+                <span className="block">RAJAMAHENDRAVARAM</span>
+                <span className="block">PALAVUCENTRE</span>
+              </h1>
+
+              <p className="text-[20px] md:text-[26px] mb-3 font-serif italic text-[#F5ECD7] px-4 lg:px-0" style={{ animation: 'fadeInUp 0.6s ease-out 0.4s both', textShadow: '0 2px 8px rgba(0,0,0,0.6)' }}>Experience Konaseema in Hyderabad</p>
+
+              <p className="text-[15px] md:text-[17px] text-[rgba(245,236,215,0.85)] mb-8 max-w-[580px] lg:mx-0 mx-auto leading-[1.7] px-4 lg:px-0" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 300, animation: 'fadeInUp 0.6s ease-out 0.6s both' }}>
+                Authentic flavors, traditional recipes, unforgettable taste
+              </p>
+
+              <div className="w-full px-4 lg:px-0 flex flex-nowrap items-center justify-center lg:justify-start gap-3 sm:gap-5" style={{ animation: 'fadeInUp 0.6s ease-out 0.8s both' }}>
+                <Link
+                  to="/menu"
+                  className="shimmer-btn bg-gradient-to-br from-[#C9A84C] to-[#A07830] text-[#1A0500] flex-1 sm:flex-none px-6 sm:px-12 py-4 rounded-[50px] font-bold transition-all transform hover:scale-[1.04] hover:shadow-[0_10px_40px_rgba(201,168,76,0.4)] text-[13px] sm:text-[15px] uppercase tracking-widest text-center min-w-[130px]"
+                  style={{ fontFamily: 'Inter, sans-serif' }}
+                >
+                  Order Online
+                </Link>
+                <Link
+                  to="/contact"
+                  className="bg-white/5 hover:bg-[#C9A84C] backdrop-blur-md border-2 border-[#C9A84C] text-[#C9A84C] hover:text-[#1A0500] flex-1 sm:flex-none px-6 sm:px-12 py-4 rounded-[50px] font-bold transition-all text-[13px] sm:text-[15px] uppercase tracking-widest text-center min-w-[130px]"
+                  style={{ fontFamily: 'Inter, sans-serif' }}
+                >
+                  Contact Us
+                </Link>
+              </div>
+
+              {/* Stats Bar */}
+              <div className="mt-10 lg:mt-12 flex flex-wrap justify-center lg:justify-start gap-8 md:gap-12 w-full px-4 lg:px-0" style={{ animation: 'fadeInUp 0.6s ease-out 1s both' }}>
+                <div className="flex flex-col">
+                  <span className="text-2xl md:text-3xl font-bold text-[#E8C84A]">10K+</span>
+                  <span className="text-[11px] uppercase tracking-[2px] text-white/60 font-medium">Customers</span>
+                </div>
+                <div className="w-[1px] h-10 bg-white/10 hidden sm:block"></div>
+                <div className="flex flex-col">
+                  <span className="text-2xl md:text-3xl font-bold text-[#E8C84A]">50+</span>
+                  <span className="text-[11px] uppercase tracking-[2px] text-white/60 font-medium">Dishes</span>
+                </div>
+                <div className="w-[1px] h-10 bg-white/10 hidden sm:block"></div>
+                <div className="flex flex-col">
+                  <span className="text-2xl md:text-3xl font-bold text-[#E8C84A]">4.8</span>
+                  <span className="text-[11px] uppercase tracking-[2px] text-white/60 font-medium">Rating</span>
+                </div>
+                <div className="w-[1px] h-10 bg-white/10 hidden sm:block"></div>
+                <div className="flex flex-col">
+                  <span className="text-2xl md:text-3xl font-bold text-[#E8C84A]">100%</span>
+                  <span className="text-[11px] uppercase tracking-[2px] text-white/60 font-medium">Quality</span>
+                </div>
+              </div>
             </div>
 
-            <h1 className="mb-6 md:text-[42px] lg:text-[72px] leading-[1.1] animate-fadeIn text-white shadow-text" style={{ fontFamily: 'Playfair Display, serif', fontWeight: 900, letterSpacing: '-0.5px', fontSize: 'clamp(32px, 10vw, 42px)', animationDelay: '0.2s' }}>RajaMahendravaram PalavuCentre</h1>
-
-            <p className="text-[20px] md:text-[24px] mb-4 text-gold animate-fadeIn" style={{ fontFamily: 'Cormorant Garamond, serif', fontStyle: 'italic', fontWeight: 600, animationDelay: '0.3s' }}>From Konaseema's Soil to Your Table</p>
-
-            <p className="text-[14px] md:text-[18px] text-gray-200 mb-10 max-w-[620px] mx-auto leading-relaxed animate-fadeIn" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 300, animationDelay: '0.4s' }}>
-              Experience the rich heritage of Godavari delta cuisine, crafted with traditional recipes passed down through generations
-            </p>
-
-            <div className="grid grid-cols-2 gap-4 w-full max-w-md mx-auto animate-fadeIn" style={{ animationDelay: '0.5s' }}>
-              <Link to="/menu" className="flex items-center justify-center text-center" style={{ background: '#D4A853', color: '#080501', padding: '16px 0', borderRadius: '999px', fontFamily: 'Inter', fontWeight: 700, fontSize: '13px', letterSpacing: '2px', textTransform: 'uppercase', border: 'none', cursor: 'pointer', textDecoration: 'none', animation: 'goldPulse 2.5s infinite' }}>
-                Order Now
-              </Link>
-              <a href="tel:9966655997" className="flex items-center justify-center text-center" style={{ background: '#B33A3A', color: '#FFFBEB', padding: '16px 0', borderRadius: '999px', fontFamily: 'Inter', fontWeight: 700, fontSize: '13px', letterSpacing: '2px', textTransform: 'uppercase', border: 'none', cursor: 'pointer', textDecoration: 'none' }}>
-                Call Now
-              </a>
+            {/* Right Column Layout */}
+            <div className="hidden lg:flex lg:w-[38%] relative justify-end">
+              <div className="hero-right-card relative group ml-auto" style={{ animation: 'fadeInRight 0.8s ease-out 0.5s both' }}>
+                {/* Refined Decorative Frame - Subtler glow */}
+                <div className="absolute -inset-10 bg-gold/10 blur-3xl rounded-full opacity-40 group-hover:opacity-70 transition-opacity duration-1000"></div>
+                
+                <div className="relative rounded-[32px] overflow-hidden border-2 border-gold/40 shadow-[0_30px_70px_rgba(0,0,0,0.9)] bg-black">
+                  <video
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    className="w-full aspect-[4/5] object-cover"
+                  >
+                    <source src="/Video-797.mp4" type="video/mp4" />
+                  </video>
+                  {/* Subtle video overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent"></div>
+                  
+                  {/* Premium Franchise Badge - Top Right */}
+                  <div className="franchise-badge absolute top-4 right-4 z-10">
+                    <div className="bg-gradient-to-br from-[#FFD700] to-[#B8860B] text-black px-5 py-2 rounded-full text-[10px] font-black tracking-[2px] uppercase shadow-2xl border border-white/20">
+                      Franchise Open
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
+
+            {/* Mobile Video Banner - ONLY VISIBLE ON MOBILE */}
+            <div className="lg:hidden w-full hero-right-card relative order-1">
+              <div className="relative h-[280px] w-full overflow-hidden">
+                <video
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    className="w-full h-full object-cover"
+                  >
+                    <source src="/Video-797.mp4" type="video/mp4" />
+                  </video>
+                  <div className="absolute inset-0 bg-black/40"></div>
+                  <div className="franchise-badge absolute top-3 right-3 z-10">
+                    <div className="bg-[#B8860B] text-white px-3 py-1 rounded-full text-[12px] font-bold tracking-[2px] uppercase shadow-xl">
+                      Franchise Open
+                    </div>
+                  </div>
+              </div>
+            </div>
+
           </div>
         </div>
       </section>
 
-      {/* Stats Bar */}
-      <section className="bg-bg-even backdrop-blur-sm border-t border-b border-gold/10 py-6 md:py-8">
-        <div className="max-w-7xl mx-auto px-4 grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8">
-          {[
-            { num: '10K+', label: 'Customers' },
-            { num: '50+', label: 'Dishes' },
-            { num: '4.8★', label: 'Rating' },
-            { num: '5+', label: 'Years' },
-          ].map((stat, idx) => (
-            <div key={idx} className="text-center relative">
-              {idx > 0 && <div className="hidden md:block absolute left-0 top-1/2 -translate-y-1/2 w-[1px] h-12 bg-[#2E2200]"></div>}
-              <div className="text-[32px] md:text-[40px] font-bold text-gold mb-1" style={{ fontFamily: 'Playfair Display, serif', fontWeight: 700 }}>{stat.num}</div>
-              <div className="text-[10px] md:text-[11px] uppercase tracking-[2px] md:tracking-[3px] text-text-secondary" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 500 }}>{stat.label}</div>
-            </div>
-          ))}
-        </div>
-      </section>
 
       {/* Quick Nav */}
-      <section className="py-8 md:py-10 px-4 bg-bg-section border-t border-b border-gold/20 shadow-inner" style={{ background: 'rgba(30,5,5,0.8)' }}>
+      <section className="py-4 md:py-6 px-4 bg-bg-section border-t border-b border-gold/20 shadow-inner" style={{ background: 'rgba(30,5,5,0.8)' }}>
         <div className="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
           {[
             { icon: UtensilsCrossed, label: 'Our Menu', path: '/menu' },
@@ -96,12 +165,12 @@ export default function Home() {
       </section>
 
       {/* Why Choose Us */}
-      <section className="py-24 md:py-32 px-4 bg-bg-even">
+      <section className="py-12 md:py-16 px-4 bg-bg-even">
         <div className="max-w-7xl mx-auto">
           <h2 className="text-center section-title-treatment">Why Choose Us</h2>
           <p className="tagline text-center max-w-xl mx-auto text-[20px]">Authentic flavors rooted in tradition and heritage</p>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-16">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-10">
             {[
               { icon: Award, title: 'Heritage Recipes', desc: 'Authentic Godavari recipes passed down through generations' },
               { icon: Leaf, title: 'Farm Fresh', desc: 'Ingredients sourced directly from Konaseema farms' },
@@ -121,12 +190,12 @@ export default function Home() {
       </section>
 
       {/* Best Sellers */}
-      <section className="py-24 md:py-32 px-4 bg-black/10 backdrop-blur-sm">
+      <section className="py-12 md:py-16 px-4 bg-black/10 backdrop-blur-sm">
         <div className="max-w-7xl mx-auto">
           <h2 className="text-center section-title-treatment">Best Sellers</h2>
           <p className="tagline text-center max-w-xl mx-auto">Our most loved dishes crafted with passion</p>
 
-          <div className="mt-16 overflow-x-auto md:overflow-visible scrollbar-hide">
+          <div className="mt-10 overflow-x-auto md:overflow-visible scrollbar-hide">
             <div className="flex md:grid md:grid-cols-3 gap-4 md:gap-8 pb-4 md:pb-0 px-4 md:px-0" style={{ scrollSnapType: 'x mandatory' }}>
               {featured.map(item => (
                 <div key={item.id} className="bg-bg-card gold-border rounded-xl overflow-hidden shadow-2xl transition-all duration-500 group min-w-[260px] max-w-[260px] md:min-w-0 md:max-w-none flex-shrink-0 flex flex-col" style={{ scrollSnapAlign: 'start' }}>
@@ -146,7 +215,7 @@ export default function Home() {
                     <p className="text-[13px] text-text-dim/80 line-clamp-2 leading-relaxed">{item.desc}</p>
                   </div>
                   <Link to="/menu" className="block w-full bg-gold text-bg-page py-4 text-center text-[12px] uppercase tracking-[3px] font-black hover:bg-gold-bright transition-all duration-300" style={{ fontFamily: 'Inter, sans-serif' }}>
-                    Order Now
+                    Add to Order
                   </Link>
                 </div>
               ))}
@@ -163,7 +232,7 @@ export default function Home() {
       </section>
 
       {/* CTA Banner */}
-      <section className="py-24 md:py-32 px-4 relative overflow-hidden bg-bg-even gold-texture" style={{ background: 'linear-gradient(135deg, #2D0808, #1A0505)' }}>
+      <section className="py-12 md:py-16 px-4 relative overflow-hidden bg-bg-even gold-texture" style={{ background: 'linear-gradient(135deg, #2D0808, #1A0505)' }}>
         <div className="max-w-4xl mx-auto text-center relative z-10">
           <span className="block text-[28px] text-gold opacity-80 mb-4">✦</span>
           <h2 className="text-[56px] leading-tight mb-6" style={{ fontFamily: 'Playfair Display, serif', fontWeight: 900, color: '#D4A853' }}>
@@ -171,7 +240,7 @@ export default function Home() {
           </h2>
           <p className="tagline text-[22px] mb-8 font-bold" style={{ color: '#F0C060' }}>Authentic flavors, traditional recipes, unforgettable taste</p>
           <Link to="/menu" className="inline-block border-2 border-gold bg-transparent text-gold px-12 py-4 text-[13px] uppercase tracking-[3px] font-black hover:bg-gold hover:text-bg-page transition-all duration-300" style={{ fontFamily: 'Inter, sans-serif', borderRadius: '0px' }}>
-            Order Now
+            Start Your Order
           </Link>
         </div>
       </section>
@@ -180,11 +249,11 @@ export default function Home() {
       <Reviews />
 
       {/* Special Offers */}
-      <section className="py-16 md:py-24 lg:py-32 px-4 bg-bg-section relative overflow-hidden">
+      <section className="py-10 md:py-16 px-4 bg-bg-section relative overflow-hidden">
         <div className="absolute inset-0 opacity-5" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, #C9A84C 1px, transparent 0)', backgroundSize: '40px 40px' }}></div>
         <div className="max-w-7xl mx-auto relative z-10">
           <h2 className="text-center section-title-treatment">Special Offers</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-16">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-10">
             <div className="bg-bg-card rounded-2xl gold-border overflow-hidden group hover:-translate-y-1 hover:border-gold hover:shadow-[0_20px_60px_rgba(0,0,0,0.7)] transition-all duration-300">
               <div className="h-1 bg-[#B33A3A]"></div>
               <div className="p-8">
@@ -195,7 +264,7 @@ export default function Home() {
                   <span className="text-[32px] font-bold text-gold" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 700 }}>₹599</span>
                   <span className="text-[18px] text-text-dim line-through" style={{ fontFamily: 'Inter, sans-serif' }}>₹750</span>
                 </div>
-                <Link to="/menu" style={{ width: '100%', padding: '12px', background: '#EAB308', color: '#080501', border: 'none', borderRadius: '8px', fontFamily: 'Inter', fontWeight: 700, fontSize: '12px', letterSpacing: '2px', textTransform: 'uppercase', cursor: 'pointer', textDecoration: 'none', display: 'block', textAlign: 'center' }}>Order Now</Link>
+                <Link to="/menu" style={{ width: '100%', padding: '12px', background: '#EAB308', color: '#080501', border: 'none', borderRadius: '8px', fontFamily: 'Inter', fontWeight: 700, fontSize: '12px', letterSpacing: '2px', textTransform: 'uppercase', cursor: 'pointer', textDecoration: 'none', display: 'block', textAlign: 'center' }}>Claim Offer</Link>
               </div>
             </div>
             <div className="bg-bg-card rounded-2xl gold-border overflow-hidden group hover:-translate-y-1 hover:border-gold hover:shadow-[0_20px_60px_rgba(0,0,0,0.7)] transition-all duration-300">
@@ -208,7 +277,7 @@ export default function Home() {
                   <span className="text-[32px] font-bold text-gold" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 700 }}>₹249</span>
                   <span className="text-[18px] text-text-dim line-through" style={{ fontFamily: 'Inter, sans-serif' }}>₹320</span>
                 </div>
-                <Link to="/menu" style={{ width: '100%', padding: '12px', background: '#EAB308', color: '#080501', border: 'none', borderRadius: '8px', fontFamily: 'Inter', fontWeight: 700, fontSize: '12px', letterSpacing: '2px', textTransform: 'uppercase', cursor: 'pointer', textDecoration: 'none', display: 'block', textAlign: 'center' }}>Order Now</Link>
+                <Link to="/menu" style={{ width: '100%', padding: '12px', background: '#EAB308', color: '#080501', border: 'none', borderRadius: '8px', fontFamily: 'Inter', fontWeight: 700, fontSize: '12px', letterSpacing: '2px', textTransform: 'uppercase', cursor: 'pointer', textDecoration: 'none', display: 'block', textAlign: 'center' }}>Claim Offer</Link>
               </div>
             </div>
           </div>
@@ -219,11 +288,11 @@ export default function Home() {
       {/* Stats Counter - REMOVED DUPLICATE */}
 
       {/* Instagram */}
-      <section className="pt-[60px] pb-24 md:pb-32 px-4 bg-bg-even border-t border-gold/15">
+      <section className="pt-[30px] pb-12 md:pb-20 px-4 bg-bg-even border-t border-gold/15">
         <div className="max-w-7xl mx-auto">
           <h2 className="text-center section-title-treatment">Follow Us on Instagram</h2>
           <p className="tagline text-center max-w-xl mx-auto text-[20px] mb-8">Join our community of food lovers</p>
-          <div className="grid grid-cols-3 md:grid-cols-6 gap-2 mt-12 mb-8">
+          <div className="grid grid-cols-3 md:grid-cols-6 gap-2 mt-8 mb-8">
             {[
               'photo-1585937421612-70a008356fbe',
               'photo-1589302168068-964664d93dc0',
@@ -249,6 +318,9 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* Contact Section */}
+      <Contact />
     </div>
   )
 }

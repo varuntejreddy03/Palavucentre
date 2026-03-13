@@ -16,10 +16,10 @@ export default function Contact() {
   }
 
   return (
-    <section id="contact" className="py-20 px-4 bg-earth-dark">
+    <section id="contact" className="py-8 md:py-12 px-4 bg-earth-dark">
       <div className="max-w-7xl mx-auto">
         <h2 className="text-4xl md:text-5xl font-bold text-center mb-4 text-turmeric">Visit Us</h2>
-        <p className="text-center text-gray-300 mb-12">We'd love to serve you authentic Godavari cuisine</p>
+        <p className="text-center text-gray-300 mb-8">We'd love to serve you authentic Godavari cuisine</p>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           {/* Contact Info */}

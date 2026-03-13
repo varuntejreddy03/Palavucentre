@@ -26,16 +26,16 @@ export default function CateringPage() {
         <img src="https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=1920" alt="Catering" className="w-full h-full object-cover" />
         <div className="absolute inset-0 bg-bg-page/80 flex items-center justify-center">
           <div className="text-center px-4">
-            <h1 className="text-[40px] md:text-6xl font-bold text-gold mb-2 md:mb-4" style={{fontFamily: 'Playfair Display, serif'}}>Catering & Events</h1>
-            <p className="text-[16px] md:text-xl text-text-secondary" style={{fontFamily: 'Inter, sans-serif'}}>Make your celebrations memorable with authentic Godavari cuisine</p>
+            <h1 className="text-[36px] md:text-6xl font-bold text-gold mb-1 md:mb-2" style={{fontFamily: 'Playfair Display, serif'}}>Catering & Events</h1>
+            <p className="text-[14px] md:text-xl text-text-secondary" style={{fontFamily: 'Inter, sans-serif'}}>Make your celebrations memorable with authentic Godavari cuisine</p>
           </div>
         </div>
       </div>
 
-      <div className="py-12 md:py-20 px-4">
+      <div className="py-6 md:py-8 px-4">
         <div className="max-w-7xl mx-auto">
-          <h2 className="text-[32px] md:text-4xl font-bold text-center mb-8 md:mb-12 text-gold" style={{fontFamily: 'Playfair Display, serif'}}>Our Packages</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 mb-12 md:mb-20">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-6 md:mb-10 text-gold" style={{fontFamily: 'Playfair Display, serif'}}>Our Packages</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-10 md:mb-16">
             {packages.map((pkg, idx) => (
               <div key={idx} className={`bg-bg-card border border-gold-dim rounded-2xl p-6 md:p-8 ${pkg.featured ? 'ring-2 ring-gold transform md:scale-105' : ''} hover:shadow-[0_20px_60px_rgba(0,0,0,0.7)] transition hover:-translate-y-1`}>
                 {pkg.featured && <span className="bg-gold text-bg-page px-3 py-1 rounded-full text-[11px] font-bold inline-block mb-4" style={{fontFamily: 'Inter, sans-serif'}}>Most Popular</span>}
@@ -57,8 +57,8 @@ export default function CateringPage() {
             ))}
           </div>
 
-          <h2 className="text-4xl font-bold text-center mb-12 text-turmeric">Perfect For</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-20">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-6 md:mb-8 text-turmeric" style={{fontFamily: 'Playfair Display, serif'}}>Perfect For</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12 md:mb-16">
             {[
               { icon: Users, title: 'Weddings', desc: 'Traditional feasts for your special day' },
               { icon: Briefcase, title: 'Corporate Events', desc: 'Professional catering for business gatherings' },

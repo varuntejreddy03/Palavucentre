@@ -40,10 +40,10 @@ export default function Reviews() {
   )
 
   return (
-    <section id="reviews" className="py-20 px-4 bg-bg-card">
+    <section id="reviews" className="py-12 md:py-16 px-4 bg-bg-card">
       <div className="max-w-7xl mx-auto">
         <h2 className="text-center section-title-treatment">What Our Guests Say</h2>
-        <div className="text-center mb-12">
+        <div className="text-center mb-8">
           <div className="flex items-center justify-center gap-2 mb-2">
             <span className="text-4xl font-bold text-gold">{avgRating}</span>
             <StarRating rating={Math.round(avgRating)} />

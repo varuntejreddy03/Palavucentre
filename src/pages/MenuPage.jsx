@@ -58,10 +58,10 @@ export default function MenuPage() {
         </div>
 
         <div className="absolute inset-0 flex flex-col items-center justify-center relative z-10">
-          <div className="w-12 h-[1px] bg-gold mb-4"></div>
-          <h1 className="text-[64px] leading-none" style={{ fontFamily: 'Playfair Display, serif', fontWeight: 900, color: '#E8C96A' }}>Our Menu</h1>
-          <div className="w-16 h-[2px] bg-gold mt-4"></div>
-          <p className="tagline text-[18px] mt-4 shadow-text">Authentic Godavari flavors crafted with tradition</p>
+          <div className="w-12 h-[1px] bg-gold mb-3"></div>
+          <h1 className="text-[52px] md:text-[64px] leading-none" style={{ fontFamily: 'Playfair Display, serif', fontWeight: 900, color: '#E8C96A' }}>Our Menu</h1>
+          <div className="w-16 h-[2px] bg-gold mt-3"></div>
+          <p className="tagline text-[16px] md:text-[18px] mt-3 shadow-text">Authentic Godavari flavors crafted with tradition</p>
         </div>
         <div className="absolute bottom-0 left-0 right-0 h-20 z-10" style={{ background: 'linear-gradient(to bottom, transparent 0%, #080501 100%)' }}></div>
       </section>

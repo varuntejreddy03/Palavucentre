@@ -22,12 +22,12 @@ export default function Navbar() {
   }
 
   return (
-    <nav className="fixed w-full z-50 bg-[#1A1A1A]/80 backdrop-blur-xl border-b border-white/5 shadow-2xl">
+    <nav className="fixed w-full z-50 bg-[#050100]/60 backdrop-blur-[20px] border-b border-white/5 shadow-2xl">
       <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16 md:h-[70px]">
-          <Link to="/" className="flex-shrink-0 max-w-[160px] h-[32px] flex flex-col justify-center">
-            <span className="font-bold text-gold-bright whitespace-nowrap" style={{ fontFamily: 'Playfair Display, serif', fontSize: '15px', lineHeight: '1', fontWeight: '700', color: '#E8C96A' }}>RajaMahendravaram PalavuCentre</span>
-            <span className="text-text-dim" style={{ fontFamily: 'Inter, sans-serif', fontSize: '10px', lineHeight: '1', color: '#5C4F35', marginTop: '4px' }}>Rooted in Konaseema</span>
+          <Link to="/" className="flex-shrink-0 flex flex-col justify-center max-w-[60%] sm:max-w-none">
+            <span className="brand-logo-text" style={{ fontSize: 'clamp(10px, 3.5vw, 24px)', lineHeight: '1', whiteSpace: 'nowrap' }}>RAJAMAHENDRAVARAM PALAVUCENTRE</span>
+            <span className="text-[#FFFBEB]/90 italic mt-0.5" style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '10px', lineHeight: '1' }}>Rooted in Konaseema</span>
           </Link>
 
           <div className="hidden md:flex items-center gap-8">
@@ -35,7 +35,7 @@ export default function Navbar() {
               <Link
                 key={link.path}
                 to={link.path}
-                className={`relative py-2 uppercase text-[11px] tracking-[3px] font-medium transition-colors duration-200 ${location.pathname === link.path ? 'text-gold pb-1 border-b-2 border-gold' : 'text-text-secondary hover:text-gold-bright'
+                className={`relative py-2 uppercase text-[11px] tracking-[3px] font-light transition-colors duration-200 nav-link-underline ${location.pathname === link.path ? 'text-gold-bright' : 'text-white/80 hover:text-white'
                   }`}
                 style={{ fontFamily: 'Inter, sans-serif' }}
               >
@@ -44,7 +44,7 @@ export default function Navbar() {
             ))}
             <button
               onClick={handleCallNow}
-              className="bg-[#B33A3A] text-[#EDE0C4] px-6 py-2.5 rounded-full uppercase text-[11px] tracking-[2px] font-semibold hover:bg-[#8B2E2E] transition-colors duration-200"
+              className="bg-[#B33A3A] text-[#EDE0C4] px-7 py-2.5 rounded-full uppercase text-[11px] tracking-[2px] font-bold hover:bg-[#8B2E2E] shadow-lg transition-all active:scale-95 animate-pulse-red"
               style={{ fontFamily: 'Inter, sans-serif' }}
             >
               Call Now
@@ -55,33 +55,40 @@ export default function Navbar() {
               } else {
                 window.location.href = '/menu'
               }
-            }} className="relative cursor-pointer">
-              <ShoppingCart className="w-6 h-6 text-gold hover:text-gold-bright transition" />
+            }} className="relative cursor-pointer group">
+              <ShoppingCart className="w-5 h-5 text-gold group-hover:text-gold-bright transition-all" />
               {cartItems.length > 0 && (
-                <span className="absolute -top-2 -right-2 bg-red-urgent text-white rounded-full w-5 h-5 flex items-center justify-center text-[10px] font-bold" style={{ fontFamily: 'Inter, sans-serif' }}>
+                <span className="absolute -top-2 -right-2 bg-red-urgent text-white rounded-full w-4 h-4 flex items-center justify-center text-[10px] font-bold" style={{ fontFamily: 'Inter, sans-serif' }}>
                   {cartItems.length}
                 </span>
               )}
             </button>
           </div>
 
-          <div className="md:hidden flex items-center space-x-3">
+          <div className="md:hidden flex items-center space-x-2">
+            <button
+              onClick={handleCallNow}
+              className="bg-[#B33A3A] text-[#EDE0C4] px-3.5 py-1.5 rounded-full uppercase text-[10px] tracking-[1px] font-bold shadow-lg transition-all"
+              style={{ fontFamily: 'Inter, sans-serif' }}
+            >
+              Call Now
+            </button>
             <button onClick={() => {
               if (cartItems.length > 0) {
                 setCartOpen(true)
               } else {
                 window.location.href = '/menu'
               }
-            }} className="relative cursor-pointer">
+            }} className="relative cursor-pointer p-1">
               <ShoppingCart className="w-5 h-5 text-gold" />
               {cartItems.length > 0 && (
-                <span className="absolute -top-1.5 -right-1.5 bg-red-urgent text-white rounded-full w-4 h-4 flex items-center justify-center text-[9px] font-bold">
+                <span className="absolute -top-1 -right-1 bg-red-urgent text-white rounded-full w-3.5 h-3.5 flex items-center justify-center text-[8px] font-bold">
                   {cartItems.length}
                 </span>
               )}
             </button>
             <button onClick={() => setIsOpen(!isOpen)} className="text-gold p-1">
-              {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+              {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
           </div>
         </div>
