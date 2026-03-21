@@ -134,7 +134,7 @@ export default function Home() {
               </div>
 
               {/* Mobile Video Banner - ONLY VISIBLE ON MOBILE */}
-              <div className="lg:hidden w-full hero-right-card relative order-1">
+              <div className="lg:hidden w-full px-4 hero-right-card relative order-1">
                 <div className="relative h-[280px] w-full overflow-hidden">
                   <video
                     autoPlay
