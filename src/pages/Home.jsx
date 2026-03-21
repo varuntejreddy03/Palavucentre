@@ -185,25 +185,45 @@ export default function Home() {
           <p className="tagline text-center max-w-xl mx-auto">Our most loved dishes crafted with passion</p>
 
           <div className="mt-10">
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-8 px-2 md:px-0">
-              {featured.map(item => (
-                <div key={item.id} className="bg-bg-card gold-border rounded-xl overflow-hidden shadow-2xl transition-all duration-500 group flex flex-col">
-                  <div className="relative aspect-[4/3] overflow-hidden">
-                    <img src={item.img} alt={item.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
-                    <div className="absolute inset-0 bg-gradient-to-bottom from-transparent via-transparent to-[rgba(26,5,5,0.95)]" style={{ background: 'linear-gradient(to bottom, transparent 40%, rgba(26,5,5,0.95) 100%)' }}></div>
-                    <div style={{ position: 'absolute', top: '8px', right: '8px', width: '10px', height: '10px', borderRadius: '50%', backgroundColor: item.veg ? '#3D9970' : '#C0392B', border: '1.5px solid white', zIndex: 10 }}></div>
-                    {item.name === 'Natu Kodi Biryani' && (
-                      <div className="absolute top-2 left-2 bg-gold text-bg-page px-1.5 py-0.5 rounded-full text-[7px] md:text-[9px] uppercase tracking-[1px] font-black" style={{ fontFamily: 'Inter, sans-serif' }}>Bestseller</div>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-6 md:gap-10 px-2 md:px-0">
+              {[
+                { 
+                  id: 1, 
+                  name: 'Signature Palavu', 
+                  price: 280, 
+                  img: 'https://images.unsplash.com/photo-1589302168068-964664d93dc0?w=800&q=80',
+                  bestseller: true,
+                  veg: false
+                },
+                { 
+                  id: 2, 
+                  name: 'Natu Kodi Biryani', 
+                  price: 350, 
+                  img: 'https://images.unsplash.com/photo-1563379091339-03b21bc4a6f8?w=800&q=80',
+                  veg: false
+                },
+                { 
+                  id: 3, 
+                  name: 'Village Punugulu', 
+                  price: 120, 
+                  img: 'https://images.unsplash.com/photo-1601050690597-df0568f70950?w=800&q=80',
+                  veg: true
+                }
+              ].map(item => (
+                <div key={item.id} className="bg-[#0A0501] gold-border rounded-xl md:rounded-2xl overflow-hidden shadow-2xl transition-all duration-500 group flex flex-col hover:-translate-y-2">
+                  <div className="relative aspect-[3/4.2] overflow-hidden">
+                    <img src={item.img} alt={item.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-[1.5s]" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-80"></div>
+                    <div style={{ position: 'absolute', top: '10px', right: '10px', width: '12px', height: '12px', borderRadius: '50%', backgroundColor: item.veg ? '#3D9970' : '#C0392B', border: '1.5px solid white', zIndex: 10 }}></div>
+                    {item.bestseller && (
+                      <div className="absolute top-3 left-3 bg-gold text-bg-page px-2 py-0.5 rounded-sm text-[8px] md:text-[10px] uppercase tracking-[2px] font-black" style={{ fontFamily: 'Inter, sans-serif' }}>Best Seller</div>
                     )}
                   </div>
-                  <div className="px-3 md:px-5 pt-3 md:pt-4 pb-3 md:pb-4 flex-grow">
-                    <h3 className="mb-1 md:mb-2 text-[16px] md:text-[20px] text-text-primary leading-tight font-bold" style={{ fontFamily: 'Cormorant Garamond, serif' }}>{item.name}</h3>
-                    <div className="flex items-center gap-2 mb-1 md:mb-2">
-                      <span className="text-[14px] md:text-[18px] font-black text-gold" style={{ fontFamily: 'Inter, sans-serif' }}>₹{item.price}</span>
-                    </div>
-                    <p className="hidden md:block text-[13px] text-text-dim/80 line-clamp-2 leading-relaxed">{item.desc}</p>
+                  <div className="px-3 md:px-6 pt-3 md:pt-4 pb-4 md:pb-6 flex-grow flex flex-col justify-center items-center text-center">
+                    <h3 className="mb-1 text-[15px] md:text-[20px] font-medium text-text-primary leading-tight" style={{ fontFamily: 'Playfair Display, serif' }}>{item.name}</h3>
+                    <span className="text-[13px] md:text-[16px] font-light text-gold tracking-widest" style={{ fontFamily: 'Inter, sans-serif' }}>₹{item.price}</span>
                   </div>
-                  <Link to="/menu" className="block w-full bg-gold text-bg-page py-3 md:py-4 text-center text-[10px] md:text-[12px] uppercase tracking-[2px] font-black hover:bg-gold-bright transition-all duration-300" style={{ fontFamily: 'Inter, sans-serif' }}>
+                  <Link to="/menu" className="block w-full border-t border-gold/10 py-3 md:py-4 text-center text-[9px] md:text-[12px] uppercase tracking-[3px] text-gold/80 hover:bg-gold hover:text-black transition-all duration-300" style={{ fontFamily: 'Inter, sans-serif' }}>
                     Add to Order
                   </Link>
                 </div>
