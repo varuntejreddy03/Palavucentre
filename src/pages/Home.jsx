@@ -21,13 +21,10 @@ export default function Home() {
           <img 
             src="/hero-bg.jpg" 
             alt="Rajamahendravaram Bridge" 
-            className="w-full h-full lg:w-[70%] object-cover object-left opacity-30 lg:opacity-60"
+            className="w-full h-full lg:w-[70%] object-cover object-left opacity-40 lg:opacity-60"
           />
           {/* Desktop Right Fade - Prevent image from going under video too clearly */}
           <div className="hidden lg:block absolute inset-y-0 left-[60%] right-0 bg-gradient-to-r from-transparent via-[#050100]/80 to-[#050100] z-[1]"></div>
-          
-          {/* Mobile Top Coverage - Prevent image from going behind video banner */}
-          <div className="absolute top-0 left-0 w-full h-[280px] bg-[#050100] lg:hidden z-[1]"></div>
           
           {/* Overlays for Readability */}
           <div className="absolute inset-0 z-10 mobile-overlay" style={{ background: 'linear-gradient(to right, rgba(5, 1, 0, 0.95) 0%, rgba(5, 1, 0, 0.7) 50%, rgba(5, 1, 0, 0.4) 100%)' }}></div>
