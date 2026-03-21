@@ -16,13 +16,8 @@ export default function Home() {
     <div className="animate-fadeIn">
       {/* Hero */}
       <section className="hero-section min-h-screen flex items-center pt-20 lg:pt-[70px] pb-12 lg:pb-0">
-        {/* Background Image with Overlay */}
+        {/* Background Overlay - NEW CINEMATIC GRADIENT */}
         <div className="absolute inset-0 z-0">
-          <img 
-            src="/hero-bg.png" 
-            alt="Palavu Centre Background" 
-            className="w-full h-full object-cover"
-          />
           {/* Overlays for Readability - NEW CINEMATIC GRADIENT */}
           <div className="absolute inset-0 z-10 mobile-overlay" style={{ background: 'linear-gradient(to right, rgba(5, 1, 0, 0.82) 0%, rgba(5, 1, 0, 0.45) 50%, rgba(5, 1, 0, 0.15) 100%)' }}></div>
           <div className="absolute inset-0 bg-gradient-to-t from-[#050100] via-transparent to-transparent lg:hidden z-10"></div>
