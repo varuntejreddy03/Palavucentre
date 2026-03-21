@@ -14,158 +14,169 @@ export default function Home() {
 
   return (
     <div className="animate-fadeIn">
-      {/* Hero */}
-      <section className="hero-section min-h-screen flex items-center pt-20 lg:pt-[70px] pb-12 lg:pb-0 relative overflow-hidden">
-        {/* Background Image & Overlay */}
-        <div className="absolute inset-0 z-0">
-          <img 
-            src="/hero-bg.jpg" 
-            alt="Rajamahendravaram Bridge" 
-            className="w-full h-full lg:w-[70%] object-cover object-left opacity-40 lg:opacity-60"
-          />
-          {/* Desktop Right Fade - Prevent image from going under video too clearly */}
-          <div className="hidden lg:block absolute inset-y-0 left-[60%] right-0 bg-gradient-to-r from-transparent via-[#050100]/80 to-[#050100] z-[1]"></div>
+      {/* Combined Hero & Quick Nav with Shared Background Path */}
+      <div className="relative overflow-hidden">
+        {/* Universal Background Layer */}
+        <div className="absolute inset-0 z-0 pointer-events-none">
+          {/* Base Color Fill */}
+          <div className="absolute inset-0 bg-[#050100]"></div>
           
-          {/* Overlays for Readability */}
-          <div className="absolute inset-0 z-10 mobile-overlay" style={{ background: 'linear-gradient(to right, rgba(5, 1, 0, 0.95) 0%, rgba(5, 1, 0, 0.7) 50%, rgba(5, 1, 0, 0.4) 100%)' }}></div>
-          <div className="absolute inset-0 bg-gradient-to-t from-[#050100] via-transparent to-transparent lg:hidden z-20"></div>
-        </div>
-
-        <div className="max-w-7xl mx-auto w-full relative z-20">
-          <div className="flex hero-layout items-center">
+          {/* The Bridge Image - Starts below video on mobile, covers side on desktop */}
+          <div 
+            className="absolute inset-x-0 bottom-0 top-[280px] lg:top-0 transition-all duration-700"
+            style={{ zIndex: 1 }}
+          >
+            <img 
+              src="/hero-bg.jpg" 
+              alt="Rajamahendravaram Bridge" 
+              className="w-full h-full lg:w-[70%] object-cover object-left opacity-40 lg:opacity-60"
+            />
+            {/* Desktop Right Fade */}
+            <div className="hidden lg:block absolute inset-y-0 left-[60%] right-0 bg-gradient-to-r from-transparent via-[#050100]/80 to-[#050100] z-[1]"></div>
             
-            {/* Left Content Column */}
-            <div className="hero-left lg:w-[62%] lg:pl-[60px] flex flex-col items-center lg:items-start text-center lg:text-left">
-              <div className="mb-4 flex items-center gap-4" style={{ animation: 'fadeInUp 0.6s ease-out 0.2s both' }}>
-                <div className="w-1 px-[1px] h-6 bg-[#E8C84A]"></div>
-                <span className="inline-block text-[13px] md:text-[14px] uppercase tracking-[6px] text-[#E8C84A]" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 700 }}>AUTHENTIC GODAVARI CUISINE</span>
-              </div>
-
-              <h1 className="mb-4 brand-logo-hero hero-headline" style={{ animation: 'fadeInUp 0.8s ease-out both' }}>
-                <span className="block">RAJAMAHENDRAVARAM</span>
-                <span className="block">PALAVUCENTRE</span>
-              </h1>
-
-              <p className="text-[20px] md:text-[26px] mb-3 font-serif italic text-[#F5ECD7] px-4 lg:px-0" style={{ animation: 'fadeInUp 0.6s ease-out 0.4s both', textShadow: '0 2px 8px rgba(0,0,0,0.6)' }}>Experience Konaseema in Hyderabad</p>
-
-              <p className="text-[15px] md:text-[17px] text-[rgba(245,236,215,0.85)] mb-8 max-w-[580px] lg:mx-0 mx-auto leading-[1.7] px-4 lg:px-0" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 300, animation: 'fadeInUp 0.6s ease-out 0.6s both' }}>
-                Authentic flavors, traditional recipes, unforgettable taste
-              </p>
-
-              <div className="w-full px-4 lg:px-0 flex flex-nowrap items-center justify-center lg:justify-start gap-3 sm:gap-5" style={{ animation: 'fadeInUp 0.6s ease-out 0.8s both' }}>
-                <Link
-                  to="/menu"
-                  className="shimmer-btn bg-gradient-to-br from-[#C9A84C] to-[#A07830] text-[#1A0500] flex-1 sm:flex-none px-6 sm:px-12 py-4 rounded-[50px] font-bold transition-all transform hover:scale-[1.04] hover:shadow-[0_10px_40px_rgba(201,168,76,0.4)] text-[13px] sm:text-[15px] uppercase tracking-widest text-center min-w-[130px]"
-                  style={{ fontFamily: 'Inter, sans-serif' }}
-                >
-                  Order Online
-                </Link>
-                <Link
-                  to="/contact"
-                  className="bg-white/5 hover:bg-[#C9A84C] backdrop-blur-md border-2 border-[#C9A84C] text-[#C9A84C] hover:text-[#1A0500] flex-1 sm:flex-none px-6 sm:px-12 py-4 rounded-[50px] font-bold transition-all text-[13px] sm:text-[15px] uppercase tracking-widest text-center min-w-[130px]"
-                  style={{ fontFamily: 'Inter, sans-serif' }}
-                >
-                  Contact Us
-                </Link>
-              </div>
-
-              {/* Stats Bar */}
-              <div className="mt-10 lg:mt-12 flex flex-wrap justify-center lg:justify-start gap-8 md:gap-12 w-full px-4 lg:px-0" style={{ animation: 'fadeInUp 0.6s ease-out 1s both' }}>
-                <div className="flex flex-col">
-                  <span className="text-2xl md:text-3xl font-bold text-[#E8C84A]">10K+</span>
-                  <span className="text-[11px] uppercase tracking-[2px] text-white/60 font-medium">Customers</span>
-                </div>
-                <div className="w-[1px] h-10 bg-white/10 hidden sm:block"></div>
-                <div className="flex flex-col">
-                  <span className="text-2xl md:text-3xl font-bold text-[#E8C84A]">50+</span>
-                  <span className="text-[11px] uppercase tracking-[2px] text-white/60 font-medium">Dishes</span>
-                </div>
-                <div className="w-[1px] h-10 bg-white/10 hidden sm:block"></div>
-                <div className="flex flex-col">
-                  <span className="text-2xl md:text-3xl font-bold text-[#E8C84A]">4.8</span>
-                  <span className="text-[11px] uppercase tracking-[2px] text-white/60 font-medium">Rating</span>
-                </div>
-                <div className="w-[1px] h-10 bg-white/10 hidden sm:block"></div>
-                <div className="flex flex-col">
-                  <span className="text-2xl md:text-3xl font-bold text-[#E8C84A]">100%</span>
-                  <span className="text-[11px] uppercase tracking-[2px] text-white/60 font-medium">Quality</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Right Column Layout */}
-            <div className="hidden lg:flex lg:w-[38%] relative justify-end">
-              <div className="hero-right-card relative group ml-auto" style={{ animation: 'fadeInRight 0.8s ease-out 0.5s both' }}>
-                {/* Refined Decorative Frame - Subtler glow */}
-                <div className="absolute -inset-10 bg-gold/10 blur-3xl rounded-full opacity-40 group-hover:opacity-70 transition-opacity duration-1000"></div>
-                
-                <div className="relative rounded-[32px] overflow-hidden border-2 border-gold/40 shadow-[0_30px_70px_rgba(0,0,0,0.9)] bg-black">
-                  <video
-                    autoPlay
-                    loop
-                    muted
-                    playsInline
-                    className="w-full aspect-[4/5] object-cover"
-                  >
-                    <source src="/Video-797.mp4" type="video/mp4" />
-                  </video>
-                  {/* Subtle video overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent"></div>
-                  
-                  {/* Premium Franchise Badge - Top Right */}
-                  <div className="franchise-badge absolute top-4 right-4 z-10">
-                    <div className="bg-gradient-to-br from-[#FFD700] to-[#B8860B] text-black px-5 py-2 rounded-full text-[10px] font-black tracking-[2px] uppercase shadow-2xl border border-white/20">
-                      Franchise Open
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Mobile Video Banner - ONLY VISIBLE ON MOBILE */}
-            <div className="lg:hidden w-full hero-right-card relative order-1">
-              <div className="relative h-[280px] w-full overflow-hidden">
-                <video
-                    autoPlay
-                    loop
-                    muted
-                    playsInline
-                    className="w-full h-full object-cover"
-                  >
-                    <source src="/Video-797.mp4" type="video/mp4" />
-                  </video>
-                  <div className="absolute inset-0 bg-black/40"></div>
-                  <div className="franchise-badge absolute top-3 right-3 z-10">
-                    <div className="bg-[#B8860B] text-white px-3 py-1 rounded-full text-[12px] font-bold tracking-[2px] uppercase shadow-xl">
-                      Franchise Open
-                    </div>
-                  </div>
-              </div>
-            </div>
-
+            {/* Soft Content Overlays */}
+            <div className="absolute inset-0 z-10 mobile-overlay" style={{ background: 'linear-gradient(to right, rgba(5, 1, 0, 0.95) 0%, rgba(5, 1, 0, 0.7) 50%, rgba(5, 1, 0, 0.4) 100%)' }}></div>
+            <div className="absolute inset-0 bg-gradient-to-t from-[#050100] via-transparent to-transparent lg:hidden z-20"></div>
           </div>
         </div>
-      </section>
 
+        {/* Hero Section */}
+        <section className="hero-section min-h-screen flex items-center pt-20 lg:pt-[70px] pb-12 lg:pb-0 relative z-10">
+          <div className="max-w-7xl mx-auto w-full relative">
+            <div className="flex hero-layout items-center">
+              
+              {/* Left Content Column */}
+              <div className="hero-left lg:w-[62%] lg:pl-[60px] flex flex-col items-center lg:items-start text-center lg:text-left">
+                <div className="mb-4 flex items-center gap-4" style={{ animation: 'fadeInUp 0.6s ease-out 0.2s both' }}>
+                  <div className="w-1 px-[1px] h-6 bg-[#E8C84A]"></div>
+                  <span className="inline-block text-[13px] md:text-[14px] uppercase tracking-[6px] text-[#E8C84A]" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 700 }}>AUTHENTIC GODAVARI CUISINE</span>
+                </div>
 
-      {/* Quick Nav */}
-      <section className="py-4 md:py-6 px-4 bg-bg-section border-t border-b border-gold/20 shadow-inner" style={{ background: 'rgba(30,5,5,0.8)' }}>
-        <div className="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-          {[
-            { icon: UtensilsCrossed, label: 'Our Menu', path: '/menu' },
-            { icon: PartyPopper, label: 'Catering', path: '/catering' },
-            { icon: Camera, label: 'Gallery', path: '/gallery' },
-            { icon: Store, label: 'Franchise', path: '/franchise' },
-          ].map((item, idx) => (
-            <Link key={idx} to={item.path} className="flex flex-col items-center text-center group cursor-pointer transition-all duration-300 hover:-translate-y-1.5">
-              <div className="w-14 h-14 rounded-full border-[1.5px] border-gold/30 bg-[rgba(212,168,83,0.08)] flex items-center justify-center mb-3 group-hover:bg-[rgba(201,168,76,0.15)] group-hover:border-gold group-hover:shadow-[0_0_20px_rgba(201,168,76,0.35)] transition-all duration-300">
-                <item.icon className="w-6 h-6 text-gold" />
+                <h1 className="mb-4 brand-logo-hero hero-headline" style={{ animation: 'fadeInUp 0.8s ease-out both' }}>
+                  <span className="block">RAJAMAHENDRAVARAM</span>
+                  <span className="block">PALAVUCENTRE</span>
+                </h1>
+
+                <p className="text-[20px] md:text-[26px] mb-3 font-serif italic text-[#F5ECD7] px-4 lg:px-0" style={{ animation: 'fadeInUp 0.6s ease-out 0.4s both', textShadow: '0 2px 8px rgba(0,0,0,0.6)' }}>Experience Konaseema in Hyderabad</p>
+
+                <p className="text-[15px] md:text-[17px] text-[rgba(245,236,215,0.85)] mb-8 max-w-[580px] lg:mx-0 mx-auto leading-[1.7] px-4 lg:px-0" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 300, animation: 'fadeInUp 0.6s ease-out 0.6s both' }}>
+                  Authentic flavors, traditional recipes, unforgettable taste
+                </p>
+
+                <div className="w-full px-4 lg:px-0 flex flex-nowrap items-center justify-center lg:justify-start gap-3 sm:gap-5" style={{ animation: 'fadeInUp 0.6s ease-out 0.8s both' }}>
+                  <Link
+                    to="/menu"
+                    className="shimmer-btn bg-gradient-to-br from-[#C9A84C] to-[#A07830] text-[#1A0500] flex-1 sm:flex-none px-6 sm:px-12 py-4 rounded-[50px] font-bold transition-all transform hover:scale-[1.04] hover:shadow-[0_10px_40px_rgba(201,168,76,0.4)] text-[13px] sm:text-[15px] uppercase tracking-widest text-center min-w-[130px]"
+                    style={{ fontFamily: 'Inter, sans-serif' }}
+                  >
+                    Order Online
+                  </Link>
+                  <Link
+                    to="/contact"
+                    className="bg-white/5 hover:bg-[#C9A84C] backdrop-blur-md border-2 border-[#C9A84C] text-[#C9A84C] hover:text-[#1A0500] flex-1 sm:flex-none px-6 sm:px-12 py-4 rounded-[50px] font-bold transition-all text-[13px] sm:text-[15px] uppercase tracking-widest text-center min-w-[130px]"
+                    style={{ fontFamily: 'Inter, sans-serif' }}
+                  >
+                    Contact Us
+                  </Link>
+                </div>
+
+                {/* Stats Bar */}
+                <div className="mt-10 lg:mt-12 flex flex-wrap justify-center lg:justify-start gap-8 md:gap-12 w-full px-4 lg:px-0" style={{ animation: 'fadeInUp 0.6s ease-out 1s both' }}>
+                  <div className="flex flex-col">
+                    <span className="text-2xl md:text-3xl font-bold text-[#E8C84A]">10K+</span>
+                    <span className="text-[11px] uppercase tracking-[2px] text-white/60 font-medium">Customers</span>
+                  </div>
+                  <div className="w-[1px] h-10 bg-white/10 hidden sm:block"></div>
+                  <div className="flex flex-col">
+                    <span className="text-2xl md:text-3xl font-bold text-[#E8C84A]">50+</span>
+                    <span className="text-[11px] uppercase tracking-[2px] text-white/60 font-medium">Dishes</span>
+                  </div>
+                  <div className="w-[1px] h-10 bg-white/10 hidden sm:block"></div>
+                  <div className="flex flex-col">
+                    <span className="text-2xl md:text-3xl font-bold text-[#E8C84A]">4.8</span>
+                    <span className="text-[11px] uppercase tracking-[2px] text-white/60 font-medium">Rating</span>
+                  </div>
+                  <div className="w-[1px] h-10 bg-white/10 hidden sm:block"></div>
+                  <div className="flex flex-col">
+                    <span className="text-2xl md:text-3xl font-bold text-[#E8C84A]">100%</span>
+                    <span className="text-[11px] uppercase tracking-[2px] text-white/60 font-medium">Quality</span>
+                  </div>
+                </div>
               </div>
-              <span className="text-[11px] uppercase tracking-[3px] text-text-secondary group-hover:text-gold transition-colors duration-300" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 500 }}>{item.label}</span>
-            </Link>
-          ))}
-        </div>
-      </section>
+
+              {/* Right Column Layout */}
+              <div className="hidden lg:flex lg:w-[38%] relative justify-end">
+                <div className="hero-right-card relative group ml-auto" style={{ animation: 'fadeInRight 0.8s ease-out 0.5s both' }}>
+                  {/* Refined Decorative Frame - Subtler glow */}
+                  <div className="absolute -inset-10 bg-gold/10 blur-3xl rounded-full opacity-40 group-hover:opacity-70 transition-opacity duration-1000"></div>
+                  
+                  <div className="relative rounded-[32px] overflow-hidden border-2 border-gold/40 shadow-[0_30px_70px_rgba(0,0,0,0.9)] bg-black">
+                    <video
+                      autoPlay
+                      loop
+                      muted
+                      playsInline
+                      className="w-full aspect-[4/5] object-cover"
+                    >
+                      <source src="/Video-797.mp4" type="video/mp4" />
+                    </video>
+                    {/* Subtle video overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent"></div>
+                    
+                    {/* Premium Franchise Badge - Top Right */}
+                    <div className="franchise-badge absolute top-4 right-4 z-10">
+                      <div className="bg-gradient-to-br from-[#FFD700] to-[#B8860B] text-black px-5 py-2 rounded-full text-[10px] font-black tracking-[2px] uppercase shadow-2xl border border-white/20">
+                        Franchise Open
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Mobile Video Banner - ONLY VISIBLE ON MOBILE */}
+              <div className="lg:hidden w-full hero-right-card relative order-1">
+                <div className="relative h-[280px] w-full overflow-hidden">
+                  <video
+                      autoPlay
+                      loop
+                      muted
+                      playsInline
+                      className="w-full h-full object-cover"
+                    >
+                      <source src="/Video-797.mp4" type="video/mp4" />
+                    </video>
+                    <div className="absolute inset-0 bg-black/40"></div>
+                    <div className="franchise-badge absolute top-3 right-3 z-10">
+                      <div className="bg-[#B8860B] text-white px-3 py-1 rounded-full text-[12px] font-bold tracking-[2px] uppercase shadow-xl">
+                        Franchise Open
+                      </div>
+                    </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </section>
+
+        {/* Quick Nav - Now sharing the background */}
+        <section className="py-4 md:py-6 px-4 bg-transparent border-t border-b border-gold/20 relative z-10">
+          <div className="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+            {[
+              { icon: UtensilsCrossed, label: 'Our Menu', path: '/menu' },
+              { icon: PartyPopper, label: 'Catering', path: '/catering' },
+              { icon: Camera, label: 'Gallery', path: '/gallery' },
+              { icon: Store, label: 'Franchise', path: '/franchise' },
+            ].map((item, idx) => (
+              <Link key={idx} to={item.path} className="flex flex-col items-center text-center group cursor-pointer transition-all duration-300 hover:-translate-y-1.5">
+                <div className="w-14 h-14 rounded-full border-[1.5px] border-gold/30 bg-[rgba(212,168,83,0.08)] flex items-center justify-center mb-3 group-hover:bg-[rgba(201,168,76,0.15)] group-hover:border-gold group-hover:shadow-[0_0_20px_rgba(201,168,76,0.35)] transition-all duration-300">
+                  <item.icon className="w-6 h-6 text-gold" />
+                </div>
+                <span className="text-[11px] uppercase tracking-[3px] text-text-secondary group-hover:text-gold transition-colors duration-300" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 500 }}>{item.label}</span>
+              </Link>
+            ))}
+          </div>
+        </section>
+      </div>
 
       {/* Why Choose Us */}
       <section className="py-12 md:py-16 px-4 bg-bg-even">
