@@ -15,12 +15,23 @@ export default function Home() {
   return (
     <div className="animate-fadeIn">
       {/* Hero */}
-      <section className="hero-section min-h-screen flex items-center pt-20 lg:pt-[70px] pb-12 lg:pb-0">
-        {/* Background Overlay - NEW CINEMATIC GRADIENT */}
+      <section className="hero-section min-h-screen flex items-center pt-20 lg:pt-[70px] pb-12 lg:pb-0 relative overflow-hidden">
+        {/* Background Image & Overlay */}
         <div className="absolute inset-0 z-0">
-          {/* Overlays for Readability - NEW CINEMATIC GRADIENT */}
-          <div className="absolute inset-0 z-10 mobile-overlay" style={{ background: 'linear-gradient(to right, rgba(5, 1, 0, 0.82) 0%, rgba(5, 1, 0, 0.45) 50%, rgba(5, 1, 0, 0.15) 100%)' }}></div>
-          <div className="absolute inset-0 bg-gradient-to-t from-[#050100] via-transparent to-transparent lg:hidden z-10"></div>
+          <img 
+            src="/hero-bg.jpg" 
+            alt="Rajamahendravaram Bridge" 
+            className="w-full h-full lg:w-[70%] object-cover object-left opacity-30 lg:opacity-60"
+          />
+          {/* Desktop Right Fade - Prevent image from going under video too clearly */}
+          <div className="hidden lg:block absolute inset-y-0 left-[60%] right-0 bg-gradient-to-r from-transparent via-[#050100]/80 to-[#050100] z-[1]"></div>
+          
+          {/* Mobile Top Coverage - Prevent image from going behind video banner */}
+          <div className="absolute top-0 left-0 w-full h-[280px] bg-[#050100] lg:hidden z-[1]"></div>
+          
+          {/* Overlays for Readability */}
+          <div className="absolute inset-0 z-10 mobile-overlay" style={{ background: 'linear-gradient(to right, rgba(5, 1, 0, 0.95) 0%, rgba(5, 1, 0, 0.7) 50%, rgba(5, 1, 0, 0.4) 100%)' }}></div>
+          <div className="absolute inset-0 bg-gradient-to-t from-[#050100] via-transparent to-transparent lg:hidden z-20"></div>
         </div>
 
         <div className="max-w-7xl mx-auto w-full relative z-20">
