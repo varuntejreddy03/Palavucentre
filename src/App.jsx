@@ -9,6 +9,7 @@ import GalleryPage from './pages/GalleryPage'
 import CateringPage from './pages/CateringPage'
 import FranchisePage from './pages/FranchisePage'
 import ContactPage from './pages/ContactPage'
+import StoryPage from './pages/StoryPage'
 import AdminLogin from './pages/admin/AdminLogin'
 import AdminDashboard from './pages/admin/AdminDashboard'
 import CartDrawer from './components/CartDrawer'
@@ -30,6 +31,7 @@ function AppContent() {
           <Route path="/catering" element={<CateringPage />} />
           <Route path="/franchise" element={<FranchisePage />} />
           <Route path="/contact" element={<ContactPage />} />
+          <Route path="/story" element={<StoryPage />} />
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
         </Routes>

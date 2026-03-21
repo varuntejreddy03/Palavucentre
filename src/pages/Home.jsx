@@ -20,22 +20,22 @@ export default function Home() {
         <div className="absolute inset-0 z-0 pointer-events-none">
           {/* Base Color Fill */}
           <div className="absolute inset-0 bg-[#050100]"></div>
-          
-          {/* The Bridge Image - Starts below video on mobile, covers side on desktop */}
-          <div 
-            className="absolute inset-x-0 bottom-0 top-[280px] lg:top-0 transition-all duration-700"
+
+          {/* The Bridge Image - Top behind content on mobile, full side on desktop */}
+          <div
+            className="absolute inset-x-0 top-25 bottom-[280px] lg:bottom-0 lg:top-0 transition-all duration-700 overflow-hidden"
             style={{ zIndex: 1 }}
           >
-            <img 
-              src="/hero-bg.jpg" 
-              alt="Rajamahendravaram Bridge" 
-              className="w-full h-full lg:w-[70%] object-cover object-left opacity-40 lg:opacity-60"
+            <img
+              src="/hero-bg.jpg"
+              alt="Rajamahendravaram Bridge"
+              className="w-full h-full lg:w-[70%] object-contain lg:object-cover object-top lg:object-center opacity-70 lg:opacity-60"
             />
             {/* Desktop Right Fade */}
             <div className="hidden lg:block absolute inset-y-0 left-[60%] right-0 bg-gradient-to-r from-transparent via-[#050100]/80 to-[#050100] z-[1]"></div>
-            
+
             {/* Soft Content Overlays */}
-            <div className="absolute inset-0 z-10 mobile-overlay" style={{ background: 'linear-gradient(to right, rgba(5, 1, 0, 0.95) 0%, rgba(5, 1, 0, 0.7) 50%, rgba(5, 1, 0, 0.4) 100%)' }}></div>
+            <div className="absolute inset-0 z-10 mobile-overlay" style={{ background: 'linear-gradient(to bottom, rgba(5, 1, 0, 0.4) 0%, rgba(5, 1, 0, 1) 100%), linear-gradient(to right, rgba(5, 1, 0, 0.9) 0%, rgba(5, 1, 0, 0.4) 100%)' }}></div>
             <div className="absolute inset-0 bg-gradient-to-t from-[#050100] via-transparent to-transparent lg:hidden z-20"></div>
           </div>
         </div>
@@ -44,18 +44,18 @@ export default function Home() {
         <section className="hero-section min-h-screen flex items-center pt-20 lg:pt-[70px] pb-12 lg:pb-0 relative z-10">
           <div className="max-w-7xl mx-auto w-full relative">
             <div className="flex hero-layout items-center">
-              
+
               {/* Left Content Column */}
               <div className="hero-left lg:w-[62%] lg:pl-[60px] flex flex-col items-center lg:items-start text-center lg:text-left">
-                <div className="mb-4 flex items-center gap-4" style={{ animation: 'fadeInUp 0.6s ease-out 0.2s both' }}>
-                  <div className="w-1 px-[1px] h-6 bg-[#E8C84A]"></div>
-                  <span className="inline-block text-[13px] md:text-[14px] uppercase tracking-[6px] text-[#E8C84A]" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 700 }}>AUTHENTIC GODAVARI CUISINE</span>
-                </div>
-
                 <h1 className="mb-4 brand-logo-hero hero-headline" style={{ animation: 'fadeInUp 0.8s ease-out both' }}>
                   <span className="block">RAJAMAHENDRAVARAM</span>
                   <span className="block">PALAVUCENTRE</span>
                 </h1>
+
+                <div className="mb-6 flex items-center gap-4" style={{ animation: 'fadeInUp 0.6s ease-out 0.2s both' }}>
+                  <div className="w-1 px-[1px] h-6 bg-[#E8C84A]"></div>
+                  <span className="inline-block text-[13px] md:text-[14px] uppercase tracking-[6px] text-[#E8C84A]" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 700 }}>AUTHENTIC GODAVARI CUISINE</span>
+                </div>
 
                 <p className="text-[20px] md:text-[26px] mb-3 font-serif italic text-[#F5ECD7] px-4 lg:px-0" style={{ animation: 'fadeInUp 0.6s ease-out 0.4s both', textShadow: '0 2px 8px rgba(0,0,0,0.6)' }}>Experience Konaseema in Hyderabad</p>
 
@@ -109,7 +109,7 @@ export default function Home() {
                 <div className="hero-right-card relative group ml-auto" style={{ animation: 'fadeInRight 0.8s ease-out 0.5s both' }}>
                   {/* Refined Decorative Frame - Subtler glow */}
                   <div className="absolute -inset-10 bg-gold/10 blur-3xl rounded-full opacity-40 group-hover:opacity-70 transition-opacity duration-1000"></div>
-                  
+
                   <div className="relative rounded-[32px] overflow-hidden border-2 border-gold/40 shadow-[0_30px_70px_rgba(0,0,0,0.9)] bg-black">
                     <video
                       autoPlay
@@ -122,7 +122,7 @@ export default function Home() {
                     </video>
                     {/* Subtle video overlay */}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent"></div>
-                    
+
                     {/* Premium Franchise Badge - Top Right */}
                     <div className="franchise-badge absolute top-4 right-4 z-10">
                       <div className="bg-gradient-to-br from-[#FFD700] to-[#B8860B] text-black px-5 py-2 rounded-full text-[10px] font-black tracking-[2px] uppercase shadow-2xl border border-white/20">
@@ -137,20 +137,20 @@ export default function Home() {
               <div className="lg:hidden w-full hero-right-card relative order-1">
                 <div className="relative h-[280px] w-full overflow-hidden">
                   <video
-                      autoPlay
-                      loop
-                      muted
-                      playsInline
-                      className="w-full h-full object-cover"
-                    >
-                      <source src="/Video-797.mp4" type="video/mp4" />
-                    </video>
-                    <div className="absolute inset-0 bg-black/40"></div>
-                    <div className="franchise-badge absolute top-3 right-3 z-10">
-                      <div className="bg-[#B8860B] text-white px-3 py-1 rounded-full text-[12px] font-bold tracking-[2px] uppercase shadow-xl">
-                        Franchise Open
-                      </div>
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    className="w-full h-full object-cover"
+                  >
+                    <source src="/Video-797.mp4" type="video/mp4" />
+                  </video>
+                  <div className="absolute inset-0 bg-black/40"></div>
+                  <div className="franchise-badge absolute top-3 right-3 z-10">
+                    <div className="bg-[#B8860B] text-white px-3 py-1 rounded-full text-[12px] font-bold tracking-[2px] uppercase shadow-xl">
+                      Franchise Open
                     </div>
+                  </div>
                 </div>
               </div>
 
@@ -178,6 +178,47 @@ export default function Home() {
         </section>
       </div>
 
+      {/* Best Sellers */}
+      <section className="py-12 md:py-16 px-4 bg-black/10 backdrop-blur-sm">
+        <div className="max-w-7xl mx-auto">
+          <h2 className="text-center section-title-treatment">Best Sellers</h2>
+          <p className="tagline text-center max-w-xl mx-auto">Our most loved dishes crafted with passion</p>
+
+          <div className="mt-10">
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-8 px-2 md:px-0">
+              {featured.map(item => (
+                <div key={item.id} className="bg-bg-card gold-border rounded-xl overflow-hidden shadow-2xl transition-all duration-500 group flex flex-col">
+                  <div className="relative aspect-[4/3] overflow-hidden">
+                    <img src={item.img} alt={item.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                    <div className="absolute inset-0 bg-gradient-to-bottom from-transparent via-transparent to-[rgba(26,5,5,0.95)]" style={{ background: 'linear-gradient(to bottom, transparent 40%, rgba(26,5,5,0.95) 100%)' }}></div>
+                    <div style={{ position: 'absolute', top: '8px', right: '8px', width: '10px', height: '10px', borderRadius: '50%', backgroundColor: item.veg ? '#3D9970' : '#C0392B', border: '1.5px solid white', zIndex: 10 }}></div>
+                    {item.name === 'Natu Kodi Biryani' && (
+                      <div className="absolute top-2 left-2 bg-gold text-bg-page px-1.5 py-0.5 rounded-full text-[7px] md:text-[9px] uppercase tracking-[1px] font-black" style={{ fontFamily: 'Inter, sans-serif' }}>Bestseller</div>
+                    )}
+                  </div>
+                  <div className="px-3 md:px-5 pt-3 md:pt-4 pb-3 md:pb-4 flex-grow">
+                    <h3 className="mb-1 md:mb-2 text-[16px] md:text-[20px] text-text-primary leading-tight font-bold" style={{ fontFamily: 'Cormorant Garamond, serif' }}>{item.name}</h3>
+                    <div className="flex items-center gap-2 mb-1 md:mb-2">
+                      <span className="text-[14px] md:text-[18px] font-black text-gold" style={{ fontFamily: 'Inter, sans-serif' }}>₹{item.price}</span>
+                    </div>
+                    <p className="hidden md:block text-[13px] text-text-dim/80 line-clamp-2 leading-relaxed">{item.desc}</p>
+                  </div>
+                  <Link to="/menu" className="block w-full bg-gold text-bg-page py-3 md:py-4 text-center text-[10px] md:text-[12px] uppercase tracking-[2px] font-black hover:bg-gold-bright transition-all duration-300" style={{ fontFamily: 'Inter, sans-serif' }}>
+                    Add to Order
+                  </Link>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="text-center mt-12">
+            <Link to="/menu" className="inline-block border-2 border-gold text-gold px-12 py-4 rounded-full text-[13px] uppercase tracking-[2px] font-semibold hover:bg-gold hover:text-bg-page transition-all duration-200" style={{ fontFamily: 'Inter, sans-serif' }}>
+              More
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* Why Choose Us */}
       <section className="py-12 md:py-16 px-4 bg-bg-even">
         <div className="max-w-7xl mx-auto">
@@ -203,48 +244,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Best Sellers */}
-      <section className="py-12 md:py-16 px-4 bg-black/10 backdrop-blur-sm">
-        <div className="max-w-7xl mx-auto">
-          <h2 className="text-center section-title-treatment">Best Sellers</h2>
-          <p className="tagline text-center max-w-xl mx-auto">Our most loved dishes crafted with passion</p>
-
-          <div className="mt-10 overflow-x-auto md:overflow-visible scrollbar-hide">
-            <div className="flex md:grid md:grid-cols-3 gap-4 md:gap-8 pb-4 md:pb-0 px-4 md:px-0" style={{ scrollSnapType: 'x mandatory' }}>
-              {featured.map(item => (
-                <div key={item.id} className="bg-bg-card gold-border rounded-xl overflow-hidden shadow-2xl transition-all duration-500 group min-w-[260px] max-w-[260px] md:min-w-0 md:max-w-none flex-shrink-0 flex flex-col" style={{ scrollSnapAlign: 'start' }}>
-                  <div className="relative aspect-[4/3] overflow-hidden">
-                    <img src={item.img} alt={item.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
-                    <div className="absolute inset-0 bg-gradient-to-bottom from-transparent via-transparent to-[rgba(26,5,5,0.95)]" style={{ background: 'linear-gradient(to bottom, transparent 40%, rgba(26,5,5,0.95) 100%)' }}></div>
-                    <div style={{ position: 'absolute', top: '10px', right: '10px', width: '12px', height: '12px', borderRadius: '50%', backgroundColor: item.veg ? '#3D9970' : '#C0392B', border: '2px solid white', zIndex: 10 }}></div>
-                    {item.name === 'Natu Kodi Biryani' && (
-                      <div className="absolute top-3 left-3 bg-gold text-bg-page px-2 py-0.5 rounded-full text-[9px] uppercase tracking-[1.5px] font-black" style={{ fontFamily: 'Inter, sans-serif' }}>Bestseller</div>
-                    )}
-                  </div>
-                  <div className="px-5 pt-4 pb-4 flex-grow">
-                    <h3 className="mb-2 text-[20px] text-text-primary leading-tight font-bold" style={{ fontFamily: 'Cormorant Garamond, serif' }}>{item.name}</h3>
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className="text-[18px] font-black text-gold" style={{ fontFamily: 'Inter, sans-serif' }}>₹{item.price}</span>
-                    </div>
-                    <p className="text-[13px] text-text-dim/80 line-clamp-2 leading-relaxed">{item.desc}</p>
-                  </div>
-                  <Link to="/menu" className="block w-full bg-gold text-bg-page py-4 text-center text-[12px] uppercase tracking-[3px] font-black hover:bg-gold-bright transition-all duration-300" style={{ fontFamily: 'Inter, sans-serif' }}>
-                    Add to Order
-                  </Link>
-                </div>
-              ))}
-            </div>
-          </div>
-          <p className="text-center text-[11px] text-text-dim mt-4 md:hidden" style={{ fontFamily: 'Inter, sans-serif' }}>← Swipe to see more →</p>
-
-          <div className="text-center mt-12">
-            <Link to="/menu" className="inline-block border-2 border-gold text-gold px-12 py-4 rounded-full text-[13px] uppercase tracking-[2px] font-semibold hover:bg-gold hover:text-bg-page transition-all duration-200" style={{ fontFamily: 'Inter, sans-serif' }}>
-              Order Now
-            </Link>
-          </div>
-        </div>
-      </section>
-
       {/* CTA Banner */}
       <section className="py-12 md:py-16 px-4 relative overflow-hidden bg-bg-even gold-texture" style={{ background: 'linear-gradient(135deg, #2D0808, #1A0505)' }}>
         <div className="max-w-4xl mx-auto text-center relative z-10">
@@ -253,8 +252,8 @@ export default function Home() {
             Experience Konaseema in Hyderabad
           </h2>
           <p className="tagline text-[22px] mb-8 font-bold" style={{ color: '#F0C060' }}>Authentic flavors, traditional recipes, unforgettable taste</p>
-          <Link to="/menu" className="inline-block border-2 border-gold bg-transparent text-gold px-12 py-4 text-[13px] uppercase tracking-[3px] font-black hover:bg-gold hover:text-bg-page transition-all duration-300" style={{ fontFamily: 'Inter, sans-serif', borderRadius: '0px' }}>
-            Start Your Order
+          <Link to="/story" className="inline-block border-2 border-gold bg-transparent text-gold px-12 py-4 text-[13px] uppercase tracking-[3px] font-black hover:bg-gold hover:text-bg-page transition-all duration-300" style={{ fontFamily: 'Inter, sans-serif', borderRadius: '0px' }}>
+            Our Story
           </Link>
         </div>
       </section>

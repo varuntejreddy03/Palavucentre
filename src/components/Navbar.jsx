@@ -27,7 +27,7 @@ export default function Navbar() {
         <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16 md:h-[70px]">
             <Link to="/" className="flex-shrink-0 flex flex-col justify-center max-w-[60%] sm:max-w-none">
-              <span className="brand-logo-text" style={{ fontSize: 'clamp(10px, 3.5vw, 24px)', lineHeight: '1', whiteSpace: 'nowrap' }}>RAJAMAHENDRAVARAM PALAVUCENTRE</span>
+              <span className="brand-logo-text" style={{ fontSize: 'clamp(10px, 3.2vw, 20px)', lineHeight: '1', whiteSpace: 'nowrap' }}>RAJAMAHENDRAVARAM PALAVUCENTRE</span>
               <span className="text-[#FFFBEB]/90 italic mt-0.5" style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '10px', lineHeight: '1' }}>Rooted in Konaseema</span>
             </Link>
 
