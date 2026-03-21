@@ -23,7 +23,7 @@ export default function Home() {
 
           {/* The Bridge Image - Top behind content on mobile, full side on desktop */}
           <div
-            className="absolute inset-x-0 top-25 bottom-[280px] lg:bottom-0 lg:top-0 transition-all duration-700 overflow-hidden"
+            className="absolute inset-x-0 top-16 bottom-[280px] lg:bottom-0 lg:top-0 transition-all duration-700 overflow-hidden"
             style={{ zIndex: 1 }}
           >
             <img
@@ -41,7 +41,7 @@ export default function Home() {
         </div>
 
         {/* Hero Section */}
-        <section className="hero-section min-h-screen flex items-center pt-20 lg:pt-[70px] pb-12 lg:pb-0 relative z-10">
+        <section className="hero-section min-h-screen flex items-center pt-16 lg:pt-[70px] pb-12 lg:pb-0 relative z-10">
           <div className="max-w-7xl mx-auto w-full relative">
             <div className="flex hero-layout items-center">
 
@@ -49,7 +49,7 @@ export default function Home() {
               <div className="hero-left lg:w-[62%] lg:pl-[60px] flex flex-col items-center lg:items-start text-center lg:text-left">
                 <h1 className="mb-4 brand-logo-hero hero-headline" style={{ animation: 'fadeInUp 0.8s ease-out both' }}>
                   <span className="block">RAJAMAHENDRAVARAM</span>
-                  <span className="block">PALAVUCENTRE</span>
+                  <span className="block">PALAVU CENTRE</span>
                 </h1>
 
                 <div className="mb-6 flex items-center gap-4" style={{ animation: 'fadeInUp 0.6s ease-out 0.2s both' }}>

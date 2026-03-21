@@ -61,6 +61,7 @@ h1 {
   font-style: normal;
   text-transform: uppercase;
   letter-spacing: -2px;
+  word-spacing: 4px;
   background: linear-gradient(
     to bottom,
     #F5D060 0%,
