@@ -172,14 +172,17 @@ npm run dev
 
 Server defaults to `http://localhost:4000`.
 
-## Default Admin Seed
+## Admin Seed Bootstrap
 
-If you do not override env values, seed uses:
+Admin credentials are database-backed. To bootstrap the first admin, set `ADMIN_EMAIL`
+and `ADMIN_PASSWORD` in `.env` and run:
 
-- Email: `admin@palavucentre.com`
-- Password: `ChangeMe@123`
+```bash
+npm run seed
+```
 
-Override these in `.env` before seeding for production.
+After the admin row is created in DB, login always validates against the stored
+`admins` table record.
 
 ## Razorpay Flow
 

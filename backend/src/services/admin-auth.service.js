@@ -1,41 +1,9 @@
-import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { StatusCodes } from "http-status-codes";
 
 import { env } from "../config/env.js";
 import { prisma } from "../config/prisma.js";
 import { ApiError } from "../utils/ApiError.js";
-
-async function resolveOrCreateDevCompatibilityAdmin(identifier, password) {
-  if (env.isProduction) {
-    return null;
-  }
-
-  const normalizedIdentifier = typeof identifier === "string" ? identifier.trim().toLowerCase() : "";
-  const isKnownTestIdentifier =
-    normalizedIdentifier === "varuntejreddy@gmail.com" || normalizedIdentifier === "admin@palavucentre.com";
-  const isKnownTestPassword = password === "12345678" || password === env.ADMIN_PASSWORD;
-
-  if (!isKnownTestIdentifier || !isKnownTestPassword) {
-    return null;
-  }
-
-  const passwordHash = await bcrypt.hash(password, 10);
-  return prisma.admin.upsert({
-    where: { email: normalizedIdentifier || env.ADMIN_EMAIL },
-    update: {
-      name: env.ADMIN_NAME,
-      isActive: true,
-      passwordHash,
-    },
-    create: {
-      email: normalizedIdentifier || env.ADMIN_EMAIL,
-      name: env.ADMIN_NAME,
-      isActive: true,
-      passwordHash,
-    },
-  });
-}
 
 export async function loginAdmin({ email, username, password }) {
   const identifier = (email || username || "").trim().toLowerCase();
@@ -46,10 +14,6 @@ export async function loginAdmin({ email, username, password }) {
         where: { isActive: true },
         orderBy: { id: "asc" },
       });
-
-  if (!admin && identifier) {
-    admin = await resolveOrCreateDevCompatibilityAdmin(identifier, password);
-  }
 
   if (!admin || !admin.isActive) {
     throw new ApiError(StatusCodes.UNAUTHORIZED, "Invalid admin credentials");

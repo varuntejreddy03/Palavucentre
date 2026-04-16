@@ -176,7 +176,8 @@ Request:
 
 ```json
 {
-  "password": "ChangeMe@123"
+  "email": "<admin-email-from-db>",
+  "password": "<admin-password>"
 }
 ```
 
@@ -189,8 +190,8 @@ Response:
     "data": {
       "admin": {
         "id": 1,
-        "email": "admin@palavucentre.com",
-        "name": "RajaMahendravaram PalavuCentre Admin"
+        "email": "<admin-email-from-db>",
+        "name": "<admin-name-from-db>"
       }
     }
   }

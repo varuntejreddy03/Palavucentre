@@ -124,20 +124,27 @@ function slugify(value) {
 }
 
 async function seedAdmin() {
-  const email = process.env.ADMIN_EMAIL || "admin@palavucentre.com";
-  const password = process.env.ADMIN_PASSWORD || "ChangeMe@123";
+  const email = process.env.ADMIN_EMAIL?.trim().toLowerCase();
+  const password = process.env.ADMIN_PASSWORD;
+
+  if (!email || !password) {
+    console.warn("Skipping admin seed: set ADMIN_EMAIL and ADMIN_PASSWORD to bootstrap an admin user.");
+    return;
+  }
+
+  const adminName = process.env.ADMIN_NAME?.trim() || email;
   const passwordHash = await bcrypt.hash(password, 10);
 
   await prisma.admin.upsert({
     where: { email },
     update: {
-      name: process.env.ADMIN_NAME || "RajaMahendravaram PalavuCentre Admin",
+      name: adminName,
       passwordHash,
       isActive: true,
     },
     create: {
       email,
-      name: process.env.ADMIN_NAME || "RajaMahendravaram PalavuCentre Admin",
+      name: adminName,
       passwordHash,
       isActive: true,
     },
