@@ -4,9 +4,19 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "concurrently -n user,backend -c cyan,yellow \"npm run dev:frontend\" \"npm run dev:backend\"",
+    "dev:frontend": "vite --port 5173 --strictPort",
+    "dev:admin": "vite --mode admin --port 5174 --strictPort",
+    "dev:all": "concurrently -n user,admin,backend -c cyan,magenta,yellow \"npm run dev:frontend\" \"npm run dev:admin\" \"npm run dev:backend\"",
+    "dev:backend": "npm run dev --prefix backend",
     "build": "vite build",
+    "build:admin": "vite build --mode admin",
     "lint": "eslint .",
+    "test": "vitest",
+    "test:run": "vitest run",
+    "test:backend": "vitest run backend/src/app.public-routes.test.js",
+    "test:ui": "vitest run src/components/CartDrawer.test.jsx src/pages/OrderPage.test.jsx src/pages/account/AuthPage.test.jsx",
+    "test:e2e": "npx playwright test",
     "preview": "vite preview"
   },
   "dependencies": {
@@ -16,18 +26,25 @@
     "react-router-dom": "^7.13.1"
   },
   "devDependencies": {
+    "@playwright/test": "^1.54.2",
     "@eslint/js": "^9.39.1",
     "@tailwindcss/postcss": "^4.2.1",
+    "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.1",
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^5.1.1",
     "autoprefixer": "^10.4.27",
+    "concurrently": "^9.2.1",
     "eslint": "^9.39.1",
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-refresh": "^0.4.24",
     "globals": "^16.5.0",
+    "jsdom": "^29.0.1",
     "postcss": "^8.5.8",
+    "supertest": "^7.2.2",
     "tailwindcss": "^4.2.1",
-    "vite": "^7.3.1"
+    "vite": "^7.3.1",
+    "vitest": "^4.1.2"
   }
 }
