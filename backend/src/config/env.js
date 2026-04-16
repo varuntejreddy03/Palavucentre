@@ -39,6 +39,7 @@ const envSchema = z
     DATABASE_URL: z.string().min(1, "DATABASE_URL is required"),
     CORS_ORIGIN: z.string().default("http://localhost:5173"),
     COOKIE_DOMAIN: z.preprocess(emptyToUndefined, z.string().optional()),
+    COOKIE_SAME_SITE: z.enum(["lax", "strict", "none"]).default("lax"),
     COOKIE_NAME: z.string().default("palavu_admin_token"),
     USER_COOKIE_NAME: z.string().default("palavu_user_token"),
     JWT_SECRET: z.string().min(16).default("development-only-change-this-secret"),
@@ -71,6 +72,14 @@ const envSchema = z
         code: z.ZodIssueCode.custom,
         path: ["RAZORPAY_KEY_ID"],
         message: "Both Razorpay credentials must be provided together",
+      });
+    }
+
+    if (data.COOKIE_SAME_SITE === "none" && data.NODE_ENV !== "production") {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["COOKIE_SAME_SITE"],
+        message: "COOKIE_SAME_SITE=none should be used only with HTTPS production deployments",
       });
     }
   });

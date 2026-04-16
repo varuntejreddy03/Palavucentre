@@ -2,7 +2,7 @@ import { env } from "../config/env.js";
 
 const baseCookieOptions = {
   httpOnly: true,
-  sameSite: "lax",
+  sameSite: env.COOKIE_SAME_SITE,
   secure: env.isProduction,
   path: "/",
 };

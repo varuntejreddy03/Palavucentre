@@ -18,6 +18,8 @@ services:
         sync: false
       - key: COOKIE_DOMAIN
         sync: false
+      - key: COOKIE_SAME_SITE
+        value: none
       - key: COOKIE_NAME
         value: palavu_admin_token
       - key: USER_COOKIE_NAME
