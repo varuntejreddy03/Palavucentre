@@ -1,5 +1,6 @@
 import { prisma } from "../config/prisma.js";
 import { env } from "../config/env.js";
+import { rupeesToPaise } from "../utils/amounts.js";
 import { serializeSiteSettings } from "../utils/serializers.js";
 import { createTtlCache } from "../utils/ttl-cache.js";
 import { deleteManagedAsset } from "./media.service.js";
@@ -41,6 +42,8 @@ function getDefaultSettingsInput() {
       "Andhra restaurant Hyderabad",
     ],
     googleReviewUrl: "https://g.page/r/YOUR_GOOGLE_BUSINESS_ID/review",
+    deliveryFeePaise: rupeesToPaise(40),
+    freeDeliveryThresholdPaise: rupeesToPaise(299),
     orderTaxPercent: env.ORDER_TAX_PERCENT,
     currency: env.CURRENCY,
   };
@@ -94,6 +97,8 @@ export async function getAdminSiteSettings() {
 export async function getOrderConfig() {
   const settings = await getOrCreateSettingsRecord({ useCache: true });
   return {
+    deliveryFeePaise: Number(settings.deliveryFeePaise || 0),
+    freeDeliveryThresholdPaise: Number(settings.freeDeliveryThresholdPaise || 0),
     taxPercent: Number(settings.orderTaxPercent),
     currency: settings.currency,
   };

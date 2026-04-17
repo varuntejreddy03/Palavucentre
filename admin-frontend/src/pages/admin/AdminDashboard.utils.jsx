@@ -114,6 +114,8 @@ export function buildSettingsForm(settings) {
     metaDescription: settings?.seo?.metaDescription || '',
     metaKeywords: (settings?.seo?.metaKeywords || []).join(', '),
     googleReviewUrl: settings?.seo?.googleReviewUrl || '',
+    deliveryFee: String(settings?.ordering?.deliveryFee ?? 0),
+    freeDeliveryThreshold: String(settings?.ordering?.freeDeliveryThreshold ?? 0),
     orderTaxPercent: String(settings?.ordering?.taxPercent ?? 0),
     currency: settings?.ordering?.currency || 'INR',
     socialLinks: socialPlatforms.map((platform, index) => {
@@ -169,6 +171,8 @@ export function buildSettingsPayload(form) {
       .map((item) => item.trim())
       .filter(Boolean),
     googleReviewUrl: emptyToUndefined(form.googleReviewUrl),
+    deliveryFee: Number(form.deliveryFee || 0),
+    freeDeliveryThreshold: Number(form.freeDeliveryThreshold || 0),
     orderTaxPercent: Number(form.orderTaxPercent || 0),
     currency: emptyToUndefined(form.currency),
     socialLinks: form.socialLinks

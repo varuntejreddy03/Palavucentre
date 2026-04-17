@@ -192,8 +192,11 @@ export default function OrderPage() {
   const restaurantName = siteSettings?.restaurantName || 'PalavuCentre'
 
   const taxPercent = Number(siteSettings?.ordering?.taxPercent || 0)
-  const estimatedTax = total * (taxPercent / 100)
-  const estimatedGrandTotal = total + estimatedTax
+  const deliveryFee = Number(siteSettings?.ordering?.deliveryFee || 0)
+  const freeDeliveryThreshold = Number(siteSettings?.ordering?.freeDeliveryThreshold || 0)
+  const estimatedDeliveryFee = deliveryFee > 0 && total < freeDeliveryThreshold ? deliveryFee : 0
+  const estimatedTax = (total + estimatedDeliveryFee) * (taxPercent / 100)
+  const estimatedGrandTotal = total + estimatedDeliveryFee + estimatedTax
   const totalItems = cartItems.reduce((count, item) => count + item.quantity, 0)
 
   const baseOrderPreview = useMemo(
@@ -201,10 +204,11 @@ export default function OrderPage() {
       subTotal: total,
       discountAmount: 0,
       discountedSubTotal: total,
+      deliveryFee: estimatedDeliveryFee,
       taxAmount: estimatedTax,
       grandTotal: estimatedGrandTotal,
     }),
-    [estimatedGrandTotal, estimatedTax, total],
+    [estimatedDeliveryFee, estimatedGrandTotal, estimatedTax, total],
   )
 
   const orderPreview =
@@ -649,6 +653,10 @@ export default function OrderPage() {
                     <span>Tax</span>
                     <span>{formatCurrency(orderResult.pricing?.taxAmount)}</span>
                   </div>
+                  <div className="mt-2 flex items-center justify-between text-sm text-text-secondary">
+                    <span>Delivery</span>
+                    <span>{formatCurrency(orderResult.pricing?.deliveryFee)}</span>
+                  </div>
                   <div className="mt-3 flex items-center justify-between border-t border-gold/10 pt-3 text-base font-black text-gold">
                     <span>Total Paid</span>
                     <span>{formatCurrency(orderResult.pricing?.grandTotal)}</span>
@@ -689,24 +697,24 @@ export default function OrderPage() {
   }
 
   return (
-    <div className="w-full max-w-screen overflow-x-hidden bg-bg-page pt-20 animate-page-mount">
+    <div className="w-full max-w-screen overflow-x-hidden bg-bg-page pt-16 animate-page-mount sm:pt-20">
       <section className="relative overflow-hidden bg-[linear-gradient(135deg,#1A1510_0%,#0F0C08_100%)]">
         <div className="pointer-events-none absolute inset-0 opacity-[0.03] [background-image:radial-gradient(circle_at_1px_1px,rgba(240,165,0,0.95)_1px,transparent_0)] [background-size:12px_12px]" aria-hidden="true" />
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(240,165,0,0.18),transparent_34%)]" aria-hidden="true" />
 
-        <div className="relative z-10 mx-auto w-full max-w-6xl px-4 py-14 md:px-8 md:py-20">
+        <div className="relative z-10 mx-auto w-full max-w-6xl px-3 py-8 sm:px-4 sm:py-12 md:px-8 md:py-20">
           <div className="max-w-4xl">
             <div className="inline-flex items-center gap-3 rounded-full border border-gold/20 bg-[var(--bg-card)] px-4 py-2 font-sans text-[11px] font-medium uppercase tracking-[0.16em] text-gold backdrop-blur">
               <ShieldCheck className="h-4 w-4" />
               Account Checkout
             </div>
-            <h1 className="mt-6 text-left text-[40px] leading-none text-gold md:text-[54px]">Checkout</h1>
-            <p className="mt-4 max-w-3xl font-sans text-[15px] leading-7 text-[var(--text-muted)] md:text-[16px]">
+            <h1 className="mt-4 text-left text-[32px] leading-none text-gold sm:mt-6 sm:text-[40px] md:text-[54px]">Checkout</h1>
+            <p className="mt-3 max-w-3xl font-sans text-[14px] leading-6 text-[var(--text-muted)] md:text-[16px]">
               Saved addresses, faster orders, simple tracking.
             </p>
           </div>
 
-          <div className="mt-10 grid gap-4 md:grid-cols-3">
+          <div className="mt-6 hidden gap-4 md:mt-10 md:grid md:grid-cols-3">
             {[
               { label: 'Signed in', value: user?.name || 'Account ready', icon: User },
               { label: 'Saved addresses', value: `${savedAddresses.length} saved addresses`, icon: MapPin },
@@ -724,8 +732,8 @@ export default function OrderPage() {
         </div>
       </section>
 
-      <div className="mx-auto w-full max-w-6xl px-4 py-4 md:px-8 md:py-6">
-        <div className="grid gap-8 xl:grid-cols-[minmax(0,1fr)_360px]">
+      <div className="mx-auto w-full max-w-6xl px-3 py-4 sm:px-4 md:px-8 md:py-6">
+        <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_360px] xl:gap-8">
           <form id="order-checkout-form" onSubmit={handleSubmitOrder} className="space-y-4">
             {error && (
               <div className="rounded-[28px] border border-red-500/30 bg-red-950/35 px-5 py-4 text-sm text-red-100">
@@ -1045,25 +1053,11 @@ export default function OrderPage() {
                 {promoError && <p className="mt-3 font-sans text-[13px] text-red-300">{promoError}</p>}
               </div>
 
-              <div className="mt-6 md:hidden">
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="brand-primary-btn w-full px-6 text-[16px]"
-                >
-                  {submitButtonLabel}
-                </button>
-                {paymentMethod === 'online' && (
-                  <p className="mt-3 rounded-[12px] border border-gold/20 bg-gold/10 px-3 py-2 font-sans text-[12px] leading-5 text-[var(--text-primary)]">
-                    {onlinePaymentHelperText}
-                  </p>
-                )}
-              </div>
             </section>
           </form>
 
           <aside className="space-y-5">
-            <div className="sticky top-[110px] rounded-[16px] border border-[var(--border)] bg-[var(--bg-card)] p-[18px] shadow-[var(--shadow-card)]">
+            <div className="rounded-[16px] border border-[var(--border)] bg-[var(--bg-card)] p-4 shadow-[var(--shadow-card)] sm:p-[18px] xl:sticky xl:top-[110px]">
               <SectionHeading eyebrow="Summary" title="Your order" description={`${totalItems} items`} />
 
               <div className="mt-6 space-y-3">
@@ -1138,6 +1132,10 @@ export default function OrderPage() {
                     <span>Tax ({taxPercent}%)</span>
                     <span className="text-white">{formatCurrency(orderPreview.taxAmount)}</span>
                   </div>
+                  <div className="flex items-center justify-between text-[var(--text-muted)]">
+                    <span>Delivery</span>
+                    <span className="text-white">{formatCurrency(orderPreview.deliveryFee || 0)}</span>
+                  </div>
                   <div className="flex items-center justify-between border-t border-gold/10 pt-3 font-sans text-[16px] font-semibold text-white">
                     <span>Final Total</span>
                     <span className="text-gold">{formatCurrency(orderPreview.grandTotal)}</span>
@@ -1145,16 +1143,22 @@ export default function OrderPage() {
                 </div>
               </div>
 
+              {deliveryFee > 0 && (
+                <p className="mt-3 text-[12px] text-[var(--text-muted)]">
+                  Delivery fee {formatCurrency(deliveryFee)} applies below {formatCurrency(freeDeliveryThreshold)}.
+                </p>
+              )}
+
               <button
                 type="submit"
                 form="order-checkout-form"
                 disabled={isSubmitting}
-                className="brand-primary-btn mt-4 hidden w-full px-6 text-[16px] md:flex"
+                className="brand-primary-btn mt-4 w-full px-6 text-[16px]"
               >
                 {submitButtonLabel}
               </button>
               {paymentMethod === 'online' && (
-                <p className="mt-3 hidden rounded-[12px] border border-gold/20 bg-gold/10 px-3 py-2 font-sans text-[12px] leading-5 text-[var(--text-primary)] md:block">
+                <p className="mt-3 rounded-[12px] border border-gold/20 bg-gold/10 px-3 py-2 font-sans text-[12px] leading-5 text-[var(--text-primary)]">
                   {onlinePaymentHelperText}
                 </p>
               )}

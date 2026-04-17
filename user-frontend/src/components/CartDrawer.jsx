@@ -1,7 +1,5 @@
 import {
   ArrowRight,
-  ChevronDown,
-  ChevronUp,
   Lock,
   Minus,
   Plus,
@@ -43,9 +41,6 @@ export default function CartDrawer() {
   const { user, isAuthenticated } = useAccount()
   const { cartItems, removeFromCart, updateQuantity, total, isCartOpen, setCartOpen } = useCart()
   const { siteSettings } = useSiteSettings()
-  const [summaryOpen, setSummaryOpen] = useState(true)
-  const [promoCode, setPromoCode] = useState('')
-  const [promoMessage, setPromoMessage] = useState('')
   const [hideSignedInBanner, setHideSignedInBanner] = useState(() => {
     try {
       return window.localStorage.getItem(SIGNED_IN_BANNER_STORAGE_KEY) === 'true'
@@ -56,9 +51,11 @@ export default function CartDrawer() {
   const [removingIds, setRemovingIds] = useState({})
 
   const taxPercent = Number(siteSettings?.ordering?.taxPercent || 0)
-  const deliveryFee = 0
-  const estimatedTax = total * (taxPercent / 100)
-  const estimatedGrandTotal = total + estimatedTax + deliveryFee
+  const deliveryFee = Number(siteSettings?.ordering?.deliveryFee || 0)
+  const freeDeliveryThreshold = Number(siteSettings?.ordering?.freeDeliveryThreshold || 0)
+  const estimatedDeliveryFee = deliveryFee > 0 && total < freeDeliveryThreshold ? deliveryFee : 0
+  const estimatedTax = (total + estimatedDeliveryFee) * (taxPercent / 100)
+  const estimatedGrandTotal = total + estimatedDeliveryFee + estimatedTax
   const itemCount = useMemo(
     () => cartItems.reduce((count, item) => count + item.quantity, 0),
     [cartItems],
@@ -131,15 +128,6 @@ export default function CartDrawer() {
     updateQuantity(item.id, nextQuantity)
   }
 
-  const handlePromoApply = () => {
-    if (!promoCode.trim()) {
-      setPromoMessage('Enter a promo code first.')
-      return
-    }
-
-    setPromoMessage('Promo codes apply on the order page.')
-  }
-
   const openMenu = () => {
     closeDrawer()
     navigate('/menu')
@@ -161,10 +149,10 @@ export default function CartDrawer() {
               <div className="mt-2 flex items-center gap-2">
                 <Shield className="h-5 w-5 text-gold" />
                 <h2
-                  className="text-[28px] leading-none text-gold"
+                  className="text-[26px] leading-none text-gold"
                   style={{ fontFamily: 'Playfair Display, serif', textTransform: 'none', filter: 'none' }}
                 >
-                  Secure Checkout
+                  Checkout
                 </h2>
               </div>
               <p className="mt-3 font-sans text-[13px] leading-6 text-[var(--text-muted)]">
@@ -321,65 +309,38 @@ export default function CartDrawer() {
               </div>
 
               <div className="rounded-[16px] border border-[var(--border)] bg-[var(--bg-card)] p-5 backdrop-blur-[8px]">
-                <button
-                  type="button"
-                  onClick={() => setSummaryOpen((current) => !current)}
-                  className="flex w-full items-center justify-between gap-3"
-                >
-                  <div className="text-left">
+                <div className="flex items-end justify-between gap-3">
+                  <div>
                     <p className="font-sans text-[11px] font-medium uppercase tracking-[0.16em] text-[var(--text-subtle)]">Order Summary</p>
                     <p className="mt-2 font-sans text-[13px] text-[var(--text-muted)]">{itemCount} items</p>
                   </div>
-                  <div className="flex items-center gap-3">
-                    <span className="rounded-full bg-gold/10 px-3 py-1 font-sans text-[13px] font-medium text-gold">
-                      {formatCurrency(estimatedGrandTotal)}
+                  <span className="font-sans text-[24px] font-semibold text-gold">{formatCurrency(estimatedGrandTotal)}</span>
+                </div>
+
+                <div className="mt-5 space-y-3 border-t border-gold/10 pt-4 font-sans text-[13px]">
+                  <div className="flex items-center justify-between text-[var(--text-muted)]">
+                    <span>Subtotal</span>
+                    <span className="text-white">{formatCurrency(total)}</span>
+                  </div>
+                  <div className="flex items-center justify-between text-[var(--text-muted)]">
+                    <span>Delivery fee</span>
+                    <span className={estimatedDeliveryFee === 0 ? 'text-emerald-300' : 'text-white'}>
+                      {estimatedDeliveryFee === 0 ? 'Free' : formatCurrency(estimatedDeliveryFee)}
                     </span>
-                    {summaryOpen ? <ChevronUp className="h-5 w-5 text-gold" /> : <ChevronDown className="h-5 w-5 text-gold" />}
                   </div>
-                </button>
-
-                {summaryOpen && (
-                  <div className="mt-5 space-y-4 border-t border-gold/10 pt-5">
-                    <div className="space-y-3 font-sans text-[13px]">
-                      <div className="flex items-center justify-between border-b border-[var(--border)] pb-3 text-[var(--text-muted)]">
-                        <span>Subtotal</span>
-                        <span className="text-white">{formatCurrency(total)}</span>
-                      </div>
-                      <div className="flex items-center justify-between border-b border-[var(--border)] pb-3 text-[var(--text-muted)]">
-                        <span>Delivery fee</span>
-                        <span className={deliveryFee === 0 ? 'text-emerald-300' : 'text-white'}>{deliveryFee === 0 ? 'Free' : formatCurrency(deliveryFee)}</span>
-                      </div>
-                      <div className="flex items-center justify-between border-b border-[var(--border)] pb-3 text-[var(--text-muted)]">
-                        <span>Taxes</span>
-                        <span className="text-white">{formatCurrency(estimatedTax)}</span>
-                      </div>
-                      <div className="flex items-center justify-between pt-1 font-sans text-[15px] font-semibold text-white">
-                        <span>Total</span>
-                        <span className="text-gold">{formatCurrency(estimatedGrandTotal)}</span>
-                      </div>
-                    </div>
-
-                    <div className="rounded-[22px] border border-gold/10 bg-black/20 p-4">
-                      <div className="flex gap-3">
-                        <input
-                          type="text"
-                          value={promoCode}
-                          onChange={(event) => setPromoCode(event.target.value.toUpperCase())}
-                          placeholder="Promo code"
-                          className="h-[52px] min-w-0 flex-1 rounded-[12px] border border-[var(--input-border)] bg-[var(--input-bg)] px-4 font-sans text-[14px] text-[var(--text-primary)] outline-none transition focus:border-[var(--input-border-focus)] focus:shadow-[0_0_0_4px_rgba(240,165,0,0.12)]"
-                        />
-                        <button
-                          type="button"
-                          onClick={handlePromoApply}
-                          className="rounded-[12px] border border-gold/30 px-4 font-sans text-[13px] font-medium uppercase tracking-wide text-gold transition hover:bg-gold/10"
-                        >
-                          Apply
-                        </button>
-                      </div>
-                      {promoMessage && <p className="mt-3 text-xs text-text-secondary">{promoMessage}</p>}
-                    </div>
+                  <div className="flex items-center justify-between text-[var(--text-muted)]">
+                    <span>Taxes ({taxPercent}%)</span>
+                    <span className="text-white">{formatCurrency(estimatedTax)}</span>
                   </div>
-                )}
+                  <div className="flex items-center justify-between border-t border-gold/10 pt-3 font-sans text-[15px] font-semibold text-white">
+                    <span>Total</span>
+                    <span className="text-gold">{formatCurrency(estimatedGrandTotal)}</span>
+                  </div>
+                </div>
+
+                <p className="mt-4 text-xs text-[var(--text-muted)]">
+                  Promo codes can be applied on the order page.
+                </p>
               </div>
             </div>
           )}

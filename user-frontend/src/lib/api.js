@@ -10,6 +10,38 @@ import { getAssetBaseUrl, normalizeApiData } from './media'
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api'
 const ASSET_BASE_URL = getAssetBaseUrl(API_BASE_URL)
 const publicResponseCache = new Map()
+const USER_TOKEN_STORAGE_KEY = 'palavu_user_token'
+
+function getStoredUserToken() {
+  if (typeof window === 'undefined') {
+    return ''
+  }
+
+  return window.localStorage.getItem(USER_TOKEN_STORAGE_KEY) || ''
+}
+
+export function setUserAuthToken(token) {
+  if (typeof window === 'undefined') {
+    return
+  }
+
+  const normalizedToken = String(token || '').trim()
+
+  if (!normalizedToken) {
+    window.localStorage.removeItem(USER_TOKEN_STORAGE_KEY)
+    return
+  }
+
+  window.localStorage.setItem(USER_TOKEN_STORAGE_KEY, normalizedToken)
+}
+
+export function clearUserAuthToken() {
+  if (typeof window === 'undefined') {
+    return
+  }
+
+  window.localStorage.removeItem(USER_TOKEN_STORAGE_KEY)
+}
 
 async function parseResponse(response) {
   const contentType = response.headers.get('content-type') || ''
@@ -34,16 +66,19 @@ async function parseResponse(response) {
 export async function apiRequest(path, options = {}) {
   const { body, headers, credentials = 'include', ...restOptions } = options
   const isFormData = typeof FormData !== 'undefined' && body instanceof FormData
+  const userToken = getStoredUserToken()
+  const requestHeaders = {
+    ...(!isFormData && body ? { 'Content-Type': 'application/json' } : {}),
+    ...(userToken ? { Authorization: `Bearer ${userToken}` } : {}),
+    ...headers,
+  }
 
   let response
 
   try {
     response = await fetch(`${API_BASE_URL}${path}`, {
       credentials,
-      headers: {
-        ...(!isFormData && body ? { 'Content-Type': 'application/json' } : {}),
-        ...headers,
-      },
+      headers: requestHeaders,
       ...(body ? { body: isFormData ? body : JSON.stringify(body) } : {}),
       ...restOptions,
     })
@@ -54,7 +89,17 @@ export async function apiRequest(path, options = {}) {
     throw error
   }
 
-  const payload = await parseResponse(response)
+  let payload
+
+  try {
+    payload = await parseResponse(response)
+  } catch (requestError) {
+    if (requestError?.status === 401 && path.startsWith('/account')) {
+      clearUserAuthToken()
+    }
+
+    throw requestError
+  }
 
   if (!payload || typeof payload !== 'object' || !payload.data) {
     return payload

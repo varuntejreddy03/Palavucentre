@@ -186,6 +186,7 @@ model Order {
   orderStatus     OrderStatus   @default(pending)
   subtotalPaise   Int
   discountPaise   Int           @default(0)
+  deliveryFeePaise Int          @default(0)
   promoCode       String?
   taxPercent      Decimal       @default(5) @db.Decimal(5, 2)
   taxPaise        Int
@@ -405,6 +406,8 @@ model SiteSetting {
   metaDescription        String?
   metaKeywords           String[]
   googleReviewUrl        String?
+  deliveryFeePaise       Int          @default(0)
+  freeDeliveryThresholdPaise Int      @default(0)
   orderTaxPercent        Decimal      @default(5) @db.Decimal(5, 2)
   currency               String       @default("INR")
   socialLinks            SocialLink[]

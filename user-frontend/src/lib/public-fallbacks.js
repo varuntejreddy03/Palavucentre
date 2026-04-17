@@ -230,6 +230,10 @@ export const fallbackSiteSettings = {
     googleReviewUrl: 'https://g.page/r/YOUR_GOOGLE_BUSINESS_ID/review',
   },
   ordering: {
+    deliveryFee: 40,
+    freeDeliveryThreshold: 299,
+    deliveryFeePaise: 4000,
+    freeDeliveryThresholdPaise: 29900,
     taxPercent: 5,
     currency: 'INR',
   },

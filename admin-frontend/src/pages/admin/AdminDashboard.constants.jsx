@@ -8,6 +8,7 @@ import {
   Settings,
   ShoppingBag,
   Tag,
+  Truck,
 } from 'lucide-react'
 
 import { DEFAULT_MENU_CATEGORY_ICON } from '../../../../user-frontend/src/lib/menu-icons.js'
@@ -90,6 +91,13 @@ export const tabs = [
     icon: Settings,
     group: 'System',
     description: 'Update brand, contact, SEO, and ordering settings for the public experience.',
+  },
+  {
+    id: 'ordering',
+    label: 'Ordering',
+    icon: Truck,
+    group: 'System',
+    description: 'Configure delivery fee, free-delivery threshold, and tax used at checkout.',
   },
 ]
 

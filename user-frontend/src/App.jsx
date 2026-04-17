@@ -53,13 +53,15 @@ function RequireAccountAuth({ children }) {
 }
 
 function AppContent() {
+  const location = useLocation()
   const showPublicShell = !ADMIN_STANDALONE
+  const hideWhatsappFab = location.pathname === '/order' || location.pathname.startsWith('/profile')
 
   return (
     <div className="min-h-screen bg-bg-page text-text-primary flex flex-col">
       {showPublicShell && <Navbar />}
       {showPublicShell && <CartDrawer />}
-      {showPublicShell && <WhatsAppButton />}
+      {showPublicShell && !hideWhatsappFab && <WhatsAppButton />}
       <main className="flex-grow">
         <Routes>
           {ADMIN_STANDALONE ? (

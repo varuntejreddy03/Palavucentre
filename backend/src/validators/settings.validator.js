@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+import { rupeesToPaise } from "../utils/amounts.js";
 import { assetUrlSchema, optionalAssetUrlSchema, optionalTrimmedString } from "./common.js";
 
 const heroMediaItemSchema = z.object({
@@ -43,8 +44,33 @@ export const updateSiteSettingsSchema = {
     metaDescription: optionalTrimmedString,
     metaKeywords: z.array(z.string().trim().min(1)).optional(),
     googleReviewUrl: optionalTrimmedString,
+    deliveryFee: z.preprocess((value) => (value === "" ? undefined : value), z.coerce.number().min(0)).optional(),
+    freeDeliveryThreshold: z
+      .preprocess((value) => (value === "" ? undefined : value), z.coerce.number().min(0))
+      .optional(),
+    deliveryFeePaise: z
+      .preprocess((value) => (value === "" ? undefined : value), z.coerce.number().int().min(0))
+      .optional(),
+    freeDeliveryThresholdPaise: z
+      .preprocess((value) => (value === "" ? undefined : value), z.coerce.number().int().min(0))
+      .optional(),
     orderTaxPercent: z.coerce.number().min(0).max(100).optional(),
     currency: z.string().trim().min(3).max(5).optional(),
     socialLinks: z.array(socialLinkSchema).optional(),
+  })
+  .transform((payload) => {
+    const nextPayload = { ...payload };
+
+    if (typeof nextPayload.deliveryFee === "number") {
+      nextPayload.deliveryFeePaise = rupeesToPaise(nextPayload.deliveryFee);
+      delete nextPayload.deliveryFee;
+    }
+
+    if (typeof nextPayload.freeDeliveryThreshold === "number") {
+      nextPayload.freeDeliveryThresholdPaise = rupeesToPaise(nextPayload.freeDeliveryThreshold);
+      delete nextPayload.freeDeliveryThreshold;
+    }
+
+    return nextPayload;
   }),
 };

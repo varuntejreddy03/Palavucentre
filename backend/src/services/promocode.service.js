@@ -79,7 +79,12 @@ export async function applyPromoCodePreview({ code, subTotal }) {
   const orderConfig = await getOrderConfig();
   const { promoCode, discountPaise } = await resolvePromoCodeOrThrow(code, subtotalPaise);
   const discountedSubtotalPaise = Math.max(subtotalPaise - discountPaise, 0);
-  const totals = calculateTotals(discountedSubtotalPaise, orderConfig.taxPercent);
+  const totals = calculateTotals({
+    subtotalPaise: discountedSubtotalPaise,
+    taxPercent: orderConfig.taxPercent,
+    deliveryFeePaise: orderConfig.deliveryFeePaise,
+    freeDeliveryThresholdPaise: orderConfig.freeDeliveryThresholdPaise,
+  });
 
   return {
     promoCode: serializePromoCode(promoCode),
@@ -90,6 +95,8 @@ export async function applyPromoCodePreview({ code, subTotal }) {
       discountPaise,
       discountedSubTotal: paiseToRupees(discountedSubtotalPaise),
       discountedSubtotalPaise,
+      deliveryFee: paiseToRupees(totals.deliveryFeePaise),
+      deliveryFeePaise: totals.deliveryFeePaise,
       taxPercent: Number(totals.taxPercent),
       taxAmount: paiseToRupees(totals.taxPaise),
       taxPaise: totals.taxPaise,

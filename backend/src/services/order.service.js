@@ -128,7 +128,12 @@ export async function createOrder(payload, { user } = {}) {
   const promoResolution = await resolvePromoCodeForOrder(payload.promoCode, subtotalPaise);
   const discountPaise = promoResolution?.discountPaise || 0;
   const orderConfig = await getOrderConfig();
-  const totals = calculateTotals(Math.max(subtotalPaise - discountPaise, 0), orderConfig.taxPercent);
+  const totals = calculateTotals({
+    subtotalPaise: Math.max(subtotalPaise - discountPaise, 0),
+    taxPercent: orderConfig.taxPercent,
+    deliveryFeePaise: orderConfig.deliveryFeePaise,
+    freeDeliveryThresholdPaise: orderConfig.freeDeliveryThresholdPaise,
+  });
   const orderNumber = await createUniqueOrderNumber();
   const address = buildAddress(payload.customer, selectedAddress);
 
@@ -168,6 +173,7 @@ export async function createOrder(payload, { user } = {}) {
         orderStatus: "pending",
         subtotalPaise,
         discountPaise,
+        deliveryFeePaise: totals.deliveryFeePaise,
         promoCode: promoResolution?.promoCode?.code,
         taxPercent: totals.taxPercent,
         taxPaise: totals.taxPaise,

@@ -53,10 +53,21 @@ async function requireOwnedAddress(userId, addressId) {
   return address;
 }
 
-export async function listUserOrders(userId) {
+export async function listUserOrders(userId, { email } = {}) {
   const orders = await withReadDbRetry(() =>
     prisma.order.findMany({
-      where: { userId },
+      where: {
+        OR: [
+          { userId },
+          ...(email
+            ? [
+                {
+                  AND: [{ userId: null }, { email }],
+                },
+              ]
+            : []),
+        ],
+      },
       include: {
         user: true,
         address: true,
@@ -85,19 +96,20 @@ export async function listUserAddresses(userId) {
 }
 
 export async function getAccountProfile(userId) {
-  const [user, addresses, orders] = await Promise.all([
+  const [user, addresses] = await Promise.all([
     withReadDbRetry(() =>
       prisma.user.findUnique({
         where: { id: userId },
       }),
     ),
     listUserAddresses(userId),
-    listUserOrders(userId),
   ]);
 
   if (!user || !user.isActive) {
     throw new ApiError(StatusCodes.NOT_FOUND, "User not found");
   }
+
+  const orders = await listUserOrders(userId, { email: user.email });
 
   return {
     user: serializeUser(user),

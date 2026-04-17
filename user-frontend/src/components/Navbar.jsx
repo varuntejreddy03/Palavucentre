@@ -329,29 +329,66 @@ export default function Navbar() {
               </div>
 
               <div className="mt-5 grid gap-3 sm:grid-cols-2">
-                <button
-                  type="button"
-                  onClick={() => {
-                    closeMobileMenu()
-                    handleAccountClick()
-                  }}
-                  className="rounded-[22px] border border-white/8 bg-white/5 px-4 py-4 text-left text-text-primary transition hover:border-gold/30 hover:text-gold-bright"
+                {isAuthenticated ? (
+                  <Link
+                    to="/profile"
+                    onClick={closeMobileMenu}
+                    className="rounded-[22px] border border-white/8 bg-white/5 px-4 py-4 text-left text-text-primary transition hover:border-gold/30 hover:text-gold-bright"
+                    style={{ fontFamily: 'var(--font-body)' }}
+                  >
+                    <div className="flex items-center justify-between gap-3">
+                      <div>
+                        <span className="block text-[12px] font-black uppercase tracking-[2px]">Profile</span>
+                        <span className="mt-1 block text-[10px] uppercase tracking-[2px] text-text-dim">
+                          Account details
+                        </span>
+                      </div>
+                      <span className="flex h-9 w-9 items-center justify-center rounded-full border border-gold/20 bg-black/20 text-gold">
+                        <User className="h-4 w-4" />
+                      </span>
+                    </div>
+                  </Link>
+                ) : (
+                  <Link
+                    to="/login"
+                    onClick={closeMobileMenu}
+                    className="rounded-[22px] border border-white/8 bg-white/5 px-4 py-4 text-left text-text-primary transition hover:border-gold/30 hover:text-gold-bright"
+                    style={{ fontFamily: 'var(--font-body)' }}
+                  >
+                    <div className="flex items-center justify-between gap-3">
+                      <div>
+                        <span className="block text-[12px] font-black uppercase tracking-[2px]">Login</span>
+                        <span className="mt-1 block text-[10px] uppercase tracking-[2px] text-text-dim">
+                          Account and orders
+                        </span>
+                      </div>
+                      <span className="flex h-9 w-9 items-center justify-center rounded-full border border-gold/20 bg-black/20 text-gold">
+                        <User className="h-4 w-4" />
+                      </span>
+                    </div>
+                  </Link>
+                )}
+
+                <Link
+                  to={isAuthenticated ? '/profile?tab=orders' : '/order'}
+                  onClick={closeMobileMenu}
+                  className="rounded-[22px] border border-gold/30 bg-gold/10 px-4 py-4 text-left text-gold-bright transition hover:border-gold/45 hover:bg-gold/15"
                   style={{ fontFamily: 'var(--font-body)' }}
                 >
                   <div className="flex items-center justify-between gap-3">
                     <div>
                       <span className="block text-[12px] font-black uppercase tracking-[2px]">
-                        {isAuthenticated ? 'Profile' : 'Login'}
+                        {isAuthenticated ? 'My Orders' : 'Place Order'}
                       </span>
-                      <span className="mt-1 block text-[10px] uppercase tracking-[2px] text-text-dim">
-                        Account and orders
+                      <span className="mt-1 block text-[10px] uppercase tracking-[2px] text-white/60">
+                        {isAuthenticated ? 'Track and reorder' : 'Checkout page'}
                       </span>
                     </div>
                     <span className="flex h-9 w-9 items-center justify-center rounded-full border border-gold/20 bg-black/20 text-gold">
-                      <User className="h-4 w-4" />
+                      <ShoppingCart className="h-4 w-4" />
                     </span>
                   </div>
-                </button>
+                </Link>
 
                 <button
                   type="button"
@@ -359,7 +396,7 @@ export default function Navbar() {
                     closeMobileMenu()
                     handleCallNow()
                   }}
-                  className="rounded-[22px] border border-[#B33A3A]/30 bg-[#B33A3A]/12 px-4 py-4 text-left text-[#F5ECD7] transition hover:border-[#B33A3A]/45 hover:bg-[#B33A3A]/20"
+                  className="rounded-[22px] border border-[#B33A3A]/30 bg-[#B33A3A]/12 px-4 py-4 text-left text-[#F5ECD7] transition hover:border-[#B33A3A]/45 hover:bg-[#B33A3A]/20 sm:col-span-2"
                   style={{ fontFamily: 'var(--font-body)' }}
                 >
                   <div className="flex items-center justify-between gap-3">

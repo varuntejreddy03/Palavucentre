@@ -170,17 +170,17 @@ function SummaryCard({ label, value, note, icon, active = false }) {
   return (
     <button
       type="button"
-      className="w-full rounded-xl border border-gold/15 bg-[#100603] p-4 text-left shadow-[0_2px_8px_rgba(0,0,0,0.08)] transition duration-200 hover:-translate-y-0.5 hover:shadow-[0_4px_12px_rgba(0,0,0,0.12)]"
+      className="w-full rounded-xl border border-gold/15 bg-[#100603] p-3 text-left shadow-[0_2px_8px_rgba(0,0,0,0.08)] transition duration-200 hover:-translate-y-0.5 hover:shadow-[0_4px_12px_rgba(0,0,0,0.12)] sm:p-4"
     >
       <div className="flex items-start justify-between">
-        <IconComponent className="h-5 w-5 text-[#FF6B35]" />
+        <IconComponent className="h-4.5 w-4.5 text-[#FF6B35] sm:h-5 sm:w-5" />
         {active && <span className="h-2.5 w-2.5 rounded-full bg-[#48C479] animate-[pulse_1.5s_ease-in-out_infinite]" />}
       </div>
-      <p className="mt-3 text-[22px] font-bold leading-none text-[#F8F1DE]">
+      <p className="mt-3 text-[20px] font-bold leading-none text-[#F8F1DE] sm:text-[22px]">
         <AnimatedCounter value={value} />
       </p>
-      <p className="mt-2 text-[12px] leading-5 text-[#A8977E]">{label}</p>
-      <p className="mt-1 text-[11px] leading-5 text-[#A8977E]">{note}</p>
+      <p className="mt-2 text-[11px] leading-5 text-[#A8977E] sm:text-[12px]">{label}</p>
+      <p className="mt-1 text-[10px] leading-5 text-[#A8977E] sm:text-[11px]">{note}</p>
     </button>
   )
 }
@@ -244,9 +244,17 @@ function OrderCard({ order, onReorder, showReorder = false, showTrack = false, i
   const hasMultipleImages = (order.items?.length || 0) > 1
   const secondItem = order.items?.[1]
 
+  // Detect if this card is rendered in the Overview page (by prop or context)
+  // We'll use a prop: isOverview, default false
+  // If isOverview, Track button should redirect to /profile?tab=orders
+  // Otherwise, keep the original toggle logic
+  const isOverview = !!order.isOverview;
+  const navigateToOrders = () => {
+    window.location.href = '/profile?tab=orders';
+  };
   return (
     <article
-      className="rounded-2xl border border-gold/15 bg-[#100603] px-5 py-5 shadow-[0_2px_8px_rgba(0,0,0,0.08)] transition duration-200 hover:-translate-y-0.5 hover:shadow-[0_4px_16px_rgba(0,0,0,0.12)]"
+      className="rounded-2xl border border-gold/15 bg-[#100603] px-4 py-4 shadow-[0_2px_8px_rgba(0,0,0,0.08)] transition duration-200 hover:-translate-y-0.5 hover:shadow-[0_4px_16px_rgba(0,0,0,0.12)] sm:px-5 sm:py-5"
       style={{ animationDelay: `${index * 50}ms` }}
     >
       <div className="flex flex-wrap items-start justify-between gap-3">
@@ -260,7 +268,7 @@ function OrderCard({ order, onReorder, showReorder = false, showTrack = false, i
         </div>
       </div>
 
-      <div className="mt-4 flex items-center justify-between gap-4">
+      <div className="mt-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
         <div className="flex min-w-0 items-center gap-3">
           <div className="relative h-14 w-[70px] shrink-0">
             {firstItem?.img ? (
@@ -297,33 +305,43 @@ function OrderCard({ order, onReorder, showReorder = false, showTrack = false, i
           </div>
         </div>
 
-        <div className="text-right">
+        <div className="text-left sm:text-right">
           <p className="text-[11px] uppercase tracking-[0.08em] text-[#A8977E]">Total</p>
-          <p className="mt-1 text-[18px] font-bold leading-none text-[#F8F1DE]">{formatCurrency(order.pricing?.grandTotal)}</p>
+          <p className="mt-1 text-[17px] font-bold leading-none text-[#F8F1DE] sm:text-[18px]">{formatCurrency(order.pricing?.grandTotal)}</p>
         </div>
       </div>
 
-      <div className="mt-4 flex items-center justify-between gap-3 border-t border-gold/15 pt-3">
-        <p className="inline-flex items-center gap-1.5 text-[12px] text-[#48C479]">
+      <div className="mt-4 flex flex-col gap-3 border-t border-gold/15 pt-3 sm:flex-row sm:items-center sm:justify-between">
+        <p className="inline-flex items-center gap-1.5 text-[11px] text-[#48C479] sm:text-[12px]">
           <MapPin className="h-3.5 w-3.5" />
           {isLiveOrder ? 'Live tracking available' : 'Order completed'}
         </p>
 
-        <div className="flex items-center gap-2">
+        <div className="flex w-full items-center gap-2 sm:w-auto sm:justify-end">
           {showTrack && isLiveOrder && (
-            <button
-              type="button"
-              onClick={onTrackToggle}
-              className="inline-flex h-8 items-center justify-center rounded-full border border-[#FF6B35] px-4 text-[13px] font-medium text-[#FF6B35] transition hover:bg-[#FFF1EB]"
-            >
-              {isTracking ? 'Hide' : 'Track'}
-            </button>
+            isOverview ? (
+              <button
+                type="button"
+                onClick={navigateToOrders}
+                className="inline-flex h-9 flex-1 items-center justify-center rounded-full border border-[#FF6B35] px-4 text-[13px] font-medium text-[#FF6B35] transition hover:bg-[#FFF1EB] sm:flex-none"
+              >
+                Track
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={onTrackToggle}
+                className="inline-flex h-9 flex-1 items-center justify-center rounded-full border border-[#FF6B35] px-4 text-[13px] font-medium text-[#FF6B35] transition hover:bg-[#FFF1EB] sm:flex-none"
+              >
+                {isTracking ? 'Hide' : 'Track'}
+              </button>
+            )
           )}
           {showReorder && (
             <button
               type="button"
               onClick={() => onReorder(order)}
-              className="inline-flex h-8 items-center justify-center gap-1.5 rounded-full border border-[#FF6B35] px-4 text-[13px] font-medium text-[#FF6B35] transition hover:bg-[#FFF1EB]"
+              className="inline-flex h-9 flex-1 items-center justify-center gap-1.5 rounded-full border border-[#FF6B35] px-4 text-[13px] font-medium text-[#FF6B35] transition hover:bg-[#FFF1EB] sm:flex-none"
             >
               <RotateCcw className="h-3.5 w-3.5" />
               Reorder
@@ -577,7 +595,7 @@ export default function ProfilePage() {
 
   return (
     // REDESIGNED: Page Shell
-    <div className="min-h-screen bg-[radial-gradient(circle_at_top,#20150b_0%,#0b0502_55%,#050201_100%)] px-4 pb-10 pt-24">
+    <div className="min-h-screen overflow-x-hidden bg-[radial-gradient(circle_at_top,#20150b_0%,#0b0502_55%,#050201_100%)] px-3 pb-10 pt-20 sm:px-4 sm:pt-24">
       <div className="mx-auto w-full max-w-[1100px]">
         {dashboardNotice && (
           <div className="mb-4 rounded-2xl border border-[#BCE9CC] bg-[#E8F8EF] px-5 py-3 text-sm text-[#2E7D32]">
@@ -586,16 +604,16 @@ export default function ProfilePage() {
         )}
 
         {/* REDESIGNED: Two-column layout */}
-        <div className="grid gap-6 md:grid-cols-[280px_minmax(0,1fr)]">
+        <div className="grid gap-5 md:grid-cols-[280px_minmax(0,1fr)] lg:gap-6">
           {/* REDESIGNED: Left profile panel */}
-          <aside className="rounded-2xl border border-gold/15 bg-[#100603] p-5 shadow-[0_2px_8px_rgba(0,0,0,0.08)]">
-            <div className="flex items-start gap-4 md:block">
-              <div className="flex h-[72px] w-[72px] shrink-0 items-center justify-center rounded-full bg-[#FF6B35] text-xl font-bold text-white">
+          <aside className="rounded-2xl border border-gold/15 bg-[#100603] p-4 shadow-[0_2px_8px_rgba(0,0,0,0.08)] sm:p-5">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-start md:block">
+              <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-[#FF6B35] text-lg font-bold text-white sm:h-[72px] sm:w-[72px] sm:text-xl">
                 {userInitials}
               </div>
 
               <div className="min-w-0 flex-1 md:mt-4">
-                <h1 className="truncate text-[28px] font-bold leading-tight text-[#F8F1DE]">{displayName}</h1>
+                <h1 className="truncate text-[24px] font-bold leading-tight text-[#F8F1DE] sm:text-[28px]">{displayName}</h1>
                 <div className="mt-2 space-y-1">
                   <p className="inline-flex items-center gap-2 text-[12px] text-[#A8977E]">
                     <Mail className="h-3.5 w-3.5" />
@@ -611,7 +629,7 @@ export default function ProfilePage() {
 
             <hr className="my-4 border-gold/15" />
 
-            <div className="grid grid-cols-3 gap-2 md:grid-cols-1">
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-3 md:grid-cols-1">
               <Link
                 to="/menu"
                 className="inline-flex h-10 items-center justify-center rounded-full bg-[#FF6B35] px-3 text-[13px] font-medium text-white transition hover:bg-[#FC8019]"
@@ -637,7 +655,7 @@ export default function ProfilePage() {
             <hr className="my-4 border-gold/15" />
 
             {/* REDESIGNED: Stats grid */}
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 gap-2 sm:gap-3">
               <SummaryCard
                 label="Saved Addresses"
                 value={addresses.length}
@@ -668,14 +686,14 @@ export default function ProfilePage() {
 
           <div className="space-y-6">
             {/* REDESIGNED: Tab bar underline style */}
-            <div className="rounded-2xl border border-gold/15 bg-[#100603] px-4 shadow-[0_2px_8px_rgba(0,0,0,0.08)]">
-              <div className="flex overflow-x-auto">
+            <div className="rounded-2xl border border-gold/15 bg-[#100603] px-3 shadow-[0_2px_8px_rgba(0,0,0,0.08)] sm:px-4">
+              <div className="scrollbar-hide flex overflow-x-auto">
                 {tabs.map((tab) => (
                   <button
                     key={tab.id}
                     type="button"
                     onClick={() => setActiveTab(tab.id)}
-                    className={`relative mr-6 whitespace-nowrap border-b-[3px] py-3 text-[14px] transition-all duration-200 ${
+                    className={`relative mr-5 whitespace-nowrap border-b-[3px] py-3 text-[13px] transition-all duration-200 sm:mr-6 sm:text-[14px] ${
                       activeTab === tab.id
                         ? 'border-[#FF6B35] font-semibold text-[#FF6B35]'
                         : 'border-transparent font-medium text-[#A8977E] hover:text-[#C9B9A0]'
@@ -692,9 +710,9 @@ export default function ProfilePage() {
               {activeTab === 'overview' && (
                 // REDESIGNED: Overview cards
                 <section className={`grid gap-6 ${activeOrders.length > 0 ? 'xl:grid-cols-2' : 'grid-cols-1'}`}>
-                  <div className="rounded-2xl border border-gold/15 bg-[#100603] p-5 shadow-[0_2px_8px_rgba(0,0,0,0.08)]">
+                  <div className="rounded-2xl border border-gold/15 bg-[#100603] p-4 shadow-[0_2px_8px_rgba(0,0,0,0.08)] sm:p-5">
                     <p className="text-[11px] font-semibold uppercase tracking-[0.3px] text-[#C9B9A0]">Snapshot</p>
-                    <h2 className="mt-2 text-[20px] font-semibold text-[#F8F1DE]">Account Snapshot</h2>
+                    <h2 className="mt-2 text-[18px] font-semibold text-[#F8F1DE] sm:text-[20px]">Account Snapshot</h2>
 
                     <div className="mt-3 divide-y divide-[#E9E9EB]">
                       <SnapshotAction
@@ -727,17 +745,17 @@ export default function ProfilePage() {
                   </div>
 
                   {activeOrders.length > 0 ? (
-                    <div className="rounded-2xl border border-gold/15 bg-[#100603] p-5 shadow-[0_2px_8px_rgba(0,0,0,0.08)]">
+                    <div className="rounded-2xl border border-gold/15 bg-[#100603] p-4 shadow-[0_2px_8px_rgba(0,0,0,0.08)] sm:p-5">
                       <p className="text-[11px] font-semibold uppercase tracking-[0.3px] text-[#C9B9A0]">Live Orders</p>
-                      <h2 className="mt-2 text-[20px] font-semibold text-[#F8F1DE]">Order Status</h2>
+                      <h2 className="mt-2 text-[18px] font-semibold text-[#F8F1DE] sm:text-[20px]">Order Status</h2>
                       <div className="mt-4 space-y-4">
                         {activeOrders.slice(0, 2).map((order, index) => (
-                          <OrderCard key={order.id} order={order} showTrack index={index} />
+                          <OrderCard key={order.id} order={{...order, isOverview: true}} showTrack index={index} />
                         ))}
                       </div>
                     </div>
                   ) : (
-                    <div className="rounded-2xl border border-gold/15 bg-[#100603] p-5 text-[#C9B9A0] shadow-[0_2px_8px_rgba(0,0,0,0.08)]">
+                    <div className="rounded-2xl border border-gold/15 bg-[#100603] p-4 text-[#C9B9A0] shadow-[0_2px_8px_rgba(0,0,0,0.08)] sm:p-5">
                       No active orders right now.
                     </div>
                   )}
@@ -746,7 +764,7 @@ export default function ProfilePage() {
 
               {activeTab === 'addresses' && (
                 // REDESIGNED: Addresses tab
-                <section className="rounded-2xl border border-gold/15 bg-[#100603] p-5 shadow-[0_2px_8px_rgba(0,0,0,0.08)]">
+                <section className="rounded-2xl border border-gold/15 bg-[#100603] p-4 shadow-[0_2px_8px_rgba(0,0,0,0.08)] sm:p-5">
                   <div className="space-y-4">
                     <button
                       type="button"
@@ -761,11 +779,11 @@ export default function ProfilePage() {
                         showAddressForm || editingAddressId ? 'max-h-[1400px] opacity-100' : 'max-h-0 opacity-0'
                       }`}
                     >
-                      <form onSubmit={handleAddressSubmit} className="rounded-2xl border border-gold/15 bg-[#1a110b] p-4">
-                        <div className="flex items-center justify-between gap-3">
+                      <form onSubmit={handleAddressSubmit} className="rounded-2xl border border-gold/15 bg-[#1a110b] p-4 sm:p-4">
+                        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                           <div>
                             <p className="text-[11px] font-semibold uppercase tracking-[0.3px] text-[#C9B9A0]">Address Book</p>
-                            <p className="mt-2 text-[18px] font-semibold leading-none text-[#F8F1DE]">
+                            <p className="mt-2 text-[17px] font-semibold leading-none text-[#F8F1DE] sm:text-[18px]">
                               {editingAddressId ? 'Edit Address' : 'Add Address'}
                             </p>
                           </div>
@@ -828,7 +846,7 @@ export default function ProfilePage() {
                       {addresses.map((address, index) => (
                         <div
                           key={address.id}
-                          className="rounded-2xl border border-gold/15 bg-[#100603] p-5 shadow-[0_2px_8px_rgba(0,0,0,0.08)] transition hover:shadow-[0_4px_16px_rgba(0,0,0,0.12)]"
+                          className="rounded-2xl border border-gold/15 bg-[#100603] p-4 shadow-[0_2px_8px_rgba(0,0,0,0.08)] transition hover:shadow-[0_4px_16px_rgba(0,0,0,0.12)] sm:p-5"
                           style={{ animationDelay: `${index * 50}ms` }}
                         >
                           <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
@@ -850,7 +868,7 @@ export default function ProfilePage() {
                               </p>
                             </div>
 
-                            <div className="flex flex-wrap gap-2">
+                            <div className="flex flex-wrap gap-2 sm:justify-end">
                               {!address.isDefault && (
                                 <button
                                   type="button"
@@ -908,14 +926,14 @@ export default function ProfilePage() {
                 // REDESIGNED: Orders tab with Live + History
                 <section className="space-y-6">
                   {/* REDESIGNED: Live orders section */}
-                  <div className="rounded-2xl border border-gold/15 bg-[#100603] p-6 shadow-[0_2px_8px_rgba(0,0,0,0.08)]">
-                    <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                  <div className="rounded-2xl border border-gold/15 bg-[#100603] p-4 shadow-[0_2px_8px_rgba(0,0,0,0.08)] sm:p-6">
+                    <div className="mb-5 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                       <div>
                         <p className="text-[11px] font-medium uppercase tracking-[0.3px] text-[#A8977E]">CURRENT ORDERS</p>
-                        <h2 className="mt-1 text-[20px] font-semibold text-[#F8F1DE]">Live Orders</h2>
+                        <h2 className="mt-1 text-[18px] font-semibold text-[#F8F1DE] sm:text-[20px]">Live Orders</h2>
                       </div>
 
-                      <div className="flex items-center gap-3">
+                      <div className="flex flex-wrap items-center gap-3">
                         <span className="inline-flex items-center gap-2 rounded-full bg-[#E8F5E9] px-3 py-1 text-[12px] font-medium text-[#2E7D32]">
                           <span className="h-2 w-2 rounded-full bg-[#48C479] animate-[pulse_1.5s_ease-in-out_infinite]" />
                           {activeOrders.length} live
@@ -967,11 +985,11 @@ export default function ProfilePage() {
                   </div>
 
                   {/* REDESIGNED: Past orders section */}
-                  <div className="rounded-2xl border border-gold/15 bg-[#100603] p-6 shadow-[0_2px_8px_rgba(0,0,0,0.08)]">
-                    <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
+                  <div className="rounded-2xl border border-gold/15 bg-[#100603] p-4 shadow-[0_2px_8px_rgba(0,0,0,0.08)] sm:p-6">
+                    <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
                       <div>
                         <p className="text-[11px] font-medium uppercase tracking-[0.3px] text-[#A8977E]">HISTORY</p>
-                        <h2 className="mt-1 text-[20px] font-semibold text-[#F8F1DE]">Past Orders</h2>
+                        <h2 className="mt-1 text-[18px] font-semibold text-[#F8F1DE] sm:text-[20px]">Past Orders</h2>
                       </div>
                       <span className="rounded-full border border-gold/15 bg-[#1a110b] px-3 py-1 text-[12px] font-medium text-[#C9B9A0]">
                         {previousOrders.length} history

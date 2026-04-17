@@ -1,7 +1,9 @@
-import { createContext, useContext, useEffect, useMemo, useState } from 'react'
+/* eslint-disable react-refresh/only-export-components */
+
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 
 import { ADMIN_STANDALONE } from '../../../admin-frontend/src/lib/admin-routing'
-import { accountApi } from '../lib/api'
+import { accountApi, clearUserAuthToken, setUserAuthToken } from '../lib/api'
 
 const AccountContext = createContext(null)
 
@@ -11,7 +13,7 @@ export function AccountProvider({ children }) {
   const [isLoading, setIsLoading] = useState(!ADMIN_STANDALONE)
   const [isProfileLoading, setIsProfileLoading] = useState(false)
 
-  const refreshProfile = async () => {
+  const refreshProfile = useCallback(async () => {
     if (ADMIN_STANDALONE || !user) {
       setProfile({ addresses: [], orders: [] })
       return null
@@ -28,9 +30,9 @@ export function AccountProvider({ children }) {
     } finally {
       setIsProfileLoading(false)
     }
-  }
+  }, [user])
 
-  const refreshSession = async () => {
+  const refreshSession = useCallback(async () => {
     if (ADMIN_STANDALONE) {
       setIsLoading(false)
       return null
@@ -46,13 +48,17 @@ export function AccountProvider({ children }) {
         console.warn('[account] Could not hydrate account session.', requestError)
       }
 
+      if (requestError.status === 401) {
+        clearUserAuthToken()
+      }
+
       setUser(null)
       setProfile({ addresses: [], orders: [] })
       return null
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [])
 
   useEffect(() => {
     if (ADMIN_STANDALONE) {
@@ -61,7 +67,7 @@ export function AccountProvider({ children }) {
     }
 
     refreshSession()
-  }, [])
+  }, [refreshSession])
 
   useEffect(() => {
     if (!user) {
@@ -74,34 +80,38 @@ export function AccountProvider({ children }) {
         console.warn('[account] Could not load account profile.', requestError)
       }
     })
-  }, [user?.id])
+  }, [refreshProfile, user])
 
-  const signup = async (payload) => {
+  const signup = useCallback(async (payload) => {
     const response = await accountApi.signup(payload)
+    setUserAuthToken(response.data.token)
     setUser(response.data.user)
     return response.data.user
-  }
+  }, [])
 
-  const login = async (payload) => {
+  const login = useCallback(async (payload) => {
     const response = await accountApi.login(payload)
+    setUserAuthToken(response.data.token)
     setUser(response.data.user)
     return response.data.user
-  }
+  }, [])
 
-  const googleLogin = async (payload) => {
+  const googleLogin = useCallback(async (payload) => {
     const response = await accountApi.googleLogin(payload)
+    setUserAuthToken(response.data.token)
     setUser(response.data.user)
     return response.data.user
-  }
+  }, [])
 
-  const logout = async () => {
+  const logout = useCallback(async () => {
     try {
       await accountApi.logout()
     } finally {
+      clearUserAuthToken()
       setUser(null)
       setProfile({ addresses: [], orders: [] })
     }
-  }
+  }, [])
 
   const value = useMemo(
     () => ({
@@ -117,7 +127,7 @@ export function AccountProvider({ children }) {
       refreshSession,
       refreshProfile,
     }),
-    [profile, user, isLoading, isProfileLoading],
+    [profile, user, isLoading, isProfileLoading, signup, login, googleLogin, logout, refreshSession, refreshProfile],
   )
 
   return <AccountContext.Provider value={value}>{children}</AccountContext.Provider>
