@@ -5,6 +5,8 @@ import {
   ChevronRight,
   Clock3,
   MapPin,
+  Minus,
+  Plus,
   Search,
   ShoppingBag,
   Sparkles,
@@ -229,38 +231,34 @@ function ItemCard({ item, quantity, onAdd, onUpdateQuantity }) {
 /* ─── Popular picks card ──────────────────────────────────────── */
 function FavouriteCard({ item, quantity, onAdd, onUpdateQuantity }) {
   return (
-    <article className="flex min-w-[140px] max-w-[140px] sm:min-w-[160px] sm:max-w-[160px] snap-start flex-col overflow-hidden rounded-[14px] border border-[#2E2B1F] bg-[#1A1810] transition hover:border-[#F0A500]/50">
-      <div className="relative h-[88px] sm:h-[100px] w-full overflow-hidden bg-[#111009]">
-        <MenuImage src={item.img} alt={item.name} className="h-full w-full" />
-        <VegBadge veg={isVegItem(item)} />
-        <span className="absolute right-2 top-2 flex items-center gap-1 rounded-full bg-[#F0A500]/15 px-2 py-0.5 text-[9px] font-bold uppercase tracking-[0.12em] text-[#F0A500] border border-[#F0A500]/30">
-          <Star className="h-2.5 w-2.5" />
-          Popular
+    <article className="w-[200px] shrink-0 snap-start overflow-hidden rounded-[14px] border border-[#2E2B1F] bg-[#1A1810] transition-all duration-200 hover:border-[#F0A500]/40">
+      <div className="relative h-[120px] w-full overflow-hidden bg-[#111009]">
+        {item.img ? (
+          <img src={item.img} alt={item.name} className="h-full w-full object-cover" />
+        ) : (
+          <div className="flex h-full w-full items-center justify-center text-[#F0A500]/30"><Sparkles className="h-6 w-6" /></div>
+        )}
+        <span className="absolute left-2.5 top-2.5 flex h-4 w-4 items-center justify-center rounded-full bg-black/60">
+          <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: isVegItem(item) ? '#4CAF50' : '#E53935' }} />
+        </span>
+        <span className="absolute right-2.5 top-2.5 inline-flex items-center gap-1 rounded-md border border-[#F0A500]/40 bg-black/70 px-1.5 py-0.5 text-[8px] font-bold uppercase text-[#F0A500] backdrop-blur-sm">
+          <Star className="h-2.5 w-2.5" /> Popular
         </span>
       </div>
-
-      <div className="flex flex-1 flex-col p-2.5 sm:p-3">
-        <p className="line-clamp-1 text-[12px] sm:text-[13px] font-semibold text-white" style={{ fontFamily: 'DM Sans, sans-serif' }}>
-          {item.name}
-        </p>
-        <p className="mt-0.5 line-clamp-1 text-[11px] text-[#8A8060]" style={{ fontFamily: 'DM Sans, sans-serif' }}>
-          {item.desc || item.description}
-        </p>
-        <div className="mt-auto flex items-center justify-between gap-2 pt-2.5">
-          <span className="text-[13px] sm:text-[14px] font-bold text-[#F0A500]">{formatCurrency(item.price)}</span>
+      <div className="p-3">
+        <p className="truncate text-[14px] font-semibold text-white" style={{ fontFamily: 'DM Sans, sans-serif' }}>{item.name}</p>
+        <p className="mt-0.5 truncate text-[11px] text-[#8A8060]" style={{ fontFamily: 'DM Sans, sans-serif' }}>{item.desc || item.description || ''}</p>
+        <div className="mt-2.5 flex items-center justify-between">
+          <span className="text-[15px] font-bold text-[#F0A500]" style={{ fontFamily: 'DM Sans, sans-serif' }}>{formatCurrency(item.price)}</span>
           {quantity > 0 ? (
-            <QuantityControl
-              size="sm"
-              quantity={quantity}
-              onDecrease={() => onUpdateQuantity(item, quantity - 1)}
-              onIncrease={() => onUpdateQuantity(item, quantity + 1)}
-            />
+            <div className="flex h-8 items-center rounded-lg border border-[#F0A500] bg-[#111009] overflow-hidden">
+              <button type="button" onClick={() => onUpdateQuantity(item, quantity - 1)} className="flex h-full w-7 items-center justify-center text-[#F0A500]"><Minus className="h-3 w-3" /></button>
+              <span className="min-w-[22px] text-center text-[13px] font-bold text-white">{quantity}</span>
+              <button type="button" onClick={() => onUpdateQuantity(item, quantity + 1)} className="flex h-full w-7 items-center justify-center text-[#F0A500]"><Plus className="h-3 w-3" /></button>
+            </div>
           ) : (
-            <button
-              type="button"
-              onClick={() => onAdd(item)}
-              className="rounded-[7px] border border-[#F0A500] px-2.5 py-1.5 text-[11px] font-semibold text-[#F0A500] transition hover:bg-[#F0A500] hover:text-black"
-            >
+            <button type="button" onClick={() => onAdd(item)}
+              className="h-8 rounded-lg border border-[#F0A500] px-3.5 text-[12px] font-semibold text-[#F0A500] transition hover:bg-[#F0A500] hover:text-black">
               ADD
             </button>
           )}

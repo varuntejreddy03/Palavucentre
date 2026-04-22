@@ -361,94 +361,97 @@ export default function OrderPage() {
 
   if (orderResult) {
     return (
-      <div className="min-h-screen bg-bg-page px-4 pb-16 pt-28">
-        <div className="mx-auto max-w-6xl">
-          <div className="overflow-hidden rounded-[36px] border border-gold/15 bg-black/30 shadow-[0_30px_100px_rgba(0,0,0,0.55)] backdrop-blur">
-            <div className="relative overflow-hidden border-b border-gold/10 px-6 py-10 md:px-10 md:py-12">
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(212,168,83,0.2),transparent_45%),linear-gradient(135deg,rgba(20,8,4,0.96),rgba(8,4,2,0.98))]"></div>
-              <div className="relative z-10 flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
-                <div>
-                  <div className="inline-flex items-center gap-3 rounded-full border border-emerald-400/25 bg-emerald-500/10 px-4 py-2 text-[11px] font-black uppercase tracking-[3px] text-emerald-200">
-                    <CheckCircle2 className="h-4 w-4" /> Order Confirmed
-                  </div>
-                  <h1 className="mt-5 text-left text-[38px] leading-none md:text-[56px]">Order confirmed.</h1>
-                  <p className="mt-3 max-w-2xl text-sm leading-7 text-text-secondary md:text-base">Your order is in the kitchen queue now. Live progress and history are available in your account.</p>
-                </div>
-                <div className="rounded-[20px] border border-gold/15 bg-black/30 px-5 py-4">
-                  <p className="text-[10px] font-black uppercase tracking-[2px] text-gold/70">Order Number</p>
-                  <p className="mt-1 text-xl font-black text-gold md:text-2xl">{orderResult.orderNumber}</p>
-                  <p className="mt-1 text-xs uppercase tracking-[1.4px] text-text-secondary">{orderResult.paymentMethod === 'online' ? 'Paid online' : 'Cash on delivery'}</p>
-                </div>
-              </div>
+      <div className="min-h-screen bg-[#0D0C09] px-4 pt-20 pb-12 sm:pt-24">
+        <div className="mx-auto max-w-[520px]">
+
+          {/* Success header */}
+          <div className="text-center">
+            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-emerald-500/15 border border-emerald-500/25">
+              <CheckCircle2 className="h-8 w-8 text-emerald-400" />
             </div>
+            <p className="mt-4 text-[28px] font-bold text-[#F8F1DE] sm:text-[34px]" style={{ fontFamily: 'Playfair Display, serif' }}>Order Confirmed</p>
+            <p className="mt-2 text-[14px] text-[#8A8060]" style={{ fontFamily: 'DM Sans, sans-serif' }}>Your order is being prepared. Track it live in your account.</p>
+          </div>
 
-            <div className="grid gap-6 px-6 py-8 md:px-10 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)]">
-              <div className="space-y-6">
-                <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-                  <div className="rounded-[20px] border border-gold/12 bg-[#100603] px-4 py-4">
-                    <p className="text-[10px] font-black uppercase tracking-[2px] text-gold/65">Customer</p>
-                    <p className="mt-2 font-semibold text-text-primary">{orderResult.customer?.name}</p>
-                    <p className="mt-1 text-sm text-text-secondary">{orderResult.customer?.phone}</p>
-                  </div>
-                  <div className="rounded-[20px] border border-gold/12 bg-[#100603] px-4 py-4">
-                    <p className="text-[10px] font-black uppercase tracking-[2px] text-gold/65">Grand Total</p>
-                    <p className="mt-2 text-xl font-black text-gold">{formatCurrency(orderResult.pricing?.grandTotal)}</p>
-                    <p className="mt-1 text-sm capitalize text-text-secondary">{orderResult.orderStatus}</p>
-                  </div>
-                  <div className="rounded-[20px] border border-gold/12 bg-[#100603] px-4 py-4 sm:col-span-2 xl:col-span-1">
-                    <p className="text-[10px] font-black uppercase tracking-[2px] text-gold/65">Items</p>
-                    <p className="mt-2 text-xl font-black text-text-primary">{orderResult.items?.length || 0}</p>
-                    <p className="mt-1 text-sm text-text-secondary">In this order</p>
-                  </div>
-                </div>
+          {/* Order number card */}
+          <div className="mt-6 rounded-[14px] border border-[#F0A500]/25 bg-[#F0A500]/5 p-4 text-center">
+            <p className="text-[10px] font-bold uppercase tracking-wider text-[#F0A500]/60" style={{ fontFamily: 'DM Sans, sans-serif' }}>Order Number</p>
+            <p className="mt-1 text-[18px] font-bold text-[#F0A500] sm:text-[20px]" style={{ fontFamily: 'DM Sans, sans-serif' }}>{orderResult.orderNumber}</p>
+            <p className="mt-1 text-[11px] uppercase tracking-wider text-[#8A8060]">{orderResult.paymentMethod === 'online' ? 'Paid Online' : 'Cash on Delivery'}</p>
+          </div>
 
-                {orderResult.customer?.address && (
-                  <div className="rounded-[22px] border border-gold/12 bg-[#100603] px-5 py-4">
-                    <p className="text-[10px] font-black uppercase tracking-[2px] text-gold/65">Delivery Address</p>
-                    <p className="mt-2 text-sm leading-7 text-text-secondary">{orderResult.customer.address}</p>
-                  </div>
-                )}
-
-                <div className="rounded-[22px] border border-gold/12 bg-[#100603] px-5 py-5">
-                  <p className="text-[11px] font-black uppercase tracking-[2px] text-gold/70">What Happens Next</p>
-                  <div className="mt-4 grid gap-3 sm:grid-cols-3">
-                    <div className="rounded-[14px] border border-gold/10 bg-black/20 px-3 py-3 text-xs leading-6 text-text-secondary"><span className="font-black text-gold">1.</span> Kitchen accepts your order.</div>
-                    <div className="rounded-[14px] border border-gold/10 bg-black/20 px-3 py-3 text-xs leading-6 text-text-secondary"><span className="font-black text-gold">2.</span> Live status updates appear in your account.</div>
-                    <div className="rounded-[14px] border border-gold/10 bg-black/20 px-3 py-3 text-xs leading-6 text-text-secondary"><span className="font-black text-gold">3.</span> Delivery partner dispatches and arrives.</div>
-                  </div>
-                  <div className="mt-5 flex flex-col gap-3 sm:flex-row">
-                    <button type="button" onClick={() => navigate('/profile?tab=orders', { state: { justOrdered: true } })} className="brand-primary-btn flex-1 px-5 py-4 text-[12px]">Open My Orders</button>
-                    <Link to="/menu" className="brand-secondary-btn flex-1 px-5 py-4 text-[12px]">Browse Menu</Link>
-                  </div>
-                </div>
-              </div>
-
-              <aside className="rounded-[22px] border border-gold/12 bg-[#100603] p-5">
-                <div className="flex items-center justify-between gap-3 border-b border-gold/10 pb-3">
-                  <p className="text-[11px] font-black uppercase tracking-[2px] text-gold/70">Order Items</p>
-                  <span className="rounded-full border border-gold/20 bg-black/20 px-2.5 py-1 text-[11px] font-semibold text-text-secondary">{orderResult.items?.length || 0} items</span>
-                </div>
-                <div className="mt-4 space-y-3">
-                  {orderResult.items?.map((item) => (
-                    <div key={item.id} className="rounded-[16px] border border-gold/10 bg-black/20 p-4">
-                      <div className="flex items-start justify-between gap-4">
-                        <div className="min-w-0">
-                          <p className="truncate font-semibold text-text-primary">{item.name}</p>
-                          <p className="mt-1 text-sm text-text-secondary">{item.quantity} x {formatCurrency(item.unitPrice)}</p>
-                        </div>
-                        <p className="font-semibold text-gold">{formatCurrency(item.total)}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-                <div className="mt-4 rounded-[16px] border border-gold/10 bg-black/20 p-4">
-                  <div className="flex items-center justify-between text-sm text-text-secondary"><span>Subtotal</span><span>{formatCurrency(orderResult.pricing?.subTotal)}</span></div>
-                  <div className="mt-2 flex items-center justify-between text-sm text-text-secondary"><span>Tax</span><span>{formatCurrency(orderResult.pricing?.taxAmount)}</span></div>
-                  <div className="mt-2 flex items-center justify-between text-sm text-text-secondary"><span>Delivery</span><span>{formatCurrency(orderResult.pricing?.deliveryFee)}</span></div>
-                  <div className="mt-3 flex items-center justify-between border-t border-gold/10 pt-3 text-base font-black text-gold"><span>Total Paid</span><span>{formatCurrency(orderResult.pricing?.grandTotal)}</span></div>
-                </div>
-              </aside>
+          {/* Details grid */}
+          <div className="mt-4 grid grid-cols-2 gap-3">
+            <div className="rounded-[14px] border border-[#2E2B1F] bg-[#1A1810] p-3.5">
+              <p className="text-[10px] font-bold uppercase tracking-wider text-[#8A8060]" style={{ fontFamily: 'DM Sans, sans-serif' }}>Customer</p>
+              <p className="mt-1.5 text-[14px] font-semibold text-white" style={{ fontFamily: 'DM Sans, sans-serif' }}>{orderResult.customer?.name}</p>
+              <p className="mt-0.5 text-[12px] text-[#8A8060]">{orderResult.customer?.phone}</p>
             </div>
+            <div className="rounded-[14px] border border-[#2E2B1F] bg-[#1A1810] p-3.5">
+              <p className="text-[10px] font-bold uppercase tracking-wider text-[#8A8060]" style={{ fontFamily: 'DM Sans, sans-serif' }}>Total</p>
+              <p className="mt-1.5 text-[20px] font-bold text-[#F0A500]" style={{ fontFamily: 'DM Sans, sans-serif' }}>{formatCurrency(orderResult.pricing?.grandTotal)}</p>
+              <p className="mt-0.5 text-[12px] capitalize text-[#8A8060]">{orderResult.orderStatus}</p>
+            </div>
+          </div>
+
+          {/* Delivery address */}
+          {orderResult.customer?.address && (
+            <div className="mt-3 rounded-[14px] border border-[#2E2B1F] bg-[#1A1810] p-3.5">
+              <p className="text-[10px] font-bold uppercase tracking-wider text-[#8A8060]" style={{ fontFamily: 'DM Sans, sans-serif' }}>Delivery Address</p>
+              <p className="mt-1.5 text-[13px] leading-[1.6] text-[#B0A880]" style={{ fontFamily: 'DM Sans, sans-serif' }}>{orderResult.customer.address}</p>
+            </div>
+          )}
+
+          {/* Order items */}
+          <div className="mt-3 rounded-[14px] border border-[#2E2B1F] bg-[#1A1810] p-3.5">
+            <div className="flex items-center justify-between">
+              <p className="text-[10px] font-bold uppercase tracking-wider text-[#8A8060]" style={{ fontFamily: 'DM Sans, sans-serif' }}>Items</p>
+              <span className="text-[11px] text-[#8A8060]">{orderResult.items?.length || 0} items</span>
+            </div>
+            <div className="mt-3 space-y-2.5">
+              {orderResult.items?.map((item) => (
+                <div key={item.id} className="flex items-center justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="truncate text-[14px] font-medium text-white" style={{ fontFamily: 'DM Sans, sans-serif' }}>{item.name}</p>
+                    <p className="text-[12px] text-[#8A8060]">{item.quantity} x {formatCurrency(item.unitPrice)}</p>
+                  </div>
+                  <p className="shrink-0 text-[14px] font-bold text-white" style={{ fontFamily: 'DM Sans, sans-serif' }}>{formatCurrency(item.total)}</p>
+                </div>
+              ))}
+            </div>
+            <div className="mt-3 border-t border-[#2E2B1F] pt-3 space-y-1.5 text-[13px]" style={{ fontFamily: 'DM Sans, sans-serif' }}>
+              <div className="flex justify-between"><span className="text-[#8A8060]">Subtotal</span><span className="text-white">{formatCurrency(orderResult.pricing?.subTotal)}</span></div>
+              <div className="flex justify-between"><span className="text-[#8A8060]">Tax</span><span className="text-white">{formatCurrency(orderResult.pricing?.taxAmount)}</span></div>
+              <div className="flex justify-between"><span className="text-[#8A8060]">Delivery</span><span className="text-white">{formatCurrency(orderResult.pricing?.deliveryFee)}</span></div>
+              <div className="flex justify-between border-t border-[#2E2B1F] pt-2 text-[15px] font-bold"><span className="text-[#F0A500]">Total</span><span className="text-[#F0A500]">{formatCurrency(orderResult.pricing?.grandTotal)}</span></div>
+            </div>
+          </div>
+
+          {/* What happens next */}
+          <div className="mt-3 rounded-[14px] border border-[#2E2B1F] bg-[#1A1810] p-3.5">
+            <p className="text-[10px] font-bold uppercase tracking-wider text-[#8A8060]" style={{ fontFamily: 'DM Sans, sans-serif' }}>What Happens Next</p>
+            <div className="mt-3 space-y-0">
+              {['Kitchen accepts your order', 'Live status updates in your account', 'Delivery partner dispatches'].map((text, i) => (
+                <div key={i}>
+                  <div className="flex items-center gap-3 py-2">
+                    <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#F0A500]/15 text-[10px] font-bold text-[#F0A500]">{i + 1}</span>
+                    <p className="text-[13px] text-[#B0A880]" style={{ fontFamily: 'DM Sans, sans-serif' }}>{text}</p>
+                  </div>
+                  {i < 2 && <div className="ml-2.5 h-px bg-[#2E2B1F]" />}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Action buttons */}
+          <div className="mt-5 space-y-3">
+            <button type="button" onClick={() => navigate('/profile?tab=orders', { state: { justOrdered: true } })}
+              className="shimmer-btn flex h-[52px] w-full items-center justify-center gap-2 rounded-xl bg-[#F0A500] text-[15px] font-bold text-black active:scale-[0.97]">
+              Open My Orders
+            </button>
+            <Link to="/menu" className="flex h-[48px] w-full items-center justify-center rounded-xl border border-[#2E2B1F] text-[14px] font-medium text-[#8A8060] transition hover:border-[#F0A500]/30 hover:text-[#F0A500]">
+              Browse Menu
+            </Link>
           </div>
         </div>
       </div>
