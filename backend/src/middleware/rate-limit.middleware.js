@@ -24,16 +24,22 @@ function buildLimiter({ windowMs, max, message, skipSuccessfulRequests = false }
 
 export const authRateLimiter = buildLimiter({
   windowMs: 15 * 60 * 1000,
-  max: 50,
+  max: 20,
   skipSuccessfulRequests: true,
   message: "Too many authentication attempts. Please try again later.",
 });
 
 export const adminAuthLimiter = buildLimiter({
   windowMs: 15 * 60 * 1000,
-  max: 10,
+  max: 5,
   skipSuccessfulRequests: true,
   message: "Too many admin login attempts. Try again in 15 minutes.",
+});
+
+export const globalApiLimiter = buildLimiter({
+  windowMs: 60 * 1000,
+  max: 120,
+  message: "Too many requests. Please slow down.",
 });
 
 export const orderRateLimiter = buildLimiter({

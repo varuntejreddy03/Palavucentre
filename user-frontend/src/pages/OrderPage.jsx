@@ -137,7 +137,7 @@ function AddressOption({ address, isSelected, onSelect }) {
 
 function StepNav({ step, setStep, onSubmit, isSubmitting, submitLabel, canGoNext, nextLabel }) {
   return (
-    <div className="mt-6 flex items-center justify-between gap-3">
+    <div className="mt-6 hidden lg:flex items-center justify-between gap-3">
       {step > 1 ? (
         <button type="button" onClick={() => setStep(step - 1)} className="flex items-center gap-2 rounded-full border border-gold/30 px-5 py-3 text-[13px] font-medium text-gold transition hover:bg-gold/10">
           <ArrowLeft className="h-4 w-4" /> Back
@@ -775,7 +775,7 @@ export default function OrderPage() {
                 )}
 
                 {/* Place Order CTA - desktop only (mobile uses sticky bottom bar) */}
-                <div className="mt-5 hidden sm:flex gap-3">
+                <div className="mt-5 hidden lg:flex gap-3">
                   <button type="button" onClick={() => setCheckoutStep(2)} className="flex h-[52px] items-center justify-center gap-1.5 rounded-xl border border-[#2E2B1F] bg-transparent px-5 text-[13px] font-medium text-[#8A8060] transition hover:border-[#F0A500]/30 active:scale-[0.97]">
                     <ArrowLeft className="h-4 w-4" /> Back
                   </button>
@@ -854,14 +854,24 @@ export default function OrderPage() {
               </button>
             )}
             {checkoutStep === 2 && (
-              <button type="button" onClick={goToStep3} className="shimmer-btn flex h-[52px] w-full items-center justify-center gap-2 rounded-xl bg-[#F0A500] text-[15px] font-bold text-black active:scale-[0.97]">
-                Next: Payment <ArrowRight className="h-4 w-4" />
-              </button>
+              <div className="flex gap-3">
+                <button type="button" onClick={() => setCheckoutStep(1)} className="flex h-[52px] w-14 shrink-0 items-center justify-center rounded-xl border border-[#2E2B1F] text-[#8A8060] active:scale-[0.95]">
+                  <ArrowLeft className="h-5 w-5" />
+                </button>
+                <button type="button" onClick={goToStep3} className="shimmer-btn flex h-[52px] flex-1 items-center justify-center gap-2 rounded-xl bg-[#F0A500] text-[15px] font-bold text-black active:scale-[0.97]">
+                  Next: Payment <ArrowRight className="h-4 w-4" />
+                </button>
+              </div>
             )}
             {checkoutStep === 3 && (
-              <button type="submit" form="order-checkout-form" disabled={isSubmitting} className="shimmer-btn flex h-[52px] w-full items-center justify-center gap-2 rounded-xl bg-[#F0A500] text-[15px] font-bold text-black active:scale-[0.97] disabled:opacity-50">
-                <Lock className="h-4 w-4" /> {submitButtonLabel}
-              </button>
+              <div className="flex gap-3">
+                <button type="button" onClick={() => setCheckoutStep(2)} className="flex h-[52px] w-14 shrink-0 items-center justify-center rounded-xl border border-[#2E2B1F] text-[#8A8060] active:scale-[0.95]">
+                  <ArrowLeft className="h-5 w-5" />
+                </button>
+                <button type="submit" form="order-checkout-form" disabled={isSubmitting} className="shimmer-btn flex h-[52px] flex-1 items-center justify-center gap-2 rounded-xl bg-[#F0A500] text-[15px] font-bold text-black active:scale-[0.97] disabled:opacity-50">
+                  <Lock className="h-4 w-4" /> {submitButtonLabel}
+                </button>
+              </div>
             )}
           </div>
         </div>

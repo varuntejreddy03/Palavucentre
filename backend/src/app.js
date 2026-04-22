@@ -15,6 +15,7 @@ import { uploadsRootDir } from "./config/paths.js";
 import { doubleCsrfProtection } from "./middleware/csrf.middleware.js";
 import { errorHandler } from "./middleware/error.middleware.js";
 import { notFoundHandler } from "./middleware/not-found.middleware.js";
+import { securityHeaders, sanitizeResponses, apiAbuseProtection } from "./middleware/security.middleware.js";
 import { apiRouter } from "./routes/index.js";
 
 export function createApp() {
@@ -69,6 +70,9 @@ export function createApp() {
   app.use(express.json({ limit: "2mb" }));
   app.use(express.urlencoded({ extended: true }));
   app.use(cookieParser());
+  app.use(securityHeaders);
+  app.use(sanitizeResponses);
+  app.use(apiAbuseProtection);
   app.use(
     "/uploads",
     express.static(uploadsRootDir, {

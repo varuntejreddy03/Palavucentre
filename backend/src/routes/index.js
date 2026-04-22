@@ -25,7 +25,12 @@ import { publicPromoCodeRoutes } from "./public/promocodes.routes.js";
 import { publicReviewRoutes } from "./public/reviews.routes.js";
 import { publicSiteSettingsRoutes } from "./public/site-settings.routes.js";
 
+import { globalApiLimiter } from "../middleware/rate-limit.middleware.js";
+
 const router = Router();
+
+// Global rate limit: 120 requests/minute per IP
+router.use(globalApiLimiter);
 
 router.get("/health", (_req, res) => {
   res.json({
