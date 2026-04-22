@@ -8,8 +8,8 @@ const CSRF_SESSION_COOKIE_NAME = "palavu_csrf_session";
 
 function getBaseCookieOptions() {
   const cookieOptions = {
-    sameSite: "strict",
-    secure: env.isProduction,
+    sameSite: env.COOKIE_SAME_SITE || "lax",
+    secure: env.isProduction || env.COOKIE_SAME_SITE === "none",
     path: "/",
     httpOnly: true,
   };
