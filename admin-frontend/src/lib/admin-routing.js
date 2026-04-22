@@ -1,8 +1,3 @@
-export const ADMIN_INDEX_PATH = '/'
-export const ADMIN_HTML_PATH = '/admin.html'
 export const ADMIN_LOGIN_PATH = '/login'
 export const ADMIN_DASHBOARD_PATH = '/dashboard'
-export const LEGACY_ADMIN_BASE_PATH = '/admin'
-export const LEGACY_ADMIN_LOGIN_PATH = '/admin/login'
-export const LEGACY_ADMIN_DASHBOARD_PATH = '/admin/dashboard'
 export const PUBLIC_SITE_URL = String(import.meta.env.VITE_PUBLIC_SITE_URL || '/').trim() || '/'

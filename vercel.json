@@ -10,12 +10,10 @@
       ]
     }
   ],
-  "routes": [
+  "rewrites": [
     {
-      "src": "/[^.]+",
-      "dest": "/",
-      "status": 200
+      "source": "/((?!api|uploads|assets).*)",
+      "destination": "/index.html"
     }
   ]
 }
-
