@@ -1,4 +1,4 @@
-import { apiRequest } from '../../../shared/api/request'
+import { apiRequest } from '../shared/api/request'
 
 function buildQueryString(params = {}) {
   const searchParams = new URLSearchParams()
