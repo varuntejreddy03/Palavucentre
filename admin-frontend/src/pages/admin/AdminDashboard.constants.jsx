@@ -11,7 +11,7 @@ import {
   Truck,
 } from 'lucide-react'
 
-import { DEFAULT_MENU_CATEGORY_ICON } from '../../../../shared/menu-icons.js'
+import { DEFAULT_MENU_CATEGORY_ICON } from '../../shared/menu-icons.js'
 
 export const orderStatuses = ['pending', 'accepted', 'preparing', 'ready', 'delivered', 'cancelled']
 export const paymentStatuses = ['unpaid', 'pending', 'paid', 'failed', 'refunded']

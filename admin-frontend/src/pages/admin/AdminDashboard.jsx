@@ -21,14 +21,14 @@ import {
 import { useNavigate } from 'react-router-dom'
 
 import { adminApi } from '../../api/adminApi'
-import { formatCurrency, formatDate, formatDateTime } from '../../../../shared/formatters.js'
+import { formatCurrency, formatDate, formatDateTime } from '../../shared/formatters.js'
 import { ADMIN_LOGIN_PATH, PUBLIC_SITE_URL } from '../../lib/admin-routing'
 import {
   DEFAULT_MENU_CATEGORY_ICON,
   getMenuCategoryIcon,
   getMenuCategoryIconLabel,
   MENU_CATEGORY_ICON_OPTIONS,
-} from '../../../../shared/menu-icons.js'
+} from '../../shared/menu-icons.js'
 import {
   orderStatuses,
   paymentStatuses,
