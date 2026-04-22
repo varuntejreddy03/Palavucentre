@@ -40,7 +40,7 @@ function AppContent() {
   const location = useLocation()
   const showPublicShell = true
   const hideWhatsappFab = location.pathname === '/order' || location.pathname.startsWith('/profile')
-  const showCartBar = location.pathname === '/menu' || location.pathname === '/'
+  const showCartBar = location.pathname === '/menu'
 
   return (
     <div className="min-h-screen bg-bg-page text-text-primary flex flex-col">
