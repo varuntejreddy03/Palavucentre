@@ -49,3 +49,11 @@ if (typeof globalThis.ResizeObserver === 'undefined') {
     disconnect() {}
   }
 }
+
+if (typeof globalThis.IntersectionObserver === 'undefined') {
+  globalThis.IntersectionObserver = class IntersectionObserver {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+  }
+}

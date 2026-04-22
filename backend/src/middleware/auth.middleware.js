@@ -7,9 +7,7 @@ import { ApiError } from "../utils/ApiError.js";
 
 export async function requireAdminAuth(req, _res, next) {
   try {
-    const token =
-      req.cookies?.[env.COOKIE_NAME] ||
-      req.headers.authorization?.replace(/^Bearer\s+/i, "").trim();
+    const token = req.cookies?.[env.COOKIE_NAME];
 
     if (!token) {
       throw new ApiError(StatusCodes.UNAUTHORIZED, "Admin authentication is required");

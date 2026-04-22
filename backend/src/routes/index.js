@@ -1,5 +1,6 @@
 import { Router } from "express";
 
+import { getCsrfToken } from "../controllers/security.controller.js";
 import { adminAuthRoutes } from "./admin/auth.routes.js";
 import { adminDashboardRoutes } from "./admin/dashboard.routes.js";
 import { adminGalleryRoutes } from "./admin/gallery.routes.js";
@@ -32,6 +33,7 @@ router.get("/health", (_req, res) => {
     message: "ok",
   });
 });
+router.get("/csrf-token", getCsrfToken);
 
 router.use("/menu", publicMenuRoutes);
 router.use("/orders", publicOrderRoutes);

@@ -37,6 +37,12 @@ export function errorHandler(error, req, res, _next) {
           prismaMessage: error.message,
         };
   } else if (
+    error?.code === "EBADCSRFTOKEN" ||
+    errorMessage === "invalid csrf token"
+  ) {
+    statusCode = StatusCodes.FORBIDDEN;
+    message = "Invalid CSRF token";
+  } else if (
     errorMessage.includes("Can't reach database server") ||
     errorMessage.includes("can-connect-to-database") ||
     errorMessage.includes("ECONNREFUSED")

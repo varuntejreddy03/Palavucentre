@@ -1,10 +1,18 @@
-import { ChevronDown, ChevronRight, LogOut, Menu, PhoneCall, ShoppingCart, User, X } from 'lucide-react'
+import { ChevronDown, ChevronRight, Clock3, LogOut, Menu, PhoneCall, ShoppingCart, User, X } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 
 import { useAccount } from '../context/AccountContext'
 import { useCart } from '../context/CartContext'
 import { useSiteSettings } from '../context/SiteContext'
+import {
+  ORDER_ROUTE,
+  PROFILE_ADDRESSES_ROUTE,
+  PROFILE_ORDERS_ROUTE,
+  PROFILE_ROUTE,
+  buildPathWithSearch,
+  navigateToLoginWithRedirect,
+} from '../lib/order-flow'
 
 function getBrandLines(name) {
   const normalized = String(name || 'RajaMahendravaram PalavuCentre').trim()
@@ -78,6 +86,9 @@ export default function Navbar() {
   const [brandLineOne, brandLineTwo] = getBrandLines(brandName)
   const compactBrandName = getCompactBrandName(brandName)
   const brandMark = getBrandMark(brandName)
+  const profilePath = buildPathWithSearch(PROFILE_ROUTE.pathname, PROFILE_ROUTE.search)
+  const ordersPath = buildPathWithSearch(PROFILE_ORDERS_ROUTE.pathname, PROFILE_ORDERS_ROUTE.search)
+  const addressesPath = buildPathWithSearch(PROFILE_ADDRESSES_ROUTE.pathname, PROFILE_ADDRESSES_ROUTE.search)
   const cartCount = useMemo(
     () => cartItems.reduce((total, item) => total + item.quantity, 0),
     [cartItems],
@@ -98,11 +109,45 @@ export default function Navbar() {
 
   const handleAccountClick = () => {
     if (!isAuthenticated) {
-      navigate('/login')
+      navigateToLoginWithRedirect(navigate, PROFILE_ROUTE, 'profile')
       return
     }
 
     setIsAccountMenuOpen((current) => !current)
+  }
+
+  const handleTrackClick = () => {
+    setIsAccountMenuOpen(false)
+    closeMobileMenu()
+
+    if (isAuthenticated) {
+      navigate(ordersPath)
+      return
+    }
+
+    navigateToLoginWithRedirect(navigate, PROFILE_ORDERS_ROUTE, 'profile')
+  }
+
+  const handleOrderShortcutClick = () => {
+    closeMobileMenu()
+
+    if (isAuthenticated) {
+      navigate('/order')
+      return
+    }
+
+    navigateToLoginWithRedirect(navigate, ORDER_ROUTE, 'checkout')
+  }
+
+  const handleProfileShortcutClick = () => {
+    closeMobileMenu()
+
+    if (isAuthenticated) {
+      navigate(profilePath)
+      return
+    }
+
+    navigateToLoginWithRedirect(navigate, PROFILE_ROUTE, 'profile')
   }
 
   const handleLogout = async () => {
@@ -207,6 +252,8 @@ export default function Navbar() {
                 Call Now
               </button>
 
+              {/* Track button removed as per request */}
+
               <div ref={accountMenuRef} className="relative">
                 <button
                   onClick={handleAccountClick}
@@ -230,7 +277,7 @@ export default function Navbar() {
 
                     <div className="p-2">
                       <Link
-                        to="/profile"
+                        to={profilePath}
                         onClick={() => setIsAccountMenuOpen(false)}
                         className="flex items-center justify-between rounded-[12px] px-3 py-3 text-sm text-text-primary transition hover:bg-gold/10 hover:text-gold-bright"
                       >
@@ -238,7 +285,7 @@ export default function Navbar() {
                         <ChevronRight className="h-4 w-4" />
                       </Link>
                       <Link
-                        to="/profile?tab=orders"
+                        to={ordersPath}
                         onClick={() => setIsAccountMenuOpen(false)}
                         className="flex items-center justify-between rounded-[12px] px-3 py-3 text-sm text-text-primary transition hover:bg-gold/10 hover:text-gold-bright"
                       >
@@ -246,7 +293,7 @@ export default function Navbar() {
                         <ChevronRight className="h-4 w-4" />
                       </Link>
                       <Link
-                        to="/profile?tab=addresses"
+                        to={addressesPath}
                         onClick={() => setIsAccountMenuOpen(false)}
                         className="flex items-center justify-between rounded-[12px] px-3 py-3 text-sm text-text-primary transition hover:bg-gold/10 hover:text-gold-bright"
                       >
@@ -329,66 +376,64 @@ export default function Navbar() {
               </div>
 
               <div className="mt-5 grid gap-3 sm:grid-cols-2">
-                {isAuthenticated ? (
-                  <Link
-                    to="/profile"
-                    onClick={closeMobileMenu}
-                    className="rounded-[22px] border border-white/8 bg-white/5 px-4 py-4 text-left text-text-primary transition hover:border-gold/30 hover:text-gold-bright"
-                    style={{ fontFamily: 'var(--font-body)' }}
-                  >
-                    <div className="flex items-center justify-between gap-3">
-                      <div>
-                        <span className="block text-[12px] font-black uppercase tracking-[2px]">Profile</span>
-                        <span className="mt-1 block text-[10px] uppercase tracking-[2px] text-text-dim">
-                          Account details
-                        </span>
-                      </div>
-                      <span className="flex h-9 w-9 items-center justify-center rounded-full border border-gold/20 bg-black/20 text-gold">
-                        <User className="h-4 w-4" />
-                      </span>
-                    </div>
-                  </Link>
-                ) : (
-                  <Link
-                    to="/login"
-                    onClick={closeMobileMenu}
-                    className="rounded-[22px] border border-white/8 bg-white/5 px-4 py-4 text-left text-text-primary transition hover:border-gold/30 hover:text-gold-bright"
-                    style={{ fontFamily: 'var(--font-body)' }}
-                  >
-                    <div className="flex items-center justify-between gap-3">
-                      <div>
-                        <span className="block text-[12px] font-black uppercase tracking-[2px]">Login</span>
-                        <span className="mt-1 block text-[10px] uppercase tracking-[2px] text-text-dim">
-                          Account and orders
-                        </span>
-                      </div>
-                      <span className="flex h-9 w-9 items-center justify-center rounded-full border border-gold/20 bg-black/20 text-gold">
-                        <User className="h-4 w-4" />
-                      </span>
-                    </div>
-                  </Link>
-                )}
-
-                <Link
-                  to={isAuthenticated ? '/profile?tab=orders' : '/order'}
-                  onClick={closeMobileMenu}
-                  className="rounded-[22px] border border-gold/30 bg-gold/10 px-4 py-4 text-left text-gold-bright transition hover:border-gold/45 hover:bg-gold/15"
+                <button
+                  type="button"
+                  onClick={handleProfileShortcutClick}
+                  className="rounded-[22px] border border-white/8 bg-white/5 px-4 py-4 text-left text-text-primary transition hover:border-gold/30 hover:text-gold-bright"
                   style={{ fontFamily: 'var(--font-body)' }}
                 >
                   <div className="flex items-center justify-between gap-3">
                     <div>
                       <span className="block text-[12px] font-black uppercase tracking-[2px]">
-                        {isAuthenticated ? 'My Orders' : 'Place Order'}
+                        {isAuthenticated ? 'Profile' : 'Login'}
                       </span>
+                      <span className="mt-1 block text-[10px] uppercase tracking-[2px] text-text-dim">
+                        {isAuthenticated ? 'Account details' : 'Account and orders'}
+                      </span>
+                    </div>
+                    <span className="flex h-9 w-9 items-center justify-center rounded-full border border-gold/20 bg-black/20 text-gold">
+                      <User className="h-4 w-4" />
+                    </span>
+                  </div>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleTrackClick}
+                  className="rounded-[22px] border border-gold/30 bg-gold/10 px-4 py-4 text-left text-gold-bright transition hover:border-gold/45 hover:bg-gold/15"
+                  style={{ fontFamily: 'var(--font-body)' }}
+                >
+                  <div className="flex items-center justify-between gap-3">
+                    <div>
+                      <span className="block text-[12px] font-black uppercase tracking-[2px]">Track Orders</span>
                       <span className="mt-1 block text-[10px] uppercase tracking-[2px] text-white/60">
-                        {isAuthenticated ? 'Track and reorder' : 'Checkout page'}
+                        {isAuthenticated ? 'Live updates and history' : 'Login to track'}
+                      </span>
+                    </div>
+                    <span className="flex h-9 w-9 items-center justify-center rounded-full border border-gold/20 bg-black/20 text-gold">
+                      <Clock3 className="h-4 w-4" />
+                    </span>
+                  </div>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleOrderShortcutClick}
+                  className="rounded-[22px] border border-gold/20 bg-black/10 px-4 py-4 text-left text-text-primary transition hover:border-gold/35 hover:bg-gold/10 hover:text-gold-bright"
+                  style={{ fontFamily: 'var(--font-body)' }}
+                >
+                  <div className="flex items-center justify-between gap-3">
+                    <div>
+                      <span className="block text-[12px] font-black uppercase tracking-[2px]">Checkout</span>
+                      <span className="mt-1 block text-[10px] uppercase tracking-[2px] text-text-dim">
+                        {isAuthenticated ? 'Review and place order' : 'Login before checkout'}
                       </span>
                     </div>
                     <span className="flex h-9 w-9 items-center justify-center rounded-full border border-gold/20 bg-black/20 text-gold">
                       <ShoppingCart className="h-4 w-4" />
                     </span>
                   </div>
-                </Link>
+                </button>
 
                 <button
                   type="button"
@@ -452,15 +497,15 @@ export default function Navbar() {
             <div className="rounded-[28px] border border-gold/12 bg-black/20 p-5">
               <p className="text-[11px] font-black uppercase tracking-[3px] text-gold/70">Account Access</p>
               <p className="mt-3 text-sm leading-7 text-text-secondary">
-                Manage orders and saved addresses here.
+                Track live orders, review past orders, and manage saved addresses here.
               </p>
-              <Link
-                to={isAuthenticated ? '/profile?tab=orders' : '/login'}
-                onClick={closeMobileMenu}
+              <button
+                type="button"
+                onClick={handleTrackClick}
                 className="brand-secondary-btn mt-5 flex w-full px-5 py-4 text-[11px]"
               >
-                {isAuthenticated ? 'Open My Orders' : 'Login To Order'}
-              </Link>
+                {isAuthenticated ? 'Open My Orders' : 'Login To Track'}
+              </button>
             </div>
           </div>
         </div>

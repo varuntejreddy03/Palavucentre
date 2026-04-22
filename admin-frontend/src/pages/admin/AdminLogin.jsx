@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { LockKeyhole, Mail, ShieldCheck } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 
-import { adminApi } from '../../../../user-frontend/src/lib/api.js'
+import { adminApi } from '../../api/adminApi'
 import { ADMIN_DASHBOARD_PATH } from '../../lib/admin-routing'
 
 export default function AdminLogin() {
@@ -11,6 +11,7 @@ export default function AdminLogin() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isCheckingSession, setIsCheckingSession] = useState(true)
   const [error, setError] = useState('')
+  const [fieldError, setFieldError] = useState('')
 
   useEffect(() => {
     let isMounted = true
@@ -41,9 +42,15 @@ export default function AdminLogin() {
     try {
       setIsSubmitting(true)
       setError('')
+      setFieldError('')
+
+      if (!form.email.trim()) {
+        setFieldError('Email is required.')
+        return
+      }
 
       await adminApi.login({
-        email: form.email.trim() || undefined,
+        email: form.email.trim(),
         password: form.password,
       })
 
@@ -119,7 +126,7 @@ export default function AdminLogin() {
               <p className="text-[11px] font-semibold uppercase tracking-[1.8px] text-slate-500">Admin Login</p>
               <p className="mt-3 text-[30px] font-semibold leading-none tracking-[-0.02em] text-slate-950">Sign in</p>
               <p className="mt-3 text-sm leading-6 text-slate-600">
-                Use the admin password to access the dashboard. Email is optional for the primary admin account.
+                Use your admin email and password to access the dashboard.
               </p>
             </div>
 
@@ -132,18 +139,25 @@ export default function AdminLogin() {
 
               <div className="space-y-2">
                 <label className="ml-1 text-[11px] font-semibold uppercase tracking-[1.6px] text-slate-500">
-                  Email (Optional)
+                  Email
                 </label>
                 <div className="relative">
                   <Mail className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
                   <input
                     type="email"
+                    required
                     value={form.email}
-                    onChange={(event) => setForm((current) => ({ ...current, email: event.target.value }))}
+                    onChange={(event) => {
+                      setForm((current) => ({ ...current, email: event.target.value }))
+                      if (fieldError) {
+                        setFieldError('')
+                      }
+                    }}
                     placeholder="admin@palavucentre.com"
                     className="w-full rounded-xl border border-slate-200 bg-white py-3 pl-11 pr-4 text-sm text-slate-900 outline-none transition focus:border-slate-900 focus:ring-4 focus:ring-slate-100"
                   />
                 </div>
+                {fieldError && <p className="ml-1 text-xs text-red-600">{fieldError}</p>}
               </div>
 
               <div className="space-y-2">
@@ -180,5 +194,3 @@ export default function AdminLogin() {
     </div>
   )
 }
-
-

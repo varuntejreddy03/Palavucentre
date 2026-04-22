@@ -44,6 +44,7 @@ const envSchema = z
     USER_COOKIE_NAME: z.string().default("palavu_user_token"),
     JWT_SECRET: z.string().min(16).default("development-only-change-this-secret"),
     JWT_EXPIRES_IN: z.string().default("7d"),
+    CSRF_SECRET: z.string().min(16).default("development-only-change-this-csrf-secret"),
     ORDER_TAX_PERCENT: z.preprocess(toNumber, z.number().min(0).max(100).default(5)),
     CURRENCY: z.string().default("INR"),
     RAZORPAY_KEY_ID: z.preprocess(emptyToUndefined, z.string().optional()),
@@ -63,6 +64,14 @@ const envSchema = z
         code: z.ZodIssueCode.custom,
         path: ["JWT_SECRET"],
         message: "JWT_SECRET must be overridden in production",
+      });
+    }
+
+    if (data.NODE_ENV === "production" && data.CSRF_SECRET === "development-only-change-this-csrf-secret") {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["CSRF_SECRET"],
+        message: "CSRF_SECRET must be overridden in production",
       });
     }
 

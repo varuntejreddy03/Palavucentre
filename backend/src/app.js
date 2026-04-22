@@ -12,6 +12,7 @@ import { corsOptions } from "./config/cors.js";
 import { env } from "./config/env.js";
 import { logger } from "./config/logger.js";
 import { uploadsRootDir } from "./config/paths.js";
+import { doubleCsrfProtection } from "./middleware/csrf.middleware.js";
 import { errorHandler } from "./middleware/error.middleware.js";
 import { notFoundHandler } from "./middleware/not-found.middleware.js";
 import { apiRouter } from "./routes/index.js";
@@ -82,6 +83,7 @@ export function createApp() {
     });
   });
 
+  app.use(doubleCsrfProtection);
   app.use("/api", apiRouter);
 
   app.use(notFoundHandler);

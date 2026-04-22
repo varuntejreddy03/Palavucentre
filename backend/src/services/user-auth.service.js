@@ -118,25 +118,26 @@ export async function loginUserWithGoogle({ idToken }) {
     throw new ApiError(StatusCodes.UNAUTHORIZED, "Invalid Google token");
   }
 
+  const googleSub = String(payload?.sub || "").trim();
   const normalizedEmail = normalizeEmail(payload?.email);
-  if (!normalizedEmail || payload?.email_verified !== true) {
+  if (!googleSub || !normalizedEmail || payload?.email_verified !== true) {
     throw new ApiError(StatusCodes.UNAUTHORIZED, "Google account email is not verified");
   }
 
-  const existingUser = await prisma.user.findUnique({
-    where: { email: normalizedEmail },
+  const linkedGoogleUser = await prisma.user.findUnique({
+    where: { googleSub },
   });
 
-  if (existingUser && !existingUser.isActive) {
+  if (linkedGoogleUser && !linkedGoogleUser.isActive) {
     throw new ApiError(StatusCodes.UNAUTHORIZED, "This account is disabled");
   }
 
-  if (existingUser) {
+  if (linkedGoogleUser) {
     const updatedUser = await prisma.user.update({
-      where: { id: existingUser.id },
+      where: { id: linkedGoogleUser.id },
       data: {
         lastLoginAt: new Date(),
-        ...(existingUser.name?.trim() ? {} : { name: getGoogleLoginDisplayName(payload, normalizedEmail) }),
+        ...(linkedGoogleUser.name?.trim() ? {} : { name: getGoogleLoginDisplayName(payload, normalizedEmail) }),
       },
     });
 
@@ -146,11 +147,40 @@ export async function loginUserWithGoogle({ idToken }) {
     };
   }
 
+  const existingEmailUser = await prisma.user.findUnique({
+    where: { email: normalizedEmail },
+  });
+
+  if (existingEmailUser && !existingEmailUser.isActive) {
+    throw new ApiError(StatusCodes.UNAUTHORIZED, "This account is disabled");
+  }
+
+  if (existingEmailUser?.googleSub && existingEmailUser.googleSub !== googleSub) {
+    throw new ApiError(StatusCodes.CONFLICT, "This email is already linked to another Google account");
+  }
+
+  if (existingEmailUser) {
+    const linkedUser = await prisma.user.update({
+      where: { id: existingEmailUser.id },
+      data: {
+        googleSub,
+        lastLoginAt: new Date(),
+        ...(existingEmailUser.name?.trim() ? {} : { name: getGoogleLoginDisplayName(payload, normalizedEmail) }),
+      },
+    });
+
+    return {
+      token: buildUserToken(linkedUser),
+      user: serializeUser(linkedUser),
+    };
+  }
+
   const passwordHash = await bcrypt.hash(`google-oauth-${randomUUID()}`, 10);
   const createdUser = await prisma.user.create({
     data: {
       name: getGoogleLoginDisplayName(payload, normalizedEmail),
       email: normalizedEmail,
+      googleSub,
       passwordHash,
       isActive: true,
       lastLoginAt: new Date(),

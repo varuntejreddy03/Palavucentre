@@ -6,10 +6,7 @@ import { prisma } from "../config/prisma.js";
 import { ApiError } from "../utils/ApiError.js";
 
 function readToken(req) {
-  return (
-    req.cookies?.[env.USER_COOKIE_NAME] ||
-    req.headers.authorization?.replace(/^Bearer\s+/i, "").trim()
-  );
+  return req.cookies?.[env.USER_COOKIE_NAME] || null;
 }
 
 async function resolveUserFromRequest(req) {

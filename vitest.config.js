@@ -13,6 +13,7 @@ export default defineConfig({
     mockReset: true,
     include: [
       'src/**/*.test.{js,jsx}',
+      'user-frontend/src/**/*.test.{js,jsx}',
       'backend/**/*.test.{js,jsx}',
     ],
   },

@@ -19,7 +19,6 @@ export async function signup(req, res) {
     success: true,
     message: "Account created successfully",
     data: {
-      token: result.token,
       user: result.user,
     },
   });
@@ -33,7 +32,6 @@ export async function login(req, res) {
     success: true,
     message: "Login successful",
     data: {
-      token: result.token,
       user: result.user,
     },
   });
@@ -47,7 +45,6 @@ export async function googleLogin(req, res) {
     success: true,
     message: "Google login successful",
     data: {
-      token: result.token,
       user: result.user,
     },
   });

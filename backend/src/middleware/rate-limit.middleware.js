@@ -29,6 +29,13 @@ export const authRateLimiter = buildLimiter({
   message: "Too many authentication attempts. Please try again later.",
 });
 
+export const adminAuthLimiter = buildLimiter({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  skipSuccessfulRequests: true,
+  message: "Too many admin login attempts. Try again in 15 minutes.",
+});
+
 export const orderRateLimiter = buildLimiter({
   windowMs: 15 * 60 * 1000,
   max: 30,

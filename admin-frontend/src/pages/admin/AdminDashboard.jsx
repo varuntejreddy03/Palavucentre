@@ -20,16 +20,15 @@ import {
 } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 
-import { useSiteSettings } from '../../../../user-frontend/src/context/SiteContext.jsx'
-import { adminApi } from '../../../../user-frontend/src/lib/api.js'
-import { formatCurrency, formatDate, formatDateTime } from '../../../../user-frontend/src/lib/formatters.js'
+import { adminApi } from '../../api/adminApi'
+import { formatCurrency, formatDate, formatDateTime } from '../../../../shared/formatters.js'
 import { ADMIN_LOGIN_PATH, PUBLIC_SITE_URL } from '../../lib/admin-routing'
 import {
   DEFAULT_MENU_CATEGORY_ICON,
   getMenuCategoryIcon,
   getMenuCategoryIconLabel,
   MENU_CATEGORY_ICON_OPTIONS,
-} from '../../../../user-frontend/src/lib/menu-icons.js'
+} from '../../../../shared/menu-icons.js'
 import {
   orderStatuses,
   paymentStatuses,
@@ -70,9 +69,42 @@ import {
   OrdersList,
 } from './AdminDashboard.shared'
 
+const initialSectionLoadingState = {
+  overview: false,
+  menu: false,
+  gallery: false,
+  reviews: false,
+  offers: false,
+  promocodes: false,
+  orders: false,
+  inquiries: false,
+  settings: false,
+}
+
+const initialPaginationState = {
+  menu: { page: 1, totalPages: 1 },
+  gallery: { page: 1, totalPages: 1 },
+  reviews: { page: 1, totalPages: 1 },
+  offers: { page: 1, totalPages: 1 },
+  promocodes: { page: 1, totalPages: 1 },
+  orders: { page: 1, totalPages: 1 },
+}
+
+function SectionSkeleton({ cards = 3 }) {
+  return (
+    <div className="grid gap-4">
+      {Array.from({ length: cards }).map((_, index) => (
+        <div
+          key={index}
+          className="h-28 animate-pulse rounded-[20px] border border-slate-200 bg-white shadow-[0_1px_2px_rgba(15,23,42,0.04)]"
+        />
+      ))}
+    </div>
+  )
+}
+
 export default function AdminDashboard() {
   const navigate = useNavigate()
-  const { refreshSiteSettings } = useSiteSettings()
   const [activeTab, setActiveTab] = useState('overview')
   const [admin, setAdmin] = useState(null)
   const [dashboard, setDashboard] = useState(null)
@@ -103,12 +135,16 @@ export default function AdminDashboard() {
   const [error, setError] = useState('')
   const [notice, setNotice] = useState('')
   const [busyKey, setBusyKey] = useState('')
+  const [sectionLoading, setSectionLoading] = useState(initialSectionLoadingState)
+  const [loadedSections, setLoadedSections] = useState({})
+  const [sectionPagination, setSectionPagination] = useState(initialPaginationState)
   const [menuSearch, setMenuSearch] = useState('')
   const [menuCategoryFilter, setMenuCategoryFilter] = useState('all')
   const [orderSearch, setOrderSearch] = useState('')
   const [orderStatusFilter, setOrderStatusFilter] = useState('all')
   const [orderPaymentFilter, setOrderPaymentFilter] = useState('all')
   const [expandedOrderId, setExpandedOrderId] = useState(null)
+  const activeSectionKey = activeTab === 'ordering' ? 'settings' : activeTab
 
   const showAdminAlert = (message) => {
     setError(message)
@@ -240,43 +276,67 @@ export default function AdminDashboard() {
     setDashboard(response.data)
   }
 
-  const fetchMenuData = async () => {
+  const fetchMenuData = async ({ page = 1, append = false } = {}) => {
     const [categoriesResponse, itemsResponse] = await Promise.all([
       adminApi.getMenuCategories(),
-      adminApi.getMenuItems(),
+      adminApi.getMenuItems({ page, limit: 20 }),
     ])
 
     setCategories(categoriesResponse.data.items || [])
-    setMenuItems(itemsResponse.data.items || [])
+    setMenuItems((current) => (append ? [...current, ...(itemsResponse.data.items || [])] : itemsResponse.data.items || []))
+    setSectionPagination((current) => ({
+      ...current,
+      menu: itemsResponse.data.pagination || current.menu,
+    }))
   }
 
-  const fetchGallery = async () => {
-    const response = await adminApi.getGallery()
-    setGalleryItems(response.data.items || [])
+  const fetchGallery = async ({ page = 1, append = false } = {}) => {
+    const response = await adminApi.getGallery({ page, limit: 20 })
+    setGalleryItems((current) => (append ? [...current, ...(response.data.items || [])] : response.data.items || []))
+    setSectionPagination((current) => ({
+      ...current,
+      gallery: response.data.pagination || current.gallery,
+    }))
   }
 
-  const fetchReviews = async () => {
-    const response = await adminApi.getReviews()
-    setReviews(response.data.items || [])
+  const fetchReviews = async ({ page = 1, append = false } = {}) => {
+    const response = await adminApi.getReviews({ page, limit: 20 })
+    setReviews((current) => (append ? [...current, ...(response.data.items || [])] : response.data.items || []))
+    setSectionPagination((current) => ({
+      ...current,
+      reviews: response.data.pagination || current.reviews,
+    }))
   }
 
-  const fetchOffers = async () => {
-    const response = await adminApi.getOffers()
-    setOffers(response.data.items || [])
+  const fetchOffers = async ({ page = 1, append = false } = {}) => {
+    const response = await adminApi.getOffers({ page, limit: 20 })
+    setOffers((current) => (append ? [...current, ...(response.data.items || [])] : response.data.items || []))
+    setSectionPagination((current) => ({
+      ...current,
+      offers: response.data.pagination || current.offers,
+    }))
   }
 
-  const fetchPromoCodes = async () => {
-    const response = await adminApi.getPromoCodes()
-    setPromoCodes(response.data.items || [])
+  const fetchPromoCodes = async ({ page = 1, append = false } = {}) => {
+    const response = await adminApi.getPromoCodes({ page, limit: 20 })
+    setPromoCodes((current) => (append ? [...current, ...(response.data.items || [])] : response.data.items || []))
+    setSectionPagination((current) => ({
+      ...current,
+      promocodes: response.data.pagination || current.promocodes,
+    }))
   }
 
-  const fetchOrders = async () => {
-    const response = await adminApi.getOrders()
-    setOrders(response.data.items || [])
+  const fetchOrders = async ({ page = 1, append = false } = {}) => {
+    const response = await adminApi.getOrders({ page, limit: 20 })
+    setOrders((current) => (append ? [...current, ...(response.data.items || [])] : response.data.items || []))
+    setSectionPagination((current) => ({
+      ...current,
+      orders: response.data.pagination || current.orders,
+    }))
   }
 
   const fetchInquiries = async () => {
-    const response = await adminApi.getInquiries()
+    const response = await adminApi.getInquiries({ page: 1, limit: 20 })
     setInquiries(response.data)
   }
 
@@ -286,33 +346,50 @@ export default function AdminDashboard() {
     setSettingsForm(buildSettingsForm(response.data))
   }
 
-  const refreshAllData = async ({ silent = false } = {}) => {
+  const loadSection = async (sectionKey, { force = false, silent = false } = {}) => {
+    if (!force && loadedSections[sectionKey]) {
+      return
+    }
+
     try {
       if (!silent) {
         setIsRefreshing(true)
         setError('')
       }
 
-      await Promise.all([
-        fetchDashboard(),
-        fetchMenuData(),
-        fetchGallery(),
-        fetchReviews(),
-        fetchOffers(),
-        fetchPromoCodes(),
-        fetchOrders(),
-        fetchInquiries(),
-        fetchSettings(),
-      ])
+      setSectionLoading((current) => ({ ...current, [sectionKey]: true }))
+
+      if (sectionKey === 'overview') {
+        await fetchDashboard()
+      } else if (sectionKey === 'menu') {
+        await fetchMenuData()
+      } else if (sectionKey === 'gallery') {
+        await fetchGallery()
+      } else if (sectionKey === 'reviews') {
+        await fetchReviews()
+      } else if (sectionKey === 'offers') {
+        await fetchOffers()
+      } else if (sectionKey === 'promocodes') {
+        await fetchPromoCodes()
+      } else if (sectionKey === 'orders') {
+        await fetchOrders()
+      } else if (sectionKey === 'inquiries') {
+        await fetchInquiries()
+      } else if (sectionKey === 'settings') {
+        await fetchSettings()
+      }
+
+      setLoadedSections((current) => ({ ...current, [sectionKey]: true }))
     } catch (requestError) {
       setError(requestError.message || 'Failed to refresh admin data')
     } finally {
+      setSectionLoading((current) => ({ ...current, [sectionKey]: false }))
       if (!silent) {
         setIsRefreshing(false)
       }
     }
   }
-  const refreshAllDataEvent = useEffectEvent(refreshAllData)
+  const loadSectionEvent = useEffectEvent(loadSection)
 
   useEffect(() => {
     let isMounted = true
@@ -328,7 +405,7 @@ export default function AdminDashboard() {
         }
 
         setAdmin(sessionResponse.data.admin)
-        await refreshAllDataEvent({ silent: true })
+        await loadSectionEvent('overview', { force: true, silent: true })
       } catch (requestError) {
         if (!isMounted) {
           return
@@ -353,6 +430,45 @@ export default function AdminDashboard() {
       isMounted = false
     }
   }, [navigate])
+
+  useEffect(() => {
+    if (!admin) {
+      return
+    }
+
+    loadSectionEvent(activeSectionKey, { silent: true })
+  }, [activeSectionKey, admin])
+
+  const refreshActiveSection = () => loadSection(activeSectionKey, { force: true })
+
+  const canLoadMoreSection = (sectionKey) =>
+    Number(sectionPagination[sectionKey]?.page || 1) < Number(sectionPagination[sectionKey]?.totalPages || 1)
+
+  const loadMoreSection = async (sectionKey) => {
+    const nextPage = Number(sectionPagination[sectionKey]?.page || 1) + 1
+
+    try {
+      setSectionLoading((current) => ({ ...current, [sectionKey]: true }))
+
+      if (sectionKey === 'menu') {
+        await fetchMenuData({ page: nextPage, append: true })
+      } else if (sectionKey === 'gallery') {
+        await fetchGallery({ page: nextPage, append: true })
+      } else if (sectionKey === 'reviews') {
+        await fetchReviews({ page: nextPage, append: true })
+      } else if (sectionKey === 'offers') {
+        await fetchOffers({ page: nextPage, append: true })
+      } else if (sectionKey === 'promocodes') {
+        await fetchPromoCodes({ page: nextPage, append: true })
+      } else if (sectionKey === 'orders') {
+        await fetchOrders({ page: nextPage, append: true })
+      }
+    } catch (requestError) {
+      setError(requestError.message || 'Failed to load more admin data')
+    } finally {
+      setSectionLoading((current) => ({ ...current, [sectionKey]: false }))
+    }
+  }
 
   const resetCategoryForm = () => setCategoryForm(initialCategoryForm)
   const resetMenuItemForm = () => setMenuItemForm(initialMenuItemForm)
@@ -728,7 +844,7 @@ export default function AdminDashboard() {
       setSettings(response.data)
       setSettingsForm(buildSettingsForm(response.data))
       setNotice('Site settings updated')
-      await Promise.all([refreshSiteSettings(), fetchDashboard()])
+      await Promise.all([fetchSettings(), fetchDashboard()])
     } catch (requestError) {
       setError(requestError.message || 'Could not update site settings')
     } finally {
@@ -897,7 +1013,7 @@ export default function AdminDashboard() {
                   <ActionButton
                     type="button"
                     variant="secondary"
-                    onClick={() => refreshAllData()}
+                    onClick={refreshActiveSection}
                     disabled={isRefreshing}
                     className="inline-flex items-center gap-2"
                   >
@@ -953,7 +1069,10 @@ export default function AdminDashboard() {
               })}
             </div>
 
-            <div className="space-y-6">
+            {sectionLoading[activeSectionKey] && !loadedSections[activeSectionKey] ? (
+              <SectionSkeleton cards={activeSectionKey === 'overview' ? 4 : 3} />
+            ) : (
+              <div className="space-y-6">
           {activeTab === 'overview' && (
             <>
               <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
@@ -1470,6 +1589,18 @@ export default function AdminDashboard() {
                       No menu items match the current filters.
                     </p>
                   )}
+                  {canLoadMoreSection('menu') && (
+                    <div className="pt-2">
+                      <ActionButton
+                        type="button"
+                        variant="secondary"
+                        onClick={() => loadMoreSection('menu')}
+                        disabled={sectionLoading.menu}
+                      >
+                        {sectionLoading.menu ? 'Loading...' : 'Load More Dishes'}
+                      </ActionButton>
+                    </div>
+                  )}
                 </div>
               </SectionCard>
               </div>
@@ -1555,6 +1686,18 @@ export default function AdminDashboard() {
                 busyKey={busyKey}
                 updateOrderField={updateOrderField}
               />
+              {canLoadMoreSection('orders') && (
+                <div className="mt-4">
+                  <ActionButton
+                    type="button"
+                    variant="secondary"
+                    onClick={() => loadMoreSection('orders')}
+                    disabled={sectionLoading.orders}
+                  >
+                    {sectionLoading.orders ? 'Loading...' : 'Load More Orders'}
+                  </ActionButton>
+                </div>
+              )}
             </SectionCard>
           )}
 
@@ -1723,6 +1866,18 @@ export default function AdminDashboard() {
                   </div>
                 ))}
               </div>
+              {canLoadMoreSection('gallery') && (
+                <div className="mt-4">
+                  <ActionButton
+                    type="button"
+                    variant="secondary"
+                    onClick={() => loadMoreSection('gallery')}
+                    disabled={sectionLoading.gallery}
+                  >
+                    {sectionLoading.gallery ? 'Loading...' : 'Load More Media'}
+                  </ActionButton>
+                </div>
+              )}
             </SectionCard>
           )}
 
@@ -1875,6 +2030,18 @@ export default function AdminDashboard() {
                   </div>
                 ))}
               </div>
+              {canLoadMoreSection('reviews') && (
+                <div className="mt-4">
+                  <ActionButton
+                    type="button"
+                    variant="secondary"
+                    onClick={() => loadMoreSection('reviews')}
+                    disabled={sectionLoading.reviews}
+                  >
+                    {sectionLoading.reviews ? 'Loading...' : 'Load More Reviews'}
+                  </ActionButton>
+                </div>
+              )}
             </SectionCard>
           )}
 
@@ -2065,6 +2232,18 @@ export default function AdminDashboard() {
                   </div>
                 ))}
               </div>
+              {canLoadMoreSection('offers') && (
+                <div className="mt-4">
+                  <ActionButton
+                    type="button"
+                    variant="secondary"
+                    onClick={() => loadMoreSection('offers')}
+                    disabled={sectionLoading.offers}
+                  >
+                    {sectionLoading.offers ? 'Loading...' : 'Load More Offers'}
+                  </ActionButton>
+                </div>
+              )}
             </SectionCard>
           )}
 
@@ -2307,6 +2486,18 @@ export default function AdminDashboard() {
 
                 {promoCodes.length === 0 && (
                   <p className="text-sm text-slate-600">No promo codes created yet.</p>
+                )}
+                {canLoadMoreSection('promocodes') && (
+                  <div className="pt-2">
+                    <ActionButton
+                      type="button"
+                      variant="secondary"
+                      onClick={() => loadMoreSection('promocodes')}
+                      disabled={sectionLoading.promocodes}
+                    >
+                      {sectionLoading.promocodes ? 'Loading...' : 'Load More Promo Codes'}
+                    </ActionButton>
+                  </div>
                 )}
               </div>
             </SectionCard>
@@ -2797,7 +2988,8 @@ export default function AdminDashboard() {
               </form>
             </SectionCard>
           )}
-            </div>
+              </div>
+            )}
           </main>
         </div>
       </div>

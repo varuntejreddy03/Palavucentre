@@ -16,6 +16,7 @@ import { useAccount } from '../context/AccountContext'
 import { useCart } from '../context/CartContext'
 import { useSiteSettings } from '../context/SiteContext'
 import { formatCurrency } from '../lib/formatters'
+import { ORDER_ROUTE, navigateToLoginWithRedirect } from '../lib/order-flow'
 
 const SIGNED_IN_BANNER_STORAGE_KEY = 'palavu:cart-signed-in-banner-dismissed'
 
@@ -87,13 +88,7 @@ export default function CartDrawer() {
       return
     }
 
-    navigate('/login', {
-      state: {
-        from: {
-          pathname: '/order',
-        },
-      },
-    })
+    navigateToLoginWithRedirect(navigate, ORDER_ROUTE, 'checkout')
   }
 
   const handleDismissSignedInBanner = () => {

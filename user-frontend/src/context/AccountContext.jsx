@@ -2,19 +2,20 @@
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 
-import { ADMIN_STANDALONE } from '../../../admin-frontend/src/lib/admin-routing'
-import { accountApi, clearUserAuthToken, setUserAuthToken } from '../lib/api'
+import { accountApi } from '../lib/api'
+import { clearStoredCsrfToken } from '../lib/csrf'
+import { disableGoogleAutoSelect } from '../lib/google-auth'
 
 const AccountContext = createContext(null)
 
 export function AccountProvider({ children }) {
   const [user, setUser] = useState(null)
   const [profile, setProfile] = useState({ addresses: [], orders: [] })
-  const [isLoading, setIsLoading] = useState(!ADMIN_STANDALONE)
+  const [isLoading, setIsLoading] = useState(true)
   const [isProfileLoading, setIsProfileLoading] = useState(false)
 
   const refreshProfile = useCallback(async () => {
-    if (ADMIN_STANDALONE || !user) {
+    if (!user) {
       setProfile({ addresses: [], orders: [] })
       return null
     }
@@ -33,11 +34,6 @@ export function AccountProvider({ children }) {
   }, [user])
 
   const refreshSession = useCallback(async () => {
-    if (ADMIN_STANDALONE) {
-      setIsLoading(false)
-      return null
-    }
-
     try {
       setIsLoading(true)
       const response = await accountApi.me()
@@ -46,10 +42,6 @@ export function AccountProvider({ children }) {
     } catch (requestError) {
       if (requestError.status !== 401) {
         console.warn('[account] Could not hydrate account session.', requestError)
-      }
-
-      if (requestError.status === 401) {
-        clearUserAuthToken()
       }
 
       setUser(null)
@@ -61,11 +53,6 @@ export function AccountProvider({ children }) {
   }, [])
 
   useEffect(() => {
-    if (ADMIN_STANDALONE) {
-      setIsLoading(false)
-      return
-    }
-
     refreshSession()
   }, [refreshSession])
 
@@ -84,21 +71,21 @@ export function AccountProvider({ children }) {
 
   const signup = useCallback(async (payload) => {
     const response = await accountApi.signup(payload)
-    setUserAuthToken(response.data.token)
+    clearStoredCsrfToken()
     setUser(response.data.user)
     return response.data.user
   }, [])
 
   const login = useCallback(async (payload) => {
     const response = await accountApi.login(payload)
-    setUserAuthToken(response.data.token)
+    clearStoredCsrfToken()
     setUser(response.data.user)
     return response.data.user
   }, [])
 
   const googleLogin = useCallback(async (payload) => {
     const response = await accountApi.googleLogin(payload)
-    setUserAuthToken(response.data.token)
+    clearStoredCsrfToken()
     setUser(response.data.user)
     return response.data.user
   }, [])
@@ -107,7 +94,8 @@ export function AccountProvider({ children }) {
     try {
       await accountApi.logout()
     } finally {
-      clearUserAuthToken()
+      disableGoogleAutoSelect()
+      clearStoredCsrfToken()
       setUser(null)
       setProfile({ addresses: [], orders: [] })
     }

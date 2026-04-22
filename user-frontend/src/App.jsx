@@ -8,6 +8,7 @@ import { useAccount } from './context/AccountContext'
 import Home from './pages/Home'
 import MenuPage from './pages/MenuPage'
 import OrderPage from './pages/OrderPage'
+import TrackOrderPage from './pages/TrackOrderPage'
 import GalleryPage from './pages/GalleryPage'
 import CateringPage from './pages/CateringPage'
 import FranchisePage from './pages/FranchisePage'
@@ -15,27 +16,10 @@ import ContactPage from './pages/ContactPage'
 import StoryPage from './pages/StoryPage'
 import AuthPage from './pages/account/AuthPage'
 import ProfilePage from './pages/account/ProfilePage'
-import AdminLogin from '../../admin-frontend/src/pages/admin/AdminLogin'
-import AdminDashboard from '../../admin-frontend/src/pages/admin/AdminDashboard'
+import CartBar from './components/CartBar'
 import CartDrawer from './components/CartDrawer'
-import {
-  ADMIN_SITE_URL,
-  ADMIN_DASHBOARD_PATH,
-  ADMIN_INDEX_PATH,
-  ADMIN_LOGIN_PATH,
-  ADMIN_STANDALONE,
-  LEGACY_ADMIN_BASE_PATH,
-  LEGACY_ADMIN_DASHBOARD_PATH,
-  LEGACY_ADMIN_LOGIN_PATH,
-} from '../../admin-frontend/src/lib/admin-routing'
-
-function RedirectToAdminSite() {
-  useEffect(() => {
-    window.location.replace(ADMIN_SITE_URL || '/')
-  }, [])
-
-  return null
-}
+import { ensureCsrfToken } from './lib/csrf'
+import { initializeGoogleIdentity } from './lib/google-auth'
 
 function RequireAccountAuth({ children }) {
   const location = useLocation()
@@ -54,64 +38,44 @@ function RequireAccountAuth({ children }) {
 
 function AppContent() {
   const location = useLocation()
-  const showPublicShell = !ADMIN_STANDALONE
+  const showPublicShell = true
   const hideWhatsappFab = location.pathname === '/order' || location.pathname.startsWith('/profile')
+  const showCartBar = location.pathname === '/menu' || location.pathname === '/'
 
   return (
     <div className="min-h-screen bg-bg-page text-text-primary flex flex-col">
       {showPublicShell && <Navbar />}
       {showPublicShell && <CartDrawer />}
+      {showPublicShell && showCartBar && <CartBar />}
       {showPublicShell && !hideWhatsappFab && <WhatsAppButton />}
       <main className="flex-grow">
         <Routes>
-          {ADMIN_STANDALONE ? (
-            <>
-              <Route path={ADMIN_INDEX_PATH} element={<Navigate to={ADMIN_DASHBOARD_PATH} replace />} />
-              <Route path={ADMIN_LOGIN_PATH} element={<AdminLogin />} />
-              <Route path={ADMIN_DASHBOARD_PATH} element={<AdminDashboard />} />
-              <Route path={LEGACY_ADMIN_BASE_PATH} element={<Navigate to={ADMIN_DASHBOARD_PATH} replace />} />
-              <Route path={LEGACY_ADMIN_LOGIN_PATH} element={<Navigate to={ADMIN_LOGIN_PATH} replace />} />
-              <Route path={LEGACY_ADMIN_DASHBOARD_PATH} element={<Navigate to={ADMIN_DASHBOARD_PATH} replace />} />
-              <Route path="*" element={<Navigate to={ADMIN_DASHBOARD_PATH} replace />} />
-            </>
-          ) : (
-            <>
-              <Route path="/" element={<Home />} />
-              <Route path="/menu" element={<MenuPage />} />
-              <Route
-                path="/order"
-                element={
-                  <RequireAccountAuth>
-                    <OrderPage />
-                  </RequireAccountAuth>
-                }
-              />
-              <Route path="/gallery" element={<GalleryPage />} />
-              <Route path="/catering" element={<CateringPage />} />
-              <Route path="/franchise" element={<FranchisePage />} />
-              <Route path="/contact" element={<ContactPage />} />
-              <Route
-                path="/track-order"
-                element={
-                  <RequireAccountAuth>
-                    <Navigate to="/profile?tab=orders" replace />
-                  </RequireAccountAuth>
-                }
-              />
-              <Route path="/story" element={<StoryPage />} />
-              <Route path="/login" element={<AuthPage mode="login" />} />
-              <Route path="/signup" element={<AuthPage mode="signup" />} />
-              <Route
-                path="/profile"
-                element={
-                  <RequireAccountAuth>
-                    <ProfilePage />
-                  </RequireAccountAuth>
-                }
-              />
-              <Route path="/admin/*" element={<RedirectToAdminSite />} />
-            </>
-          )}
+          <Route path="/" element={<Home />} />
+          <Route path="/menu" element={<MenuPage />} />
+          <Route
+            path="/order"
+            element={
+              <RequireAccountAuth>
+                <OrderPage />
+              </RequireAccountAuth>
+            }
+          />
+          <Route path="/gallery" element={<GalleryPage />} />
+          <Route path="/catering" element={<CateringPage />} />
+          <Route path="/franchise" element={<FranchisePage />} />
+          <Route path="/contact" element={<ContactPage />} />
+          <Route path="/track-order" element={<TrackOrderPage />} />
+          <Route path="/story" element={<StoryPage />} />
+          <Route path="/login" element={<AuthPage mode="login" />} />
+          <Route path="/signup" element={<AuthPage mode="signup" />} />
+          <Route
+            path="/profile"
+            element={
+              <RequireAccountAuth>
+                <ProfilePage />
+              </RequireAccountAuth>
+            }
+          />
         </Routes>
       </main>
       {showPublicShell && <Footer />}
@@ -120,6 +84,11 @@ function AppContent() {
 }
 
 function App() {
+  useEffect(() => {
+    ensureCsrfToken().catch(() => null)
+    initializeGoogleIdentity().catch(() => null)
+  }, [])
+
   return (
     <CartProvider>
       <BrowserRouter>

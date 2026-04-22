@@ -15,7 +15,7 @@ export default function WhatsAppButton() {
       href={`https://wa.me/${whatsappNumber}?text=Hi, I'd like to know more about ${encodeURIComponent(restaurantName)}`}
       target="_blank"
       rel="noopener noreferrer"
-      className="fixed bottom-20 right-4 h-14 w-14 rounded-full bg-whatsapp text-white transition-all duration-300 hover:scale-110 sm:bottom-24 sm:right-6 z-50 flex items-center justify-center whatsapp-fab"
+      className="fixed bottom-24 right-4 h-14 w-14 rounded-full bg-whatsapp text-white transition-all duration-300 hover:scale-110 sm:bottom-28 sm:right-6 z-50 flex items-center justify-center whatsapp-fab"
       aria-label="Chat on WhatsApp"
     >
       <span className="whatsapp-fab-ring" aria-hidden="true" />

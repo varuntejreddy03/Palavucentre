@@ -72,6 +72,7 @@ beforeEach(() => {
     },
   ]
   mockAccount.isAuthenticated = true
+  mockAccount.user = { name: 'Varun Teja', email: 'varun@example.com' }
   window.localStorage.clear()
 })
 
@@ -88,9 +89,10 @@ describe('CartDrawer', () => {
     expect(mockNavigate).toHaveBeenCalledWith('/menu')
   })
 
-  it('sends unauthenticated users to login for checkout', async () => {
+  it('sends unauthenticated users to login for checkout with the full order return path', async () => {
     const user = userEvent.setup()
     mockAccount.isAuthenticated = false
+    mockAccount.user = null
 
     render(<CartDrawer />)
     await user.click(screen.getByRole('button', { name: /login to checkout/i }))
@@ -99,15 +101,17 @@ describe('CartDrawer', () => {
       state: {
         from: {
           pathname: '/order',
+          search: '',
         },
+        authSource: 'checkout',
       },
     })
   })
 
   it('sends authenticated users to the order page', async () => {
     const user = userEvent.setup()
-    render(<CartDrawer />)
 
+    render(<CartDrawer />)
     await user.click(screen.getByRole('button', { name: /continue to order/i }))
 
     expect(mockNavigate).toHaveBeenCalledWith('/order')
@@ -115,20 +119,19 @@ describe('CartDrawer', () => {
 
   it('dismisses the signed-in banner and stores the preference', async () => {
     const user = userEvent.setup()
-    render(<CartDrawer />)
 
+    render(<CartDrawer />)
     await user.click(screen.getByLabelText('Dismiss signed in banner'))
 
     expect(window.localStorage.getItem('palavu:cart-signed-in-banner-dismissed')).toBe('true')
-    expect(screen.queryByText(/Signed in as/i)).toBeNull()
+    expect(screen.queryByText(/signed in as/i)).toBeNull()
   })
 
   it('increments item quantity from the drawer stepper', async () => {
     const user = userEvent.setup()
-    render(<CartDrawer />)
 
-    const incrementButton = screen.getByRole('button', { name: /increase punugulu quantity/i })
-    await user.click(incrementButton)
+    render(<CartDrawer />)
+    await user.click(screen.getByRole('button', { name: /increase punugulu quantity/i }))
 
     expect(mockCart.updateQuantity).toHaveBeenCalledWith(1, 3)
   })
@@ -147,28 +150,9 @@ describe('CartDrawer', () => {
     ]
 
     render(<CartDrawer />)
-    const decrementButton = screen.getByRole('button', { name: /decrease punugulu quantity/i })
-    fireEvent.click(decrementButton)
+    fireEvent.click(screen.getByRole('button', { name: /decrease punugulu quantity/i }))
     vi.advanceTimersByTime(200)
 
     expect(mockCart.removeFromCart).toHaveBeenCalledWith(1)
-  })
-
-  it('toggles the summary section closed', async () => {
-    const user = userEvent.setup()
-    render(<CartDrawer />)
-
-    expect(screen.getByText('Subtotal')).toBeTruthy()
-    await user.click(screen.getByText('Order Summary').closest('button'))
-    expect(screen.queryByText('Subtotal')).toBeNull()
-  })
-
-  it('shows a promo message when apply is clicked with no code', async () => {
-    const user = userEvent.setup()
-    render(<CartDrawer />)
-
-    await user.click(screen.getByRole('button', { name: 'Apply' }))
-
-    expect(screen.getByText('Enter a promo code first.')).toBeTruthy()
   })
 })

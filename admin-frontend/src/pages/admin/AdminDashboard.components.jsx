@@ -1,6 +1,6 @@
 import { ChevronDown, ChevronUp } from 'lucide-react'
 
-import { formatCurrency, formatDateTime } from '../../../../user-frontend/src/lib/formatters.js'
+import { formatCurrency, formatDateTime } from '../../../../shared/formatters.js'
 import { paymentStatuses, orderStatuses } from './AdminDashboard.constants'
 import { toLabelCase } from './AdminDashboard.utils'
 

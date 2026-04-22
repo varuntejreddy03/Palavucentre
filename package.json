@@ -15,7 +15,7 @@
     "test": "vitest",
     "test:run": "vitest run",
     "test:backend": "vitest run backend/src/app.public-routes.test.js",
-    "test:ui": "vitest run src/components/CartDrawer.test.jsx src/pages/OrderPage.test.jsx src/pages/account/AuthPage.test.jsx",
+    "test:ui": "vitest run user-frontend/src/components/CartBar.test.jsx user-frontend/src/components/CartDrawer.test.jsx user-frontend/src/pages/MenuPage.test.jsx user-frontend/src/pages/OrderPage.test.jsx user-frontend/src/pages/account/AuthPage.test.jsx user-frontend/src/pages/account/ProfilePage.test.jsx",
     "test:e2e": "npx playwright test",
     "preview": "vite preview"
   },

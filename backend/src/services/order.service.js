@@ -179,7 +179,6 @@ export async function createOrder(payload, { user } = {}) {
         taxPaise: totals.taxPaise,
         grandTotalPaise: totals.grandTotalPaise,
         currency: orderConfig.currency,
-        isOtpVerified: true,
         items: {
           create: orderItems,
         },

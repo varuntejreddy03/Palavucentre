@@ -1,6 +1,5 @@
 import { createContext, useContext, useEffect, useMemo, useState } from 'react'
 
-import { ADMIN_STANDALONE } from '../../../admin-frontend/src/lib/admin-routing'
 import { fallbackSiteSettings } from '../lib/public-fallbacks'
 import { publicApi } from '../lib/api'
 
@@ -8,7 +7,7 @@ const SiteContext = createContext(null)
 
 export function SiteProvider({ children }) {
   const [siteSettings, setSiteSettings] = useState(fallbackSiteSettings)
-  const [isLoading, setIsLoading] = useState(!ADMIN_STANDALONE)
+  const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState('')
 
   const loadSiteSettings = async () => {
@@ -25,11 +24,6 @@ export function SiteProvider({ children }) {
   }
 
   useEffect(() => {
-    if (ADMIN_STANDALONE) {
-      setIsLoading(false)
-      return
-    }
-
     loadSiteSettings()
     // Public site should always try to hydrate from the backend on startup.
     // eslint-disable-next-line react-hooks/exhaustive-deps

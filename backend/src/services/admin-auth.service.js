@@ -6,15 +6,16 @@ import { env } from "../config/env.js";
 import { prisma } from "../config/prisma.js";
 import { ApiError } from "../utils/ApiError.js";
 
-export async function loginAdmin({ email, username, password }) {
-  const identifier = (email || username || "").trim().toLowerCase();
+export async function loginAdmin({ email, password }) {
+  const normalizedEmail = String(email || "").trim().toLowerCase();
 
-  let admin = identifier
-    ? await prisma.admin.findUnique({ where: { email: identifier } })
-    : await prisma.admin.findFirst({
-        where: { isActive: true },
-        orderBy: { id: "asc" },
-      });
+  if (!normalizedEmail) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, "Email is required");
+  }
+
+  const admin = await prisma.admin.findUnique({
+    where: { email: normalizedEmail },
+  });
 
   if (!admin || !admin.isActive) {
     throw new ApiError(StatusCodes.UNAUTHORIZED, "Invalid admin credentials");
