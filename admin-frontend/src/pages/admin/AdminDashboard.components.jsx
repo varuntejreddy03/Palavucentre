@@ -1,4 +1,4 @@
-import { ChevronDown, ChevronUp } from 'lucide-react'
+import { ChevronDown, ChevronUp, MapPin } from 'lucide-react'
 
 import { formatCurrency, formatDateTime } from '../../shared/formatters.js'
 import { paymentStatuses, orderStatuses } from './AdminDashboard.constants'
@@ -259,6 +259,10 @@ export function OrdersList({ filteredOrders, expandedOrderId, setExpandedOrderId
                       <span className="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-[11px] font-medium text-slate-600">
                         {order.items.length} items
                       </span>
+                      <span className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-[11px] font-medium ${order.storeLocation ? 'border-emerald-200 bg-emerald-50 text-emerald-700' : 'border-slate-200 bg-slate-50 text-slate-500'}`}>
+                        <MapPin className="h-3 w-3" />
+                        {order.storeLocation ? toLabelCase(order.storeLocation) : 'No branch'}
+                      </span>
                       {order.promo?.code && (
                         <span className="rounded-full border border-blue-100 bg-blue-50 px-2.5 py-1 text-[11px] font-medium text-blue-700">
                           Promo {order.promo.code}
@@ -343,6 +347,13 @@ export function OrdersList({ filteredOrders, expandedOrderId, setExpandedOrderId
                               <p className="mt-2 break-words text-sm text-slate-800">{order.account.email}</p>
                             </div>
                           )}
+                          <div>
+                            <p className="text-xs font-semibold uppercase tracking-[1.8px] text-slate-500">Branch</p>
+                            <p className={`mt-2 inline-flex items-center gap-1.5 text-sm font-semibold ${order.storeLocation ? 'text-emerald-700' : 'text-slate-400'}`}>
+                              <MapPin className="h-3.5 w-3.5" />
+                              {order.storeLocation ? toLabelCase(order.storeLocation) : 'Not selected'}
+                            </p>
+                          </div>
                           <div>
                             <p className="text-xs font-semibold uppercase tracking-[1.8px] text-slate-500">Address</p>
                             <p className="mt-2 text-sm leading-6 text-slate-800">
@@ -455,4 +466,3 @@ export function OrdersList({ filteredOrders, expandedOrderId, setExpandedOrderId
     </div>
   )
 }
-

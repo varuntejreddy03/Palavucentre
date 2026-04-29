@@ -22,6 +22,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useAccount } from '../context/AccountContext'
 import { useCart } from '../context/CartContext'
 import { useSiteSettings } from '../context/SiteContext'
+import LocationPicker from '../components/LocationPicker'
 import { promoApi, publicApi } from '../lib/api'
 import { formatCurrency, normalizePhoneNumber } from '../lib/formatters'
 
@@ -179,6 +180,7 @@ export default function OrderPage() {
   const [orderResult, setOrderResult] = useState(null)
   const [checkoutStep, setCheckoutStep] = useState(1)
   const [orderDrawerOpen, setOrderDrawerOpen] = useState(false)
+  const [storeLocation, setStoreLocation] = useState('')
 
   const savedAddresses = profile?.addresses || []
   const defaultAddress = savedAddresses.find((a) => a.isDefault) || savedAddresses[0] || null
@@ -333,6 +335,7 @@ export default function OrderPage() {
           customer, items: cartItems.map((i) => ({ menuItemId: i.id, quantity: i.quantity })),
           paymentMethod, source: 'web', notes: formData.notes.trim() || undefined,
           promoCode: appliedPromoCode || undefined, userAddressId: selectedAddress?.id || undefined,
+          storeLocation: storeLocation || undefined,
         })
         orderPayload = r.data
       }
@@ -355,6 +358,7 @@ export default function OrderPage() {
     setError(''); setCheckoutStep(2)
   }
   const goToStep3 = () => {
+    if (!storeLocation) { setError('Please select a store location'); return }
     if (!usingSavedAddress && !formData.address.trim()) { setError('Please select or enter a delivery address'); return }
     setError(''); setCheckoutStep(3)
   }
@@ -609,8 +613,12 @@ export default function OrderPage() {
             {/* STEP 2: Address */}
             {checkoutStep === 2 && (
               <section className="step-card animate-auth-step">
-                <SectionHeading eyebrow="Step 2" title="Delivery Address" description="Pick a saved address or use a one-time address for this order."
+                <SectionHeading eyebrow="Step 2" title="Delivery Address" description="Pick your nearest store, then choose a delivery address."
                   action={<Link to="/profile?tab=addresses" className="brand-secondary-btn px-5 text-[15px]">Manage Addresses</Link>} />
+
+                <div className="mt-4 rounded-[16px] border border-[var(--border)] bg-black/20 p-[18px]">
+                  <LocationPicker selected={storeLocation} onSelect={setStoreLocation} />
+                </div>
 
                 {savedAddresses.length === 0 && (
                   <div className="mt-4 flex items-start gap-3 rounded-[16px] border border-dashed border-gold/30 bg-gold/5 px-5 py-4 font-sans text-[13px] leading-6 text-[var(--text-muted)]">

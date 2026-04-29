@@ -36,7 +36,6 @@ const values = [
 
 const heroStats = (menuItemCount) => [
   { value: '10K+', label: 'Customers' },
-  { value: `${Math.max(menuItemCount, 50)}+`, label: 'Dishes' },
   { value: '4.8', label: 'Rating' },
   { value: '100%', label: 'Quality' },
 ]

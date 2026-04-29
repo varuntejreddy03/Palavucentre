@@ -41,6 +41,7 @@ export const createOrderSchema = {
         paymentMethod: body.paymentMethod ?? body.payment_method,
         promoCode: body.promoCode ?? body.promo_code,
         userAddressId: body.userAddressId ?? body.user_address_id,
+        storeLocation: body.storeLocation ?? body.store_location,
         items: Array.isArray(body.items)
           ? body.items.map((item) => ({
               ...item,
@@ -89,6 +90,7 @@ export const createOrderSchema = {
       notes: optionalTrimmedString,
       promoCode: optionalTrimmedString,
       userAddressId: z.coerce.number().int().positive().optional(),
+      storeLocation: z.enum(["kukatpally", "bachupally"]).optional(),
     }),
   ),
 };

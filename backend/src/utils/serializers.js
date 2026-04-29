@@ -208,6 +208,7 @@ export function serializeOrder(order) {
     paymentMethod: order.paymentMethod,
     paymentStatus: order.paymentStatus,
     orderStatus: order.orderStatus,
+    storeLocation: order.storeLocation,
     source: order.source,
     notes: order.notes,
     isOtpVerified: order.isOtpVerified,

@@ -181,6 +181,7 @@ model Order {
   postalCode      String?
   fullAddress     String
   notes           String?
+  storeLocation   String?
   source          String        @default("web")
   paymentMethod   PaymentMethod
   paymentStatus   PaymentStatus @default(unpaid)

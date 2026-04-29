@@ -1,7 +1,8 @@
-import { Facebook, Instagram, Linkedin, MessageCircle } from 'lucide-react'
+import { Facebook, Instagram, Linkedin, MapPin, MessageCircle } from 'lucide-react'
 import { Link } from 'react-router-dom'
 
 import { useSiteSettings } from '../context/SiteContext'
+import { STORE_LOCATIONS } from '../../../shared/store-locations'
 
 const socialIcons = {
   instagram: Instagram,
@@ -158,6 +159,49 @@ export default function Footer() {
                 )}
             </div>
             <p className="text-text-secondary text-sm mt-4">{siteSettings?.seo?.city || 'Hyderabad'}</p>
+          </div>
+        </div>
+
+        {/* Store Locations Maps */}
+        <div className="mb-10 mt-2">
+          <h4
+            className="font-bold text-gold mb-6 uppercase text-xs tracking-[3px] pb-3 border-b border-gold-dim text-center"
+            style={{ fontFamily: 'var(--font-body)' }}
+          >
+            Our Locations
+          </h4>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {STORE_LOCATIONS.map((loc) => (
+              <div key={loc.id} className="rounded-2xl overflow-hidden border border-gold/15 bg-[#0D0C09]">
+                <iframe
+                  src={loc.embedUrl}
+                  width="100%"
+                  height="250"
+                  style={{ border: 0 }}
+                  allowFullScreen
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                  title={`${loc.name} location`}
+                />
+                <div className="px-4 py-3 flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <MapPin className="h-4 w-4 shrink-0 text-gold" />
+                    <div className="min-w-0">
+                      <p className="text-sm font-semibold text-white truncate">{loc.name}</p>
+                      <p className="text-xs text-text-secondary truncate">{loc.address}</p>
+                    </div>
+                  </div>
+                  <a
+                    href={loc.mapUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="shrink-0 rounded-lg border border-gold/30 bg-gold/10 px-3 py-1.5 text-xs font-semibold text-gold transition hover:bg-gold/20"
+                  >
+                    Directions
+                  </a>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
 

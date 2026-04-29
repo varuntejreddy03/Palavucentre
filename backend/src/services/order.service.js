@@ -167,6 +167,7 @@ export async function createOrder(payload, { user } = {}) {
         postalCode: address.postalCode,
         fullAddress: address.fullAddress,
         notes: payload.notes,
+        storeLocation: payload.storeLocation,
         source: payload.source ?? "web",
         paymentMethod: payload.paymentMethod,
         paymentStatus: payload.paymentMethod === "cod" ? "unpaid" : "pending",
