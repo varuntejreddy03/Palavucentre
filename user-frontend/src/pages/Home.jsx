@@ -35,14 +35,14 @@ const values = [
 ]
 
 const heroStats = (menuItemCount) => [
-  { value: '10K+', label: 'Customers' },
+  { value: '2K+', label: 'Daily Customers' },
   { value: '4.8', label: 'Rating' },
   { value: '100%', label: 'Quality' },
 ]
 
 function getHeroLines(name) {
-  const brandName = String(name || 'RajaMahendravaram PalavuCentre').trim()
-  const exactBrandMatch = brandName.match(/^(.*)\s+(PalavuCentre)$/i)
+  const brandName = String(name || 'RajaMahendravaram Palavu Centre').trim()
+  const exactBrandMatch = brandName.match(/^(.*)\s+(Palavu\s*Centre)$/i)
 
   if (exactBrandMatch) {
     return [exactBrandMatch[1], exactBrandMatch[2]]
@@ -208,7 +208,7 @@ export default function Home() {
     }
   }, [])
 
-  const restaurantName = siteSettings?.restaurantName || 'RajaMahendravaram PalavuCentre'
+  const restaurantName = siteSettings?.restaurantName || 'RajaMahendravaram Palavu Centre'
   const heroLines = getHeroLines(restaurantName)
   const contact = siteSettings?.contact || {}
   const primaryCta = siteSettings?.cta?.primary || { label: 'Order Online', href: '/menu' }
@@ -259,7 +259,6 @@ export default function Home() {
                 </h1>
 
                 <div className="mt-5 flex items-center justify-center gap-3">
-                  <div className="h-6 w-[4px] bg-[#E8C84A]"></div>
                   <span className="text-[10px] font-bold uppercase tracking-[4px] text-[#E8C84A]">
                     Authentic Godavari Cuisine
                   </span>
@@ -319,7 +318,6 @@ export default function Home() {
                 </h1>
 
                 <div className="mt-7 flex items-center gap-4">
-                  <div className="h-7 w-[4px] bg-[#E8C84A]"></div>
                   <span className="text-[13px] font-bold uppercase tracking-[6px] text-[#E8C84A]">
                     AUTHENTIC GODAVARI CUISINE
                   </span>
@@ -393,9 +391,6 @@ export default function Home() {
           <div className="mx-auto max-w-7xl">
             <div className="relative z-10 mb-10 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
               <div>
-                <div className="inline-flex items-center gap-2 rounded-full border border-gold/20 bg-gold/10 px-4 py-2 text-[10px] font-black uppercase tracking-[3px] text-gold">
-                  Customer Favorites
-                </div>
                 <h2 className="section-title-treatment text-left">Best Sellers</h2>
                 <p className="mt-4 max-w-2xl text-sm leading-7 text-[#E5D8BC]/78">
                   {hasBestSellers
