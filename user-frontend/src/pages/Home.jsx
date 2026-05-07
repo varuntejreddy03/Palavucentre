@@ -259,9 +259,11 @@ export default function Home() {
                 </h1>
 
                 <div className="mt-5 flex items-center justify-center gap-3">
+                  <div className="h-px w-8 bg-[#E8C84A]/50"></div>
                   <span className="text-[10px] font-bold uppercase tracking-[4px] text-[#E8C84A]">
                     Authentic Godavari Cuisine
                   </span>
+                  <div className="h-px w-8 bg-[#E8C84A]/50"></div>
                 </div>
 
                 <p className="mt-7 text-[16px] italic text-[#F5ECD7] sm:text-[20px]">
@@ -318,9 +320,11 @@ export default function Home() {
                 </h1>
 
                 <div className="mt-7 flex items-center gap-4">
+                  <div className="h-px w-10 bg-[#E8C84A]/50"></div>
                   <span className="text-[13px] font-bold uppercase tracking-[6px] text-[#E8C84A]">
                     AUTHENTIC GODAVARI CUISINE
                   </span>
+                  <div className="h-px w-10 bg-[#E8C84A]/50"></div>
                 </div>
 
                 <p className="mt-10 text-[20px] italic text-[#F5ECD7] md:text-[28px]">

@@ -258,7 +258,7 @@ h1 {
   font-weight: 700;
   font-style: normal;
   letter-spacing: 0;
-  line-height: 0.9;
+  line-height: 1.1;
   background: linear-gradient(180deg, #FDE047 0%, #D6B154 50%, #8C6218 100%);
   -webkit-background-clip: text;
   background-clip: text;
@@ -468,11 +468,7 @@ h3 {
 
 .section-title-treatment::before {
   content: '';
-  display: block;
-  width: 40px;
-  height: 1px;
-  background: #7A6230;
-  margin: 0 auto 8px;
+  display: none;
 }
 
 .section-title-treatment::after {

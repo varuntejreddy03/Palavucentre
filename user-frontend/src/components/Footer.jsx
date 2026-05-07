@@ -19,20 +19,19 @@ const socialToneClasses = {
 }
 
 function getBrandLines(name) {
-  const normalized = String(name || 'RajaMahendravaram PalavuCentre').trim()
-  const exactBrandMatch = normalized.match(/^(.*)\s+(PalavuCentre)$/i)
+  const normalized = String(name || 'RajaMahendravaram Palavu Centre').trim()
+  const exactBrandMatch = normalized.match(/^(.*)\s+(Palavu\s*Centre)$/i)
 
   if (exactBrandMatch) {
     return [exactBrandMatch[1], exactBrandMatch[2]]
   }
 
   const words = normalized.split(/\s+/).filter(Boolean)
-  if (words.length <= 1) {
+  if (words.length <= 2) {
     return [normalized]
   }
 
-  const midpoint = Math.ceil(words.length / 2)
-  return [words.slice(0, midpoint).join(' '), words.slice(midpoint).join(' ')]
+  return [words[0], words.slice(1).join(' ')]
 }
 
 export default function Footer() {

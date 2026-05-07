@@ -34,9 +34,6 @@ export default function Contact() {
   return (
     <section id="contact" className="py-8 md:py-12 px-4 bg-earth-dark">
       <div className="max-w-7xl mx-auto">
-        <h2 className="text-4xl md:text-5xl font-bold text-center mb-4 text-turmeric">Visit Us</h2>
-        <p className="text-center text-gray-300 mb-8">We&apos;d love to serve you authentic Godavari cuisine</p>
-
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           <div>
             <div className="bg-earth-brown/50 p-8 rounded-lg mb-6">
@@ -88,19 +85,6 @@ export default function Contact() {
                   </div>
                 </div>
               </div>
-            </div>
-
-            <div className="bg-earth-brown/50 rounded-lg overflow-hidden h-64">
-              <iframe
-                src={contact.mapEmbedUrl || 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d243647.3160399884!2d78.24323!3d17.412608!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bcb99daeaebd2c7%3A0xae93b78392bafbc2!2sHyderabad%2C%20Telangana!5e0!3m2!1sen!2sin!4v1234567890'}
-                width="100%"
-                height="100%"
-                style={{ border: 0 }}
-                allowFullScreen=""
-                loading="lazy"
-                referrerPolicy="no-referrer-when-downgrade"
-                title="RajaMahendravaram PalavuCentre Location"
-              ></iframe>
             </div>
           </div>
 
