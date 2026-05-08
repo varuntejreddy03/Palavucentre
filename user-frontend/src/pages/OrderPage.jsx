@@ -283,7 +283,7 @@ export default function OrderPage() {
       let orderPayload = pendingOnlineOrder
       if (paymentMethod === 'online' && orderPayload?.order?.orderNumber) {
         setOnlinePaymentStatus('Refreshing your pending payment session...')
-        const gr = await publicApi.createRazorpayOrder({ orderNumber: orderPayload.order.orderNumber, phone: customer.phone })
+        const gr = await publicApi.createRazorpayOrder({ orderNumber: orderPayload.order.orderNumber })
         orderPayload = { ...orderPayload, razorpay: gr.data }
         setPendingOnlineOrder(orderPayload)
       }
@@ -345,7 +345,7 @@ export default function OrderPage() {
               <CheckCircle2 className="h-8 w-8 text-emerald-400" />
             </div>
             <p className="mt-4 text-[28px] font-bold text-[#F8F1DE] sm:text-[34px]" style={{ fontFamily: 'Playfair Display, serif' }}>Order Confirmed</p>
-            <p className="mt-2 text-[14px] text-[#8A8060]" style={{ fontFamily: 'DM Sans, sans-serif' }}>Your order is being prepared for pickup. Track it with your order number and phone.</p>
+            <p className="mt-2 text-[14px] text-[#8A8060]" style={{ fontFamily: 'DM Sans, sans-serif' }}>Your order is being prepared for pickup. Track it from My Orders in your account.</p>
           </div>
 
           {/* Order number card */}
@@ -402,7 +402,7 @@ export default function OrderPage() {
           <div className="mt-3 rounded-[14px] border border-[#2E2B1F] bg-[#1A1810] p-3.5">
             <p className="text-[10px] font-bold uppercase tracking-wider text-[#8A8060]" style={{ fontFamily: 'DM Sans, sans-serif' }}>What Happens Next</p>
             <div className="mt-3 space-y-0">
-              {['Kitchen accepts your order', 'Track status with order number and phone', 'Pick up from the selected store'].map((text, i) => (
+              {['Kitchen accepts your order', 'Track status from My Orders', 'Pick up from the selected store'].map((text, i) => (
                 <div key={i}>
                   <div className="flex items-center gap-3 py-2">
                     <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#F0A500]/15 text-[10px] font-bold text-[#F0A500]">{i + 1}</span>

@@ -96,7 +96,7 @@ The full schema lives in [prisma/schema.prisma](/c:/Users/varun/Downloads/rest/p
 
 - `GET /api/health`
 - `GET /api/menu`
-- `POST /api/orders`
+- `POST /api/orders` (requires user login)
 - `POST /api/auth/send-otp`
 - `POST /api/auth/verify-otp`
 - `POST /api/contact`
@@ -106,8 +106,10 @@ The full schema lives in [prisma/schema.prisma](/c:/Users/varun/Downloads/rest/p
 - `GET /api/gallery`
 - `GET /api/offers`
 - `GET /api/site-settings/public`
-- `POST /api/payments/razorpay/order`
-- `POST /api/payments/razorpay/verify`
+- `POST /api/payments/razorpay/order` (requires user login)
+- `POST /api/payments/razorpay/verify` (requires user login)
+
+Public order tracking by guessed id, order number, or phone is intentionally not exposed. Customers track their orders from the authenticated account profile.
 
 ### Admin APIs
 
@@ -200,8 +202,11 @@ After the admin row is created in DB, login always validates against the stored
 4. Frontend opens Razorpay checkout.
 5. Frontend posts Razorpay response to `POST /api/payments/razorpay/verify`.
 6. Backend verifies HMAC signature before marking payment as paid.
+7. Razorpay also posts signed payment events to `POST /api/payments/razorpay/webhook`.
+8. Backend verifies `x-razorpay-signature` with `RAZORPAY_WEBHOOK_SECRET` and updates the existing payment/order from `payment.captured` or `payment.failed`.
 
 If Razorpay env vars are missing, online payment endpoints return `503`.
+If `RAZORPAY_WEBHOOK_SECRET` is missing, the webhook endpoint returns `503`.
 
 ## Media Upload Flow
 

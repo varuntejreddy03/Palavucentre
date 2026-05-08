@@ -93,13 +93,6 @@ export const adminOrdersQuerySchema = {
   }),
 };
 
-export const trackOrderSchema = {
-  body: z.object({
-    orderNumber: z.string().trim().min(4).max(40),
-    phone: phoneSchema,
-  }),
-};
-
 export const orderIdParamSchema = {
   params: idParamSchema,
 };

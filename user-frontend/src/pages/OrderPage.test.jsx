@@ -298,7 +298,7 @@ describe('OrderPage', () => {
     expect(publicApi.createOrder.mock.calls[0][0].customer.phone).toBe('9876543210')
   })
 
-  it('opens public tracking from the success state CTA after placing a COD order', async () => {
+  it('opens account orders from the success state CTA after placing a COD order', async () => {
     const user = userEvent.setup()
     publicApi.createOrder.mockResolvedValue({
       data: baseOrderPayload(),
@@ -309,14 +309,9 @@ describe('OrderPage', () => {
     await user.click(getActionButton(/place pickup order/i))
 
     expect(await screen.findByText('Order Confirmed')).toBeTruthy()
-    await user.click(screen.getByRole('button', { name: /track order/i }))
+    await user.click(screen.getByRole('button', { name: /my orders/i }))
 
-    expect(mockNavigate).toHaveBeenCalledWith('/track-order', {
-      state: {
-        orderNumber: 'ORD-501',
-        phone: '9876543210',
-      },
-    })
+    expect(mockNavigate).toHaveBeenCalledWith('/profile?tab=orders', { state: { justOrdered: true } })
     expect(mockCart.clearCart).toHaveBeenCalled()
     expect(mockAccount.refreshProfile).toHaveBeenCalled()
   })
@@ -436,7 +431,6 @@ describe('OrderPage', () => {
     await waitFor(() =>
       expect(publicApi.createRazorpayOrder).toHaveBeenCalledWith({
         orderNumber: 'ORD-501',
-        phone: '9876543210',
       }),
     )
     expect(await screen.findByText('Order Confirmed')).toBeTruthy()

@@ -1,7 +1,5 @@
 import { z } from "zod";
 
-import { phoneSchema } from "./common.js";
-
 export const createRazorpayOrderSchema = {
   body: z.preprocess(
     (raw) => {
@@ -17,7 +15,6 @@ export const createRazorpayOrderSchema = {
     },
     z.object({
       orderNumber: z.string().trim().min(4).max(40),
-      phone: phoneSchema,
     }),
   ),
 };

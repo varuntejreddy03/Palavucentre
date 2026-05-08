@@ -5,6 +5,7 @@ import { doubleCsrf } from "csrf-csrf";
 import { env } from "../config/env.js";
 
 const CSRF_SESSION_COOKIE_NAME = "palavu_csrf_session";
+const CSRF_EXEMPT_PATHS = new Set(["/api/payments/razorpay/webhook"]);
 
 function getBaseCookieOptions() {
   const cookieOptions = {
@@ -46,7 +47,7 @@ function ensureCsrfSessionCookie(req, res) {
 
 const {
   generateCsrfToken,
-  doubleCsrfProtection,
+  doubleCsrfProtection: enforceDoubleCsrfProtection,
 } = doubleCsrf({
   getSecret: () => env.CSRF_SECRET,
   getSessionIdentifier: (req) =>
@@ -64,4 +65,11 @@ export function generateToken(req, res, options) {
   return generateCsrfToken(req, res, options);
 }
 
-export { doubleCsrfProtection };
+export function doubleCsrfProtection(req, res, next) {
+  if (CSRF_EXEMPT_PATHS.has(req.path)) {
+    next();
+    return;
+  }
+
+  enforceDoubleCsrfProtection(req, res, next);
+}

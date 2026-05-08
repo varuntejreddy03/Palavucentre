@@ -50,6 +50,10 @@ function buildPickupAddress(storeLocation) {
 }
 
 export async function createOrder(payload, { user } = {}) {
+  if (!user?.id) {
+    throw new ApiError(StatusCodes.UNAUTHORIZED, "User authentication is required to place orders");
+  }
+
   if (payload.paymentMethod === "online" && !isRazorpayConfigured) {
     throw new ApiError(StatusCodes.SERVICE_UNAVAILABLE, "Online payments are not configured");
   }
@@ -261,24 +265,6 @@ export async function getOrderById(id) {
   }
 
   return serializeOrder(order);
-}
-
-export async function trackOrder({ orderNumber, phone }) {
-  const order = await withReadDbRetry(() =>
-    prisma.order.findFirst({
-      where: {
-        orderNumber,
-        phone,
-      },
-      include: orderIncludes,
-    }),
-  );
-
-  if (!order) {
-    throw new ApiError(StatusCodes.NOT_FOUND, "Order not found for the provided order number and phone");
-  }
-
-  return serializePublicOrder(order);
 }
 
 export async function updateOrder(id, payload) {

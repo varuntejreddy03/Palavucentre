@@ -1,6 +1,6 @@
 import { StatusCodes } from "http-status-codes";
 
-import { createOrder, getOrderById, listOrders, trackOrder, updateOrder } from "../services/order.service.js";
+import { createOrder, getOrderById, listOrders, updateOrder } from "../services/order.service.js";
 
 export async function createOrderHandler(req, res) {
   const data = await createOrder(req.body, { user: req.user });
@@ -8,15 +8,6 @@ export async function createOrderHandler(req, res) {
   res.status(StatusCodes.CREATED).json({
     success: true,
     message: "Order created",
-    data,
-  });
-}
-
-export async function trackOrderHandler(req, res) {
-  const data = await trackOrder(req.body);
-
-  res.status(StatusCodes.OK).json({
-    success: true,
     data,
   });
 }

@@ -49,6 +49,7 @@ const envSchema = z
     CURRENCY: z.string().default("INR"),
     RAZORPAY_KEY_ID: z.preprocess(emptyToUndefined, z.string().optional()),
     RAZORPAY_KEY_SECRET: z.preprocess(emptyToUndefined, z.string().optional()),
+    RAZORPAY_WEBHOOK_SECRET: z.preprocess(emptyToUndefined, z.string().optional()),
     DEFAULT_HERO_MEDIA_URL: z.preprocess(emptyToUndefined, z.string().optional()),
     DEFAULT_LOGO_URL: z.preprocess(emptyToUndefined, z.string().optional()),
     MEDIA_DELETE_ON_REMOVE: z.preprocess(toBoolean, z.boolean().default(true)),

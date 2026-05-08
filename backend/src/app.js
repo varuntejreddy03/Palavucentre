@@ -18,6 +18,14 @@ import { notFoundHandler } from "./middleware/not-found.middleware.js";
 import { securityHeaders, sanitizeResponses, apiAbuseProtection } from "./middleware/security.middleware.js";
 import { apiRouter } from "./routes/index.js";
 
+const RAZORPAY_WEBHOOK_PATH = "/api/payments/razorpay/webhook";
+
+function captureRawBody(req, _res, buffer) {
+  if (req.originalUrl?.startsWith(RAZORPAY_WEBHOOK_PATH)) {
+    req.rawBody = Buffer.from(buffer);
+  }
+}
+
 export function createApp() {
   const app = express();
 
@@ -67,7 +75,7 @@ export function createApp() {
   });
   app.use(cors(corsOptions));
   app.use(compression());
-  app.use(express.json({ limit: "2mb" }));
+  app.use(express.json({ limit: "2mb", verify: captureRawBody }));
   app.use(express.urlencoded({ extended: true }));
   app.use(cookieParser());
   app.use(securityHeaders);

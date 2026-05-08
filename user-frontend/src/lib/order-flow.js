@@ -1,4 +1,3 @@
-export const TRACKING_STORAGE_KEY = 'palavu:last-order-tracking'
 export const ORDER_ROUTE = { pathname: '/order', search: '' }
 export const PROFILE_ROUTE = { pathname: '/profile', search: '' }
 export const PROFILE_ORDERS_ROUTE = { pathname: '/profile', search: '?tab=orders' }
@@ -165,46 +164,5 @@ export function getOrderEta(order) {
   return {
     remainingMinutes,
     arrivalTime: new Date(Date.now() + remainingMinutes * 60_000),
-  }
-}
-
-export function readStoredTrackingOrder() {
-  if (typeof window === 'undefined') {
-    return null
-  }
-
-  try {
-    const rawValue = window.localStorage.getItem(TRACKING_STORAGE_KEY)
-
-    if (!rawValue) {
-      return null
-    }
-
-    const parsedValue = JSON.parse(rawValue)
-    if (!parsedValue?.orderNumber || !parsedValue?.phone) {
-      return null
-    }
-
-    return parsedValue
-  } catch {
-    return null
-  }
-}
-
-export function writeStoredTrackingOrder(orderNumber, phone) {
-  if (typeof window === 'undefined') {
-    return
-  }
-
-  try {
-    window.localStorage.setItem(
-      TRACKING_STORAGE_KEY,
-      JSON.stringify({
-        orderNumber,
-        phone,
-      }),
-    )
-  } catch {
-    // Best effort only.
   }
 }

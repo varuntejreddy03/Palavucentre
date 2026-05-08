@@ -122,7 +122,6 @@ export const publicApi = {
   submitFranchise: (body) => apiRequest('/franchise', { method: 'POST', body }),
   submitCatering: (body) => apiRequest('/catering', { method: 'POST', body }),
   createOrder: (body) => apiRequest('/orders', { method: 'POST', body }),
-  trackOrder: (body) => apiRequest('/orders/track', { method: 'POST', body }),
   createRazorpayOrder: (body) => apiRequest('/payments/razorpay/order', { method: 'POST', body }),
   verifyRazorpayPayment: (body) => apiRequest('/payments/razorpay/verify', { method: 'POST', body }),
 }

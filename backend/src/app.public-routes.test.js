@@ -3,7 +3,6 @@
 import request from 'supertest'
 import jwt from 'jsonwebtoken'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { StatusCodes } from 'http-status-codes'
 
 const {
   prismaConfig,
@@ -24,6 +23,9 @@ const {
         admin: {
           findUnique: vi.fn(),
         },
+        user: {
+          findUnique: vi.fn(),
+        },
       },
       shutdownPrisma: vi.fn(),
       withReadDbRetry: vi.fn((operation) => operation()),
@@ -41,7 +43,6 @@ const {
     },
     orderService: {
       createOrder: vi.fn(),
-      trackOrder: vi.fn(),
       getOrderById: vi.fn(),
       listOrders: vi.fn(),
       updateOrder: vi.fn(),
@@ -67,6 +68,7 @@ const {
     },
     paymentService: {
       createRazorpayOrderForVerifiedOrder: vi.fn(),
+      handleRazorpayWebhook: vi.fn(),
       verifyRazorpayPayment: vi.fn(),
     },
   }
@@ -81,20 +83,35 @@ vi.mock('./services/site-settings.service.js', () => siteSettingsService)
 vi.mock('./services/payment.service.js', () => paymentService)
 
 import { createApp } from './app.js'
-import { ApiError } from './utils/ApiError.js'
 
 const app = createApp()
 const ADMIN_COOKIE_NAME = 'palavu_admin_token'
+const USER_COOKIE_NAME = 'palavu_user_token'
 
-async function postWithCsrf(path, body) {
+async function postWithCsrf(path, body, cookies = []) {
   const agent = request.agent(app)
-  const csrfResponse = await agent.get('/api/csrf-token')
+  const cookieHeader = cookies.join('; ')
+  const csrfRequest = agent.get('/api/csrf-token')
+  if (cookies.length) {
+    csrfRequest.set('Cookie', cookieHeader)
+  }
 
-  return agent.post(path).set('X-CSRF-Token', csrfResponse.body.data.csrfToken).send(body)
+  const csrfResponse = await csrfRequest
+
+  const postRequest = agent.post(path).set('X-CSRF-Token', csrfResponse.body.data.csrfToken)
+  if (cookies.length) {
+    postRequest.set('Cookie', cookieHeader)
+  }
+
+  return postRequest.send(body)
 }
 
 function buildAdminCookie(payload) {
   return `${ADMIN_COOKIE_NAME}=${jwt.sign(payload, process.env.JWT_SECRET)}`
+}
+
+function buildUserCookie(payload = { sub: '7', email: 'user@example.com', role: 'user' }) {
+  return `${USER_COOKIE_NAME}=${jwt.sign(payload, process.env.JWT_SECRET)}`
 }
 
 function expectNoPublicOrderSecrets(value) {
@@ -108,8 +125,29 @@ function expectNoPublicOrderSecrets(value) {
   expect(serialized).not.toContain('stack')
 }
 
+function validOrderBody() {
+  return {
+    paymentMethod: 'cod',
+    storeLocation: 'kukatpally',
+    customer: {
+      name: 'Varun Teja',
+      phone: '9876543210',
+      email: 'varun@example.com',
+    },
+    items: [{ menuItemId: 1, quantity: 1 }],
+  }
+}
+
 beforeEach(() => {
   prismaConfig.prisma.admin.findUnique.mockReset()
+  prismaConfig.prisma.user.findUnique.mockReset().mockResolvedValue({
+    id: 7,
+    email: 'user@example.com',
+    name: 'Test User',
+    isActive: true,
+    lastLoginAt: null,
+    createdAt: new Date('2026-05-08T00:00:00.000Z'),
+  })
   menuService.getPublicMenu.mockReset().mockResolvedValue({
     categories: [{ slug: 'starters', name: 'Starters' }],
     groupedItems: { all: [] },
@@ -127,17 +165,6 @@ beforeEach(() => {
       createdAt: '2026-05-08T00:00:00.000Z',
     },
   })
-  orderService.trackOrder.mockReset().mockResolvedValue({
-    orderNumber: 'ORD-5',
-    paymentMethod: 'online',
-    paymentStatus: 'pending',
-    orderStatus: 'pending',
-    items: [{ name: 'Biryani', quantity: 1, unitPrice: 250, total: 250 }],
-    pricing: { grandTotal: 263, grandTotalPaise: 26300, currency: 'INR' },
-    pickupLocation: { id: 'kukatpally', name: 'Kukatpally' },
-    storeLocation: 'kukatpally',
-    createdAt: '2026-05-08T00:00:00.000Z',
-  })
   orderService.getOrderById.mockReset()
   orderService.listOrders.mockReset()
   orderService.updateOrder.mockReset()
@@ -152,6 +179,12 @@ beforeEach(() => {
     amountPaise: 26300,
     currency: 'INR',
     orderNumber: 'ORD-5',
+  })
+  paymentService.handleRazorpayWebhook.mockReset().mockResolvedValue({
+    event: 'payment.captured',
+    processed: true,
+    status: 'paid',
+    orderId: 5,
   })
   paymentService.verifyRazorpayPayment.mockReset().mockResolvedValue({
     orderNumber: 'ORD-5',
@@ -231,6 +264,15 @@ describe('public backend routes', () => {
     expect(response.body.message).toBe('User authentication is required')
   })
 
+  it('requires authentication for order creation', async () => {
+    const response = await postWithCsrf('/api/orders', validOrderBody())
+
+    expect(response.status).toBe(401)
+    expect(response.body.success).toBe(false)
+    expect(response.body.message).toBe('User authentication is required')
+    expect(orderService.createOrder).not.toHaveBeenCalled()
+  })
+
   it('rejects invalid order payloads before service execution', async () => {
     const response = await postWithCsrf('/api/orders', {
       paymentMethod: 'cod',
@@ -238,22 +280,23 @@ describe('public backend routes', () => {
         name: 'V',
       },
       items: [],
-    })
+    }, [buildUserCookie()])
 
     expect(response.status).toBe(400)
     expect(response.body.success).toBe(false)
     expect(response.body.message).toBe('Validation failed')
+    expect(orderService.createOrder).not.toHaveBeenCalled()
   })
 
-  it('rejects invalid order tracking payloads', async () => {
+  it('does not expose a public order tracking endpoint', async () => {
     const response = await postWithCsrf('/api/orders/track', {
-      orderNumber: '',
-      phone: '12',
-    })
+      orderNumber: 'ORD-5',
+      phone: '9876543210',
+    }, [buildUserCookie()])
 
-    expect(response.status).toBe(400)
+    expect(response.status).toBe(404)
     expect(response.body.success).toBe(false)
-    expect(response.body.message).toBe('Validation failed')
+    expectNoPublicOrderSecrets(response.body)
   })
 
   it('does not expose orders by public numeric id lookup', async () => {
@@ -264,42 +307,47 @@ describe('public backend routes', () => {
     expectNoPublicOrderSecrets(response.body)
   })
 
-  it('rejects order tracking with the wrong phone', async () => {
-    orderService.trackOrder.mockRejectedValueOnce(
-      new ApiError(StatusCodes.NOT_FOUND, 'Order not found for the provided order number and phone'),
-    )
+  it('requires authentication before validating create razorpay order input', async () => {
+    const response = await postWithCsrf('/api/payments/razorpay/order', {})
 
-    const response = await postWithCsrf('/api/orders/track', {
-      orderNumber: 'ORD-5',
-      phone: '9876543210',
-    })
-
-    expect(response.status).toBe(404)
-    expect(response.body.success).toBe(false)
+    expect(response.status).toBe(401)
+    expect(response.body.message).toBe('User authentication is required')
+    expect(paymentService.createRazorpayOrderForVerifiedOrder).not.toHaveBeenCalled()
     expectNoPublicOrderSecrets(response.body)
   })
 
-  it('tracks an order with order number and phone using a safe public payload', async () => {
-    const response = await postWithCsrf('/api/orders/track', {
-      orderNumber: 'ORD-5',
-      phone: '9876543210',
-    })
+  it('accepts razorpay webhooks without user auth or csrf token', async () => {
+    const payload = {
+      event: 'payment.captured',
+      payload: {
+        payment: {
+          entity: {
+            id: 'pay_5',
+            order_id: 'order_5',
+            amount: 26300,
+            currency: 'INR',
+          },
+        },
+      },
+    }
+
+    const response = await request(app)
+      .post('/api/payments/razorpay/webhook')
+      .set('x-razorpay-signature', 'webhook_signature')
+      .send(payload)
 
     expect(response.status).toBe(200)
-    expect(response.body.data.orderNumber).toBe('ORD-5')
-    expect(response.body.data.id).toBeUndefined()
-    expect(response.body.data.userId).toBeUndefined()
-    expect(response.body.data.customer).toBeUndefined()
-    expect(response.body.data.payments).toBeUndefined()
-    expect(orderService.trackOrder).toHaveBeenCalledWith({
-      orderNumber: 'ORD-5',
-      phone: '9876543210',
+    expect(response.body.success).toBe(true)
+    expect(response.body.data.processed).toBe(true)
+    expect(paymentService.handleRazorpayWebhook).toHaveBeenCalledWith({
+      body: payload,
+      rawBody: expect.any(Buffer),
+      signature: 'webhook_signature',
     })
-    expectNoPublicOrderSecrets(response.body)
   })
 
-  it('validates create razorpay order input', async () => {
-    const response = await postWithCsrf('/api/payments/razorpay/order', {})
+  it('validates authenticated create razorpay order input', async () => {
+    const response = await postWithCsrf('/api/payments/razorpay/order', {}, [buildUserCookie()])
 
     expect(response.status).toBe(400)
     expect(paymentService.createRazorpayOrderForVerifiedOrder).not.toHaveBeenCalled()
@@ -307,36 +355,46 @@ describe('public backend routes', () => {
   })
 
   it('rejects guessed numeric order id payment creation', async () => {
-    const response = await postWithCsrf('/api/payments/razorpay/order', { orderId: 5 })
+    const response = await postWithCsrf('/api/payments/razorpay/order', { orderId: 5 }, [buildUserCookie()])
 
     expect(response.status).toBe(400)
     expect(paymentService.createRazorpayOrderForVerifiedOrder).not.toHaveBeenCalled()
   })
 
-  it('creates a razorpay order only with verified order number and phone', async () => {
+  it('creates a razorpay order only for the authenticated account order number', async () => {
     const response = await postWithCsrf('/api/payments/razorpay/order', {
       orderNumber: 'ORD-5',
-      phone: '9876543210',
-    })
+    }, [buildUserCookie()])
 
     expect(response.status).toBe(200)
     expect(response.body.data.razorpayOrderId).toBe('order_5')
     expect(response.body.data.orderNumber).toBe('ORD-5')
     expect(response.body.data.order).toBeUndefined()
     expect(response.body.data.customer).toBeUndefined()
-    expect(paymentService.createRazorpayOrderForVerifiedOrder).toHaveBeenCalledWith({
-      orderNumber: 'ORD-5',
-      phone: '9876543210',
-    })
+    expect(paymentService.createRazorpayOrderForVerifiedOrder).toHaveBeenCalledWith(
+      { orderNumber: 'ORD-5' },
+      { user: expect.objectContaining({ id: 7, email: 'user@example.com' }) },
+    )
     expectNoPublicOrderSecrets(response.body)
   })
 
   it('validates razorpay payment verification input', async () => {
     const response = await postWithCsrf('/api/payments/razorpay/verify', {
       orderId: 5,
-    })
+    }, [buildUserCookie()])
 
     expect(response.status).toBe(400)
+    expect(paymentService.verifyRazorpayPayment).not.toHaveBeenCalled()
+  })
+
+  it('requires authentication for razorpay payment verification', async () => {
+    const response = await postWithCsrf('/api/payments/razorpay/verify', {
+      razorpayOrderId: 'order_5',
+      razorpayPaymentId: 'pay_5',
+      razorpaySignature: 'signature_12345',
+    })
+
+    expect(response.status).toBe(401)
     expect(paymentService.verifyRazorpayPayment).not.toHaveBeenCalled()
   })
 
@@ -346,18 +404,21 @@ describe('public backend routes', () => {
       razorpayPaymentId: 'pay_5',
       razorpaySignature: 'signature_12345',
       payload: { ok: true },
-    })
+    }, [buildUserCookie()])
 
     expect(response.status).toBe(200)
     expect(response.body.data.paymentStatus).toBe('paid')
     expect(response.body.data.id).toBeUndefined()
     expect(response.body.data.customer).toBeUndefined()
-    expect(paymentService.verifyRazorpayPayment).toHaveBeenCalledWith({
-      razorpayOrderId: 'order_5',
-      razorpayPaymentId: 'pay_5',
-      razorpaySignature: 'signature_12345',
-      payload: { ok: true },
-    })
+    expect(paymentService.verifyRazorpayPayment).toHaveBeenCalledWith(
+      {
+        razorpayOrderId: 'order_5',
+        razorpayPaymentId: 'pay_5',
+        razorpaySignature: 'signature_12345',
+        payload: { ok: true },
+      },
+      { user: expect.objectContaining({ id: 7, email: 'user@example.com' }) },
+    )
     expectNoPublicOrderSecrets(response.body)
   })
 
