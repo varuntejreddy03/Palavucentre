@@ -82,8 +82,8 @@ export async function applyPromoCodePreview({ code, subTotal }) {
   const totals = calculateTotals({
     subtotalPaise: discountedSubtotalPaise,
     taxPercent: orderConfig.taxPercent,
-    deliveryFeePaise: orderConfig.deliveryFeePaise,
-    freeDeliveryThresholdPaise: orderConfig.freeDeliveryThresholdPaise,
+    deliveryFeePaise: 0,
+    freeDeliveryThresholdPaise: 0,
   });
 
   return {

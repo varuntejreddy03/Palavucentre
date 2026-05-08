@@ -280,7 +280,7 @@ export function OrdersList({ filteredOrders, expandedOrderId, setExpandedOrderId
                     <p className="mb-2 text-[10px] font-semibold uppercase tracking-[1.6px] text-slate-500">Customer</p>
                     <p className="break-words text-base font-semibold leading-6 text-slate-950">{customerName}</p>
                     <p className="mt-1 break-words text-sm text-slate-600">{customerContact}</p>
-                    {order.customer?.address && <p className="mt-2 line-clamp-2 text-xs leading-5 text-slate-500">{order.customer.address}</p>}
+                    {order.customer?.address && <p className="mt-2 line-clamp-2 text-xs leading-5 text-slate-500">Pickup: {order.customer.address}</p>}
                   </div>
 
                   <div>
@@ -355,9 +355,9 @@ export function OrdersList({ filteredOrders, expandedOrderId, setExpandedOrderId
                             </p>
                           </div>
                           <div>
-                            <p className="text-xs font-semibold uppercase tracking-[1.8px] text-slate-500">Address</p>
+                            <p className="text-xs font-semibold uppercase tracking-[1.8px] text-slate-500">Pickup Store</p>
                             <p className="mt-2 text-sm leading-6 text-slate-800">
-                              {order.customer?.address || 'No delivery address captured'}
+                              {order.customer?.address || 'No pickup store captured'}
                             </p>
                           </div>
                         </div>

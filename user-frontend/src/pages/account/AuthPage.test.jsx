@@ -64,12 +64,12 @@ describe('AuthPage', () => {
   it('renders the sign-in headings and CTA copy', () => {
     renderAuth({ mode: 'login' })
 
-    expect(screen.getByText('Member Sign In')).toBeTruthy()
-    expect(screen.getByText('Welcome back')).toBeTruthy()
+    expect(screen.getByText('Sign in')).toBeTruthy()
+    expect(screen.getByText('Access your orders and favourites')).toBeTruthy()
     expect(screen.getByText('Continue with Google')).toBeTruthy()
   })
 
-  it('shows checkout redirect copy when opened from the order page', () => {
+  it('does not show address-based checkout copy when opened from the order page', () => {
     renderAuth({
       mode: 'login',
       entry: {
@@ -83,8 +83,8 @@ describe('AuthPage', () => {
       },
     })
 
-    expect(screen.getByText('Checkout Access')).toBeTruthy()
-    expect(screen.getByText('Sign in to continue to checkout with saved addresses and faster ordering.')).toBeTruthy()
+    expect(screen.getByText('Sign in')).toBeTruthy()
+    expect(screen.queryByText(/saved addresses/i)).toBeNull()
   })
 
   it('preserves the profile orders search params when redirecting an authenticated user', async () => {
@@ -111,11 +111,11 @@ describe('AuthPage', () => {
     const user = userEvent.setup()
     renderAuth({ mode: 'login' })
 
-    const emailInput = screen.getByLabelText(/email address/i)
+    const emailInput = screen.getByPlaceholderText(/email address/i)
     await user.type(emailInput, 'bad-email')
     await user.tab()
 
-    expect(await screen.findByText('Enter a valid email address.')).toBeTruthy()
+    expect(await screen.findByText('Invalid email')).toBeTruthy()
   })
 
   it('submits login with a trimmed email payload', async () => {
@@ -124,8 +124,8 @@ describe('AuthPage', () => {
 
     renderAuth({ mode: 'login' })
 
-    await user.type(screen.getByLabelText(/email address/i), '  user@example.com  ')
-    await user.type(screen.getByLabelText(/^password$/i), 'Password1!')
+    await user.type(screen.getByPlaceholderText(/email address/i), '  user@example.com  ')
+    await user.type(screen.getByPlaceholderText(/^password$/i), 'Password1!')
     await user.click(screen.getByRole('button', { name: /sign in/i }))
 
     await waitFor(() =>
@@ -136,18 +136,17 @@ describe('AuthPage', () => {
     )
   })
 
-  it('moves sign-up to the security step and submits the full payload', async () => {
+  it('submits the sign-up payload', async () => {
     const user = userEvent.setup()
     mockAccount.signup.mockResolvedValue({ id: 8 })
 
     renderAuth({ mode: 'signup' })
 
-    await user.type(screen.getByLabelText(/full name/i), 'Varun Teja')
-    await user.type(screen.getByLabelText(/email address/i), 'varun@example.com')
-    await user.click(screen.getByRole('button', { name: /continue to security/i }))
-    await user.type(screen.getByLabelText(/^password$/i), 'Password1!')
-    await user.type(screen.getByLabelText(/confirm password/i), 'Password1!')
-    await user.click(screen.getByRole('button', { name: /create my account/i }))
+    await user.type(screen.getByPlaceholderText(/full name/i), 'Varun Teja')
+    await user.type(screen.getByPlaceholderText(/email address/i), 'varun@example.com')
+    await user.type(screen.getByPlaceholderText(/password \(min 8 chars\)/i), 'Password1!')
+    await user.type(screen.getByPlaceholderText(/confirm password/i), 'Password1!')
+    await user.click(screen.getByRole('button', { name: /create account/i }))
 
     await waitFor(() =>
       expect(mockAccount.signup).toHaveBeenCalledWith({

@@ -59,7 +59,7 @@ export default function AuthModal({
   authSource = 'checkout',
   defaultEmail = '',
   title = 'Sign in faster',
-  description = 'Use your account for saved addresses and order history.',
+  description = 'Use your account for order history and faster pickup ordering.',
   onClose,
   onSuccess,
 }) {

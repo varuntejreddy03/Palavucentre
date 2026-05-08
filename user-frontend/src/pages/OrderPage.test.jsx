@@ -120,6 +120,17 @@ function getActionButton(name) {
   return matches.find((button) => !String(button.className || '').includes('hidden')) || matches[0]
 }
 
+async function advanceToPickupStep(user) {
+  await user.type(screen.getByLabelText(/phone/i), '9876543210')
+  await user.click(getActionButton(/next: pickup/i))
+}
+
+async function advanceToPaymentStep(user, storeName = /kukatpally/i) {
+  await advanceToPickupStep(user)
+  await user.click(screen.getByRole('button', { name: storeName }))
+  await user.click(getActionButton(/next: payment/i))
+}
+
 function installRazorpayMock({ onOpen } = {}) {
   const instance = {
     on: vi.fn(),
@@ -141,15 +152,9 @@ function installRazorpayMock({ onOpen } = {}) {
 function baseOrderPayload() {
   return {
     order: {
-      id: 501,
       orderNumber: 'ORD-501',
       orderStatus: 'pending',
       paymentMethod: 'cod',
-      customer: {
-        name: 'Varun Teja',
-        phone: '9876543210',
-        address: 'Door 1-1, Rajahmundry',
-      },
       pricing: {
         subTotal: 240,
         taxAmount: 12,
@@ -158,7 +163,6 @@ function baseOrderPayload() {
       },
       items: [
         {
-          id: 1,
           name: 'Punugulu',
           quantity: 2,
           unitPrice: 120,
@@ -200,26 +204,22 @@ describe('OrderPage', () => {
     renderOrderPage()
 
     expect(screen.getByText('Your cart is empty')).toBeTruthy()
-    expect(screen.getByText('Manage Addresses')).toBeTruthy()
+    expect(screen.getByText('Browse Menu')).toBeTruthy()
   })
 
-  it('renders the account-first checkout copy and saved addresses', () => {
-    renderOrderPage()
-
-    expect(screen.getByText('Account Checkout')).toBeTruthy()
-    expect(screen.getByText(/signed in as/i)).toBeTruthy()
-    expect(screen.getByText('Home')).toBeTruthy()
-    expect(screen.getByText('Office')).toBeTruthy()
-    expect(screen.queryByText(/guest checkout/i)).toBeNull()
-  })
-
-  it('lets the user switch to a one-time address form', async () => {
+  it('renders pickup checkout without address controls', async () => {
     const user = userEvent.setup()
     renderOrderPage()
 
-    await user.click(screen.getByRole('button', { name: /use a one-time address/i }))
+    expect(screen.getByText(/signed in as/i)).toBeTruthy()
+    expect(screen.getByText('Pickup')).toBeTruthy()
 
-    expect(screen.getByPlaceholderText('Street, area, landmark')).toBeTruthy()
+    await advanceToPickupStep(user)
+
+    expect(screen.getByText('Pickup Store')).toBeTruthy()
+    expect(screen.getByRole('button', { name: /kukatpally/i })).toBeTruthy()
+    expect(screen.queryByText(/delivery address/i)).toBeNull()
+    expect(screen.queryByRole('button', { name: /use a one-time address/i })).toBeNull()
   })
 
   it('applies a promo code successfully', async () => {
@@ -237,13 +237,14 @@ describe('OrderPage', () => {
     })
 
     renderOrderPage()
-    await user.type(screen.getByPlaceholderText('Enter promo code'), 'welcome10')
+    await advanceToPaymentStep(user)
+    await user.type(screen.getByPlaceholderText('Enter code'), 'welcome10')
     await user.click(screen.getByRole('button', { name: 'Apply' }))
 
     expect(await screen.findByText('WELCOME10 applied')).toBeTruthy()
   })
 
-  it('submits the selected address and promo code in the COD payload', async () => {
+  it('submits a pickup store and promo code in the COD payload', async () => {
     const user = userEvent.setup()
     promoApi.apply.mockResolvedValue({
       data: {
@@ -262,36 +263,60 @@ describe('OrderPage', () => {
 
     renderOrderPage()
 
-    await user.click(screen.getByRole('button', { name: /office/i }))
-    await user.type(screen.getByPlaceholderText('Enter promo code'), 'WELCOME10')
+    await advanceToPaymentStep(user, /bachupally/i)
+    await user.type(screen.getByPlaceholderText('Enter code'), 'WELCOME10')
     await user.click(screen.getByRole('button', { name: 'Apply' }))
     await screen.findByText('WELCOME10 applied')
-    await user.click(getActionButton(/place cod order/i))
+    await user.click(getActionButton(/place pickup order/i))
 
-    await waitFor(() =>
-      expect(publicApi.createOrder).toHaveBeenCalledWith(
-        expect.objectContaining({
-          paymentMethod: 'cod',
-          promoCode: 'WELCOME10',
-          userAddressId: 102,
-        }),
-      ),
-    )
+    await waitFor(() => expect(publicApi.createOrder).toHaveBeenCalled())
+    const payload = publicApi.createOrder.mock.calls[0][0]
+    expect(payload).toEqual(expect.objectContaining({
+      paymentMethod: 'cod',
+      promoCode: 'WELCOME10',
+      storeLocation: 'bachupally',
+    }))
+    expect(payload.userAddressId).toBeUndefined()
+    expect(payload.customer.address).toBeUndefined()
   })
 
-  it('opens profile orders from the success state CTA after placing a COD order', async () => {
+  it('normalizes formatted phone values before creating an order', async () => {
     const user = userEvent.setup()
     publicApi.createOrder.mockResolvedValue({
       data: baseOrderPayload(),
     })
 
     renderOrderPage()
-    await user.click(getActionButton(/place cod order/i))
+    await user.click(screen.getByLabelText(/phone/i))
+    await user.paste('+91 98765 43210')
+    await user.click(getActionButton(/next: pickup/i))
+    await user.click(screen.getByRole('button', { name: /kukatpally/i }))
+    await user.click(getActionButton(/next: payment/i))
+    await user.click(getActionButton(/place pickup order/i))
 
-    expect(await screen.findByText('Order confirmed.')).toBeTruthy()
-    await user.click(screen.getByRole('button', { name: /open my orders/i }))
+    await waitFor(() => expect(publicApi.createOrder).toHaveBeenCalled())
+    expect(publicApi.createOrder.mock.calls[0][0].customer.phone).toBe('9876543210')
+  })
 
-    expect(mockNavigate).toHaveBeenCalledWith('/profile?tab=orders')
+  it('opens public tracking from the success state CTA after placing a COD order', async () => {
+    const user = userEvent.setup()
+    publicApi.createOrder.mockResolvedValue({
+      data: baseOrderPayload(),
+    })
+
+    renderOrderPage()
+    await advanceToPaymentStep(user)
+    await user.click(getActionButton(/place pickup order/i))
+
+    expect(await screen.findByText('Order Confirmed')).toBeTruthy()
+    await user.click(screen.getByRole('button', { name: /track order/i }))
+
+    expect(mockNavigate).toHaveBeenCalledWith('/track-order', {
+      state: {
+        orderNumber: 'ORD-501',
+        phone: '9876543210',
+      },
+    })
     expect(mockCart.clearCart).toHaveBeenCalled()
     expect(mockAccount.refreshProfile).toHaveBeenCalled()
   })
@@ -300,9 +325,10 @@ describe('OrderPage', () => {
     const user = userEvent.setup()
     renderOrderPage()
 
+    await advanceToPaymentStep(user)
     await user.click(screen.getByRole('button', { name: /razorpay secure payment/i }))
 
-    expect(screen.getByText('How payment works')).toBeTruthy()
+    expect(screen.getByText(/how payment works/i)).toBeTruthy()
     expect(screen.getByText(/Razorpay opens for payment authorization/i)).toBeTruthy()
   })
 
@@ -340,13 +366,13 @@ describe('OrderPage', () => {
     })
 
     renderOrderPage()
+    await advanceToPaymentStep(user)
     await user.click(screen.getByRole('button', { name: /razorpay secure payment/i }))
     await user.click(getActionButton(/pay with razorpay/i))
 
-    expect(await screen.findByText('Order confirmed.')).toBeTruthy()
+    expect(await screen.findByText('Order Confirmed')).toBeTruthy()
     expect(publicApi.verifyRazorpayPayment).toHaveBeenCalledWith(
       expect.objectContaining({
-        orderId: 501,
         razorpayOrderId: 'order_test_1',
       }),
     )
@@ -380,16 +406,12 @@ describe('OrderPage', () => {
     publicApi.verifyRazorpayPayment.mockRejectedValueOnce(new Error('Payment verification failed'))
     publicApi.createRazorpayOrder.mockResolvedValueOnce({
       data: {
-        order: {
-          ...baseOrderPayload().order,
-          paymentMethod: 'online',
-        },
-        razorpay: {
-          keyId: 'rzp_test_123',
-          orderId: 'order_retry_2',
-          amountPaise: 25200,
-          currency: 'INR',
-        },
+        keyId: 'rzp_test_123',
+        orderId: 'order_retry_2',
+        razorpayOrderId: 'order_retry_2',
+        amountPaise: 25200,
+        currency: 'INR',
+        orderNumber: 'ORD-501',
       },
     })
     publicApi.verifyRazorpayPayment.mockResolvedValueOnce({
@@ -401,16 +423,50 @@ describe('OrderPage', () => {
     })
 
     renderOrderPage()
+    await advanceToPaymentStep(user)
     await user.click(screen.getByRole('button', { name: /razorpay secure payment/i }))
     await user.click(getActionButton(/pay with razorpay/i))
 
     expect(await screen.findByText('Payment verification failed')).toBeTruthy()
-    expect(screen.getByText(/Pending online order/i)).toBeTruthy()
+    expect(screen.getByText(/Pending order/i)).toBeTruthy()
 
     await user.click(getActionButton(/retry razorpay payment/i))
 
     await waitFor(() => expect(publicApi.createOrder).toHaveBeenCalledTimes(1))
-    await waitFor(() => expect(publicApi.createRazorpayOrder).toHaveBeenCalledWith({ orderId: 501 }))
-    expect(await screen.findByText('Order confirmed.')).toBeTruthy()
+    await waitFor(() =>
+      expect(publicApi.createRazorpayOrder).toHaveBeenCalledWith({
+        orderNumber: 'ORD-501',
+        phone: '9876543210',
+      }),
+    )
+    expect(await screen.findByText('Order Confirmed')).toBeTruthy()
+  })
+
+  it('keeps a pending online order when Razorpay order creation is temporarily unavailable', async () => {
+    const user = userEvent.setup()
+    publicApi.createOrder.mockResolvedValueOnce({
+      data: {
+        ...baseOrderPayload(),
+        order: {
+          ...baseOrderPayload().order,
+          paymentMethod: 'online',
+        },
+        paymentError: {
+          message: 'Could not start Razorpay payment. Please retry or choose cash at pickup.',
+          retryable: true,
+        },
+      },
+    })
+
+    renderOrderPage()
+    await advanceToPaymentStep(user)
+    await user.click(screen.getByRole('button', { name: /razorpay secure payment/i }))
+    await user.click(getActionButton(/pay with razorpay/i))
+
+    expect(await screen.findByText(/Could not start Razorpay payment/i)).toBeTruthy()
+    expect(screen.getByText(/Pending order/i)).toBeTruthy()
+    expect(getActionButton(/retry razorpay payment/i)).toBeTruthy()
+    expect(mockCart.clearCart).not.toHaveBeenCalled()
+    expect(publicApi.verifyRazorpayPayment).not.toHaveBeenCalled()
   })
 })

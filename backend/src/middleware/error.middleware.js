@@ -56,6 +56,10 @@ export function errorHandler(error, req, res, _next) {
         };
   }
 
+  if (env.isProduction && statusCode >= StatusCodes.INTERNAL_SERVER_ERROR) {
+    details = null;
+  }
+
   req.log?.error(
     {
       err: error,
@@ -70,6 +74,6 @@ export function errorHandler(error, req, res, _next) {
     error: message,
     message,
     details,
-    ...(env.isProduction ? {} : { stack: error.stack }),
+    ...(env.NODE_ENV === "development" ? { stack: error.stack } : {}),
   });
 }

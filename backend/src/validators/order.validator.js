@@ -64,15 +64,6 @@ export const createOrderSchema = {
           city: optionalTrimmedString,
           state: optionalTrimmedString,
           postalCode: optionalTrimmedString,
-        })
-        .superRefine((customer, ctx) => {
-          if (!customer.address && !customer.addressLine1) {
-            ctx.addIssue({
-              code: z.ZodIssueCode.custom,
-              path: ["address"],
-              message: "Address is required",
-            });
-          }
         }),
       items: z.array(orderItemSchema).min(1),
       pricing: z
@@ -90,7 +81,7 @@ export const createOrderSchema = {
       notes: optionalTrimmedString,
       promoCode: optionalTrimmedString,
       userAddressId: z.coerce.number().int().positive().optional(),
-      storeLocation: z.enum(["kukatpally", "bachupally"]).optional(),
+      storeLocation: z.enum(["kukatpally", "bachupally"]),
     }),
   ),
 };

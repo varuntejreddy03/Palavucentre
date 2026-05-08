@@ -2,7 +2,6 @@ export const TRACKING_STORAGE_KEY = 'palavu:last-order-tracking'
 export const ORDER_ROUTE = { pathname: '/order', search: '' }
 export const PROFILE_ROUTE = { pathname: '/profile', search: '' }
 export const PROFILE_ORDERS_ROUTE = { pathname: '/profile', search: '?tab=orders' }
-export const PROFILE_ADDRESSES_ROUTE = { pathname: '/profile', search: '?tab=addresses' }
 
 const STATUS_STEP_ORDER = ['pending', 'accepted', 'preparing', 'ready', 'delivered']
 const STATUS_META = {
@@ -19,12 +18,12 @@ const STATUS_META = {
     subtitle: 'Fresh dishes are on the stove.',
   },
   ready: {
-    label: 'Ready for dispatch',
-    subtitle: 'Packed and waiting for handoff.',
+    label: 'Ready for pickup',
+    subtitle: 'Packed and waiting at the selected store.',
   },
   delivered: {
-    label: 'Delivered',
-    subtitle: 'Order completed successfully.',
+    label: 'Completed',
+    subtitle: 'Order picked up successfully.',
   },
   cancelled: {
     label: 'Cancelled',
@@ -140,7 +139,7 @@ export function getPaymentLabel(paymentMethod, paymentStatus) {
     return normalizedStatus === 'paid' ? 'Online · Paid' : 'Online · Pending'
   }
 
-  return normalizedStatus === 'paid' ? 'Cash · Paid' : 'Cash on delivery'
+  return normalizedStatus === 'paid' ? 'Cash · Paid' : 'Cash at pickup'
 }
 
 export function getOrderEta(order) {

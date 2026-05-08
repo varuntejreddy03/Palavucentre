@@ -1,4 +1,4 @@
-import { ChevronDown, ChevronRight, Clock3, LogOut, Menu, PhoneCall, ShoppingCart, User, X } from 'lucide-react'
+import { ChevronDown, ChevronRight, LogOut, Menu, PhoneCall, ShoppingCart, User, X } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 
@@ -7,7 +7,6 @@ import { useCart } from '../context/CartContext'
 import { useSiteSettings } from '../context/SiteContext'
 import {
   ORDER_ROUTE,
-  PROFILE_ADDRESSES_ROUTE,
   PROFILE_ORDERS_ROUTE,
   PROFILE_ROUTE,
   buildPathWithSearch,
@@ -39,14 +38,12 @@ export default function Navbar() {
 
   const profilePath = buildPathWithSearch(PROFILE_ROUTE.pathname, PROFILE_ROUTE.search)
   const ordersPath = buildPathWithSearch(PROFILE_ORDERS_ROUTE.pathname, PROFILE_ORDERS_ROUTE.search)
-  const addressesPath = buildPathWithSearch(PROFILE_ADDRESSES_ROUTE.pathname, PROFILE_ADDRESSES_ROUTE.search)
   const cartCount = useMemo(() => cartItems.reduce((t, i) => t + i.quantity, 0), [cartItems])
   const accountDisplayName = user?.name?.trim() || user?.email?.split('@')?.[0] || 'My Account'
 
   const handleCallNow = () => { window.location.href = `tel:${phoneNumber}` }
   const handleCartClick = () => { if (cartCount > 0) { setCartOpen(true); return }; navigate('/menu') }
   const handleAccountClick = () => { if (!isAuthenticated) { navigateToLoginWithRedirect(navigate, PROFILE_ROUTE, 'profile'); return }; setIsAccountMenuOpen((c) => !c) }
-  const handleTrackClick = () => { setIsAccountMenuOpen(false); closeMobileMenu(); if (isAuthenticated) { navigate(ordersPath); return }; navigateToLoginWithRedirect(navigate, PROFILE_ORDERS_ROUTE, 'profile') }
   const handleOrderShortcutClick = () => { closeMobileMenu(); if (isAuthenticated) { navigate('/order'); return }; navigateToLoginWithRedirect(navigate, ORDER_ROUTE, 'checkout') }
   const handleProfileShortcutClick = () => { closeMobileMenu(); if (isAuthenticated) { navigate(profilePath); return }; navigateToLoginWithRedirect(navigate, PROFILE_ROUTE, 'profile') }
   const handleLogout = async () => { await logout(); setIsAccountMenuOpen(false); navigate('/login') }
@@ -120,7 +117,6 @@ export default function Navbar() {
                     {[
                       { to: profilePath, label: 'Profile Overview' },
                       { to: ordersPath, label: 'My Orders' },
-                      { to: addressesPath, label: 'Saved Addresses' },
                     ].map((item) => (
                       <Link key={item.to} to={item.to} onClick={() => setIsAccountMenuOpen(false)}
                         className="flex items-center justify-between rounded-lg px-3 py-2.5 text-[13px] text-white transition hover:bg-[#F0A500]/10 hover:text-[#F0A500]">
@@ -189,12 +185,6 @@ export default function Navbar() {
                 <User className="h-5 w-5 text-[#F0A500]" />
                 <p className="mt-2 text-[12px] font-bold uppercase tracking-wider text-white">{isAuthenticated ? 'Profile' : 'Login'}</p>
                 <p className="mt-0.5 text-[10px] text-[#8A8060]">{isAuthenticated ? 'Account details' : 'Sign in'}</p>
-              </button>
-              <button type="button" onClick={handleTrackClick}
-                className="rounded-xl border border-[#F0A500]/30 bg-[#F0A500]/5 p-4 text-left transition active:scale-[0.97]">
-                <Clock3 className="h-5 w-5 text-[#F0A500]" />
-                <p className="mt-2 text-[12px] font-bold uppercase tracking-wider text-[#F0A500]">Track Orders</p>
-                <p className="mt-0.5 text-[10px] text-[#8A8060]">{isAuthenticated ? 'Live updates' : 'Login to track'}</p>
               </button>
             </div>
 

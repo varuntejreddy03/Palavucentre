@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { phoneSchema } from "./common.js";
+
 export const createRazorpayOrderSchema = {
   body: z.preprocess(
     (raw) => {
@@ -10,11 +12,12 @@ export const createRazorpayOrderSchema = {
       const body = raw;
       return {
         ...body,
-        orderId: body.orderId ?? body.order_id,
+        orderNumber: body.orderNumber ?? body.order_number,
       };
     },
     z.object({
-      orderId: z.coerce.number().int().positive(),
+      orderNumber: z.string().trim().min(4).max(40),
+      phone: phoneSchema,
     }),
   ),
 };
@@ -36,7 +39,7 @@ export const verifyRazorpayPaymentSchema = {
       };
     },
     z.object({
-      orderId: z.coerce.number().int().positive(),
+      orderId: z.coerce.number().int().positive().optional(),
       razorpayOrderId: z.string().trim().min(5),
       razorpayPaymentId: z.string().trim().min(5),
       razorpaySignature: z.string().trim().min(10),

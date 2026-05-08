@@ -818,14 +818,6 @@ export default function AdminDashboard() {
   const submitSettings = async (event) => {
     event.preventDefault()
 
-    if (!validateNumberRange(settingsForm.deliveryFee, 'Delivery fee', 0, 100000)) {
-      return
-    }
-
-    if (!validateNumberRange(settingsForm.freeDeliveryThreshold, 'Free delivery threshold', 0, 100000)) {
-      return
-    }
-
     if (!validateNumberRange(settingsForm.orderTaxPercent, 'Order tax percent', 0, 100)) {
       return
     }
@@ -2935,33 +2927,11 @@ export default function AdminDashboard() {
           {activeTab === 'ordering' && (
             <SectionCard
               title="Ordering"
-              description="Set how checkout pricing is calculated for delivery and tax across the public site."
+              description="Pickup-only checkout uses item subtotal plus tax. Delivery pricing is disabled for now."
             >
               <form onSubmit={submitSettings} noValidate className="grid gap-6">
-                <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-                  <Field label="Delivery Fee (INR)" hint="Charged only below the free-delivery threshold.">
-                    <TextInput
-                      type="number"
-                      min="0"
-                      step="0.01"
-                      value={settingsForm.deliveryFee}
-                      onChange={(event) =>
-                        setSettingsForm((current) => ({ ...current, deliveryFee: event.target.value }))
-                      }
-                    />
-                  </Field>
-                  <Field label="Free Delivery Threshold (INR)" hint="Orders at or above this amount get free delivery.">
-                    <TextInput
-                      type="number"
-                      min="0"
-                      step="0.01"
-                      value={settingsForm.freeDeliveryThreshold}
-                      onChange={(event) =>
-                        setSettingsForm((current) => ({ ...current, freeDeliveryThreshold: event.target.value }))
-                      }
-                    />
-                  </Field>
-                  <Field label="Order Tax Percent" hint="Applied to the subtotal and delivery fee combined.">
+                <div className="grid gap-4 md:grid-cols-2">
+                  <Field label="Order Tax Percent" hint="Applied to the pickup order subtotal.">
                     <TextInput
                       type="number"
                       min="0"
@@ -2973,11 +2943,13 @@ export default function AdminDashboard() {
                       }
                     />
                   </Field>
+                  <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm leading-6 text-slate-600">
+                    Delivery fee and free-delivery threshold are locked at 0 while pickup-only ordering is active.
+                  </div>
                 </div>
 
                 <div className="rounded-[18px] border border-slate-200 bg-white p-5 text-sm leading-7 text-slate-600">
-                  These values are saved in the backend and automatically used by the order page, promo previews, and
-                  order history pricing.
+                  These values are saved in the backend and used by the order page, promo previews, and order history pricing.
                 </div>
 
                 <div className="flex flex-wrap gap-3">

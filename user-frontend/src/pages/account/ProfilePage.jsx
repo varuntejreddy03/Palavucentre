@@ -33,11 +33,13 @@ const initialAddressForm = {
   landmark: '', city: '', state: '', postalCode: '', isDefault: false,
 }
 
+const ADDRESS_BOOK_ENABLED = false
+
 const tabs = [
   { id: 'overview', label: 'Overview', icon: TrendingUp },
   { id: 'orders', label: 'Orders', icon: Package },
-  { id: 'addresses', label: 'Addresses', icon: MapPin },
-]
+  ADDRESS_BOOK_ENABLED ? { id: 'addresses', label: 'Addresses', icon: MapPin } : null,
+].filter(Boolean)
 
 const orderTrackingFlow = ['pending', 'accepted', 'preparing', 'ready', 'delivered']
 
@@ -56,14 +58,14 @@ function toTitleCase(v) {
 
 function StatusBadge({ value, kind = 'order' }) {
   const meta = kind === 'order'
-    ? { pending: { l: 'Placed', c: 'bg-blue-500/15 text-blue-300 border-blue-500/20' }, accepted: { l: 'Accepted', c: 'bg-purple-500/15 text-purple-300 border-purple-500/20' }, preparing: { l: 'Preparing', c: 'bg-amber-500/15 text-amber-300 border-amber-500/20' }, ready: { l: 'Out for Delivery', c: 'bg-purple-500/15 text-purple-300 border-purple-500/20' }, delivered: { l: 'Delivered', c: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/20' }, cancelled: { l: 'Cancelled', c: 'bg-red-500/15 text-red-300 border-red-500/20' } }
+    ? { pending: { l: 'Placed', c: 'bg-blue-500/15 text-blue-300 border-blue-500/20' }, accepted: { l: 'Accepted', c: 'bg-purple-500/15 text-purple-300 border-purple-500/20' }, preparing: { l: 'Preparing', c: 'bg-amber-500/15 text-amber-300 border-amber-500/20' }, ready: { l: 'Ready for Pickup', c: 'bg-purple-500/15 text-purple-300 border-purple-500/20' }, delivered: { l: 'Completed', c: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/20' }, cancelled: { l: 'Cancelled', c: 'bg-red-500/15 text-red-300 border-red-500/20' } }
     : { paid: { l: 'Paid', c: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/20' }, pending: { l: 'Pending', c: 'bg-amber-500/15 text-amber-300 border-amber-500/20' }, unpaid: { l: 'Unpaid', c: 'bg-red-500/15 text-red-300 border-red-500/20' }, failed: { l: 'Failed', c: 'bg-red-500/15 text-red-300 border-red-500/20' }, refunded: { l: 'Refunded', c: 'bg-amber-500/15 text-amber-300 border-amber-500/20' } }
   const m = meta[value] || { l: String(value || kind), c: 'bg-white/5 text-[#C9B9A0] border-white/10' }
   return <span className={`inline-flex items-center rounded-md border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider ${m.c}`}>{m.l}</span>
 }
 
 function getTrackingMeta(s) {
-  return { pending: { label: 'Order Placed', note: 'Restaurant received your order.' }, accepted: { label: 'Accepted', note: 'Kitchen accepted your order.' }, preparing: { label: 'Preparing', note: 'Your items are being prepared.' }, ready: { label: 'Ready', note: 'Packed and ready for dispatch.' }, delivered: { label: 'Delivered', note: 'Delivered successfully.' } }[s] || { label: 'Order Placed', note: 'Restaurant received your order.' }
+  return { pending: { label: 'Order Placed', note: 'Restaurant received your order.' }, accepted: { label: 'Accepted', note: 'Kitchen accepted your order.' }, preparing: { label: 'Preparing', note: 'Your items are being prepared.' }, ready: { label: 'Ready', note: 'Packed and ready for pickup.' }, delivered: { label: 'Completed', note: 'Picked up successfully.' } }[s] || { label: 'Order Placed', note: 'Restaurant received your order.' }
 }
 
 function buildTrackingSteps(order) {
@@ -275,9 +277,9 @@ export default function ProfilePage() {
             {[
               { label: 'Total Orders', value: orders.length, icon: Package, tap: () => setActiveTab('orders') },
               { label: 'Active Now', value: activeOrders.length, icon: Clock3, live: activeOrders.length > 0, tap: () => setActiveTab('orders') },
-              { label: 'Addresses', value: addresses.length, icon: MapPin, tap: () => setActiveTab('addresses') },
+              ADDRESS_BOOK_ENABLED ? { label: 'Addresses', value: addresses.length, icon: MapPin, tap: () => setActiveTab('addresses') } : null,
               { label: 'Favourites', value: profile?.favourites?.length || 0, icon: Heart },
-            ].map((s) => (
+            ].filter(Boolean).map((s) => (
               <button key={s.label} type="button" onClick={s.tap} className="rounded-lg border border-white/6 bg-white/[0.02] px-3 py-3 text-left transition hover:border-gold/20 hover:bg-gold/[0.03] active:scale-[0.97]">
                 <div className="flex items-center justify-between">
                   <s.icon className="h-4 w-4 text-gold/60" />
@@ -324,7 +326,7 @@ export default function ProfilePage() {
             <div className="space-y-4">
               {/* Quick actions */}
               {/* Quick actions — horizontal scroll on mobile, grid on desktop */}
-              <div className="flex gap-2.5 overflow-x-auto pb-1 scrollbar-hide sm:grid sm:grid-cols-3 sm:gap-3 sm:overflow-visible sm:pb-0">
+              <div className={`flex gap-2.5 overflow-x-auto pb-1 scrollbar-hide sm:grid ${ADDRESS_BOOK_ENABLED ? 'sm:grid-cols-3' : 'sm:grid-cols-2'} sm:gap-3 sm:overflow-visible sm:pb-0`}>
                 <Link to="/menu" className="group flex min-w-[200px] shrink-0 items-center gap-3 rounded-xl border border-white/8 bg-white/[0.02] p-3.5 transition active:scale-[0.97] hover:border-gold/25 hover:bg-gold/[0.04] sm:min-w-0 sm:shrink sm:p-4">
                   <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gold/10 text-gold sm:h-10 sm:w-10"><ShoppingCart className="h-4 w-4 sm:h-5 sm:w-5" /></div>
                   <div><p className="text-[13px] font-semibold text-[#F8F1DE] sm:text-[14px]">Browse Menu</p><p className="text-[10px] text-[#A8977E] sm:text-[11px]">Order something new</p></div>
@@ -333,10 +335,12 @@ export default function ProfilePage() {
                   <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gold/10 text-gold sm:h-10 sm:w-10"><Package className="h-4 w-4 sm:h-5 sm:w-5" /></div>
                   <div><p className="text-[13px] font-semibold text-[#F8F1DE] sm:text-[14px]">{activeOrders.length > 0 ? `${activeOrders.length} Active` : 'My Orders'}</p><p className="text-[10px] text-[#A8977E] sm:text-[11px]">{activeOrders.length > 0 ? 'Track live' : 'View history'}</p></div>
                 </button>
-                <button type="button" onClick={() => setActiveTab('addresses')} className="group flex min-w-[200px] shrink-0 items-center gap-3 rounded-xl border border-white/8 bg-white/[0.02] p-3.5 text-left transition active:scale-[0.97] hover:border-gold/25 hover:bg-gold/[0.04] sm:min-w-0 sm:shrink sm:p-4">
-                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gold/10 text-gold sm:h-10 sm:w-10"><MapPin className="h-4 w-4 sm:h-5 sm:w-5" /></div>
-                  <div><p className="text-[13px] font-semibold text-[#F8F1DE] sm:text-[14px]">{addresses.length} Addresses</p><p className="text-[10px] text-[#A8977E] sm:text-[11px]">{defaultAddress ? `Default: ${defaultAddress.label || 'Saved'}` : 'Add address'}</p></div>
-                </button>
+                {ADDRESS_BOOK_ENABLED && (
+                  <button type="button" onClick={() => setActiveTab('addresses')} className="group flex min-w-[200px] shrink-0 items-center gap-3 rounded-xl border border-white/8 bg-white/[0.02] p-3.5 text-left transition active:scale-[0.97] hover:border-gold/25 hover:bg-gold/[0.04] sm:min-w-0 sm:shrink sm:p-4">
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gold/10 text-gold sm:h-10 sm:w-10"><MapPin className="h-4 w-4 sm:h-5 sm:w-5" /></div>
+                    <div><p className="text-[13px] font-semibold text-[#F8F1DE] sm:text-[14px]">{addresses.length} Addresses</p><p className="text-[10px] text-[#A8977E] sm:text-[11px]">{defaultAddress ? `Default: ${defaultAddress.label || 'Saved'}` : 'Add address'}</p></div>
+                  </button>
+                )}
               </div>
 
               {/* Active orders preview */}
@@ -435,7 +439,7 @@ export default function ProfilePage() {
           )}
 
           {/* ADDRESSES TAB */}
-          {activeTab === 'addresses' && (
+          {ADDRESS_BOOK_ENABLED && activeTab === 'addresses' && (
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <p className="text-[13px] font-semibold text-[#F8F1DE]">{addresses.length} saved address{addresses.length !== 1 ? 'es' : ''}</p>

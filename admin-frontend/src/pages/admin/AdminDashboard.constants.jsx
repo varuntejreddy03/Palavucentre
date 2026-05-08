@@ -97,7 +97,7 @@ export const tabs = [
     label: 'Ordering',
     icon: Truck,
     group: 'System',
-    description: 'Configure delivery fee, free-delivery threshold, and tax used at checkout.',
+    description: 'Configure pickup checkout tax. Delivery pricing is disabled for now.',
   },
 ]
 

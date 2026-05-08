@@ -16,11 +16,8 @@ export default function CartDrawer() {
   const [removingIds, setRemovingIds] = useState({})
 
   const taxPercent = Number(siteSettings?.ordering?.taxPercent || 0)
-  const deliveryFee = Number(siteSettings?.ordering?.deliveryFee || 0)
-  const freeDeliveryThreshold = Number(siteSettings?.ordering?.freeDeliveryThreshold || 0)
-  const actualDeliveryFee = deliveryFee > 0 && total < freeDeliveryThreshold ? deliveryFee : 0
-  const tax = (total + actualDeliveryFee) * (taxPercent / 100)
-  const grandTotal = total + actualDeliveryFee + tax
+  const tax = total * (taxPercent / 100)
+  const grandTotal = total + tax
   const itemCount = useMemo(() => cartItems.reduce((s, i) => s + i.quantity, 0), [cartItems])
 
   useEffect(() => {
@@ -111,9 +108,6 @@ export default function CartDrawer() {
         <div className="my-3 h-px bg-[#2E2B1F]" />
         <div className="space-y-2 text-[13px]" style={{ fontFamily: 'DM Sans, sans-serif' }}>
           <div className="flex justify-between"><span className="text-[#8A8060]">Subtotal</span><span className="text-white">{formatCurrency(total)}</span></div>
-          <div className="flex justify-between"><span className="text-[#8A8060]">Delivery fee</span>
-            {actualDeliveryFee === 0 ? <span className="text-[#4CAF50]">FREE</span> : <span className="text-white">{formatCurrency(actualDeliveryFee)}</span>}
-          </div>
           <div className="flex justify-between"><span className="text-[#8A8060]">Taxes ({taxPercent}%)</span><span className="text-white">{formatCurrency(tax)}</span></div>
         </div>
         <div className="my-3 h-px bg-[#2E2B1F]" />

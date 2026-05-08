@@ -8,11 +8,8 @@ import {
   ChevronUp,
   Lock,
   Mail,
-  MapPin,
   Minus,
   Plus,
-  Receipt,
-  ShieldCheck,
   ShoppingBag,
   Trash2,
   User,
@@ -25,9 +22,10 @@ import { useSiteSettings } from '../context/SiteContext'
 import LocationPicker from '../components/LocationPicker'
 import { promoApi, publicApi } from '../lib/api'
 import { formatCurrency, normalizePhoneNumber } from '../lib/formatters'
+import { STORE_LOCATIONS } from '../../../shared/store-locations'
 
 const RAZORPAY_CHECKOUT_URL = 'https://checkout.razorpay.com/v1/checkout.js'
-const STEP_LABELS = ['Contact', 'Address', 'Payment']
+const STEP_LABELS = ['Contact', 'Pickup', 'Payment']
 
 let razorpayScriptPromise
 
@@ -36,36 +34,19 @@ const initialForm = {
   email: '',
   phone: '',
   whatsapp: '',
-  address: '',
-  city: '',
   notes: '',
 }
 
-function buildCustomerPayload({ formData, selectedAddress, user }) {
-  if (selectedAddress) {
-    const phone = normalizePhoneNumber(formData.phone || selectedAddress.phone)
-    const whatsapp = formData.whatsapp ? normalizePhoneNumber(formData.whatsapp) : undefined
-    return {
-      name: formData.name.trim() || selectedAddress.recipientName,
-      email: formData.email.trim() || user?.email || undefined,
-      phone,
-      whatsapp,
-      address: selectedAddress.fullAddress,
-      addressLine1: selectedAddress.addressLine1,
-      addressLine2: selectedAddress.addressLine2 || undefined,
-      landmark: selectedAddress.landmark || undefined,
-      city: selectedAddress.city || undefined,
-      state: selectedAddress.state || undefined,
-      postalCode: selectedAddress.postalCode || undefined,
-    }
-  }
+function getStoreLocationLabel(locationId) {
+  return STORE_LOCATIONS.find((location) => location.id === locationId)?.name || 'Selected store'
+}
+
+function buildCustomerPayload({ formData, user }) {
   return {
     name: formData.name.trim(),
     email: formData.email.trim() || user?.email || undefined,
     phone: normalizePhoneNumber(formData.phone),
     whatsapp: formData.whatsapp ? normalizePhoneNumber(formData.whatsapp) : undefined,
-    address: formData.address.trim(),
-    city: formData.city.trim() || undefined,
   }
 }
 
@@ -123,19 +104,6 @@ function SectionHeading({ eyebrow, title, description, action }) {
   )
 }
 
-function AddressOption({ address, isSelected, onSelect }) {
-  return (
-    <button type="button" onClick={onSelect} className={`w-full rounded-[24px] border px-4 py-4 text-left transition ${isSelected ? 'border-gold bg-gold/10 shadow-[0_18px_40px_rgba(212,168,83,0.12)]' : 'border-gold/10 bg-black/20 hover:border-gold/30'}`}>
-      <div className="flex flex-wrap items-center gap-3">
-        <p className="font-semibold text-text-primary">{address.label || 'Saved Address'}</p>
-        {address.isDefault && (<span className="rounded-full border border-emerald-400/20 bg-emerald-500/10 px-3 py-1 text-[10px] font-black uppercase tracking-[2px] text-emerald-200">Default</span>)}
-      </div>
-      <p className="mt-2 text-sm text-text-secondary">{address.recipientName} | {address.phone}</p>
-      <p className="mt-2 text-sm leading-7 text-text-secondary">{address.fullAddress}</p>
-    </button>
-  )
-}
-
 function StepNav({ step, setStep, onSubmit, isSubmitting, submitLabel, canGoNext, nextLabel }) {
   return (
     <div className="mt-6 hidden lg:flex items-center justify-between gap-3">
@@ -159,7 +127,7 @@ function StepNav({ step, setStep, onSubmit, isSubmitting, submitLabel, canGoNext
 
 export default function OrderPage() {
   const navigate = useNavigate()
-  const { user, profile, refreshProfile } = useAccount()
+  const { user, refreshProfile } = useAccount()
   const { cartItems, removeFromCart, updateQuantity, total, clearCart } = useCart()
   const { siteSettings } = useSiteSettings()
 
@@ -172,8 +140,6 @@ export default function OrderPage() {
   const [promoError, setPromoError] = useState('')
   const [promoNotice, setPromoNotice] = useState('')
   const [isApplyingPromo, setIsApplyingPromo] = useState(false)
-  const [selectedAddressId, setSelectedAddressId] = useState(null)
-  const [useOneTimeAddress, setUseOneTimeAddress] = useState(false)
   const [paymentMethod, setPaymentMethod] = useState('cod')
   const [onlinePaymentStatus, setOnlinePaymentStatus] = useState('')
   const [pendingOnlineOrder, setPendingOnlineOrder] = useState(null)
@@ -182,18 +148,12 @@ export default function OrderPage() {
   const [orderDrawerOpen, setOrderDrawerOpen] = useState(false)
   const [storeLocation, setStoreLocation] = useState('')
 
-  const savedAddresses = profile?.addresses || []
-  const defaultAddress = savedAddresses.find((a) => a.isDefault) || savedAddresses[0] || null
-  const selectedAddress = useOneTimeAddress ? null : savedAddresses.find((a) => a.id === selectedAddressId) || null
-  const usingSavedAddress = Boolean(selectedAddress)
   const restaurantName = siteSettings?.restaurantName || 'PalavuCentre'
 
   const taxPercent = Number(siteSettings?.ordering?.taxPercent || 0)
-  const deliveryFee = Number(siteSettings?.ordering?.deliveryFee || 0)
-  const freeDeliveryThreshold = Number(siteSettings?.ordering?.freeDeliveryThreshold || 0)
-  const estimatedDeliveryFee = deliveryFee > 0 && total < freeDeliveryThreshold ? deliveryFee : 0
-  const estimatedTax = (total + estimatedDeliveryFee) * (taxPercent / 100)
-  const estimatedGrandTotal = total + estimatedDeliveryFee + estimatedTax
+  const estimatedDeliveryFee = 0
+  const estimatedTax = total * (taxPercent / 100)
+  const estimatedGrandTotal = total + estimatedTax
   const totalItems = cartItems.reduce((count, item) => count + item.quantity, 0)
 
   const baseOrderPreview = useMemo(() => ({
@@ -209,7 +169,7 @@ export default function OrderPage() {
       ? pendingOnlineOrder?.order?.orderNumber
         ? 'Retry Razorpay Payment \u2192'
         : `Pay with Razorpay (${formatCurrency(orderPreview.grandTotal)}) \u2192`
-      : 'Place COD Order \u2192'
+      : 'Place Pickup Order \u2192'
 
   const onlinePaymentHelperText = isSubmitting
     ? onlinePaymentStatus || 'Preparing secure payment...'
@@ -222,13 +182,10 @@ export default function OrderPage() {
       ...c,
       name: c.name || user?.name || '',
       email: c.email || user?.email || '',
-      phone: c.phone || defaultAddress?.phone || '',
-      whatsapp: c.whatsapp || defaultAddress?.phone || '',
-      address: c.address || defaultAddress?.fullAddress || '',
-      city: c.city || defaultAddress?.city || '',
+      phone: c.phone || '',
+      whatsapp: c.whatsapp || '',
     }))
-    if (defaultAddress && !selectedAddressId && !useOneTimeAddress) setSelectedAddressId(defaultAddress.id)
-  }, [defaultAddress, selectedAddressId, useOneTimeAddress, user?.email, user?.name])
+  }, [user?.email, user?.name])
 
   useEffect(() => {
     if (cartItems.length === 0) return undefined
@@ -301,7 +258,7 @@ export default function OrderPage() {
         handler: async (pr) => {
           try {
             onStatusChange?.('Payment received. Verifying with the restaurant...')
-            const vr = await publicApi.verifyRazorpayPayment({ orderId: order.id, razorpayOrderId: pr.razorpay_order_id, razorpayPaymentId: pr.razorpay_payment_id, razorpaySignature: pr.razorpay_signature, payload: pr })
+            const vr = await publicApi.verifyRazorpayPayment({ razorpayOrderId: pr.razorpay_order_id, razorpayPaymentId: pr.razorpay_payment_id, razorpaySignature: pr.razorpay_signature, payload: pr })
             settled = true; resolve(vr.data)
           } catch (e) { settled = true; reject(e) }
         },
@@ -322,25 +279,36 @@ export default function OrderPage() {
       setIsSubmitting(true); setError('')
       if (paymentMethod === 'online') setOnlinePaymentStatus('Preparing secure checkout...')
       const checkoutLoader = paymentMethod === 'online' ? loadRazorpayCheckout().catch(() => null) : null
-      const customer = buildCustomerPayload({ formData, selectedAddress, user })
+      const customer = buildCustomerPayload({ formData, user })
       let orderPayload = pendingOnlineOrder
-      if (paymentMethod === 'online' && orderPayload?.order?.id) {
+      if (paymentMethod === 'online' && orderPayload?.order?.orderNumber) {
         setOnlinePaymentStatus('Refreshing your pending payment session...')
-        const gr = await publicApi.createRazorpayOrder({ orderId: orderPayload.order.id })
-        orderPayload = gr.data; setPendingOnlineOrder(gr.data)
+        const gr = await publicApi.createRazorpayOrder({ orderNumber: orderPayload.order.orderNumber, phone: customer.phone })
+        orderPayload = { ...orderPayload, razorpay: gr.data }
+        setPendingOnlineOrder(orderPayload)
       }
       if (!orderPayload) {
         if (paymentMethod === 'online') setOnlinePaymentStatus('Creating your order and payment request...')
         const r = await publicApi.createOrder({
           customer, items: cartItems.map((i) => ({ menuItemId: i.id, quantity: i.quantity })),
           paymentMethod, source: 'web', notes: formData.notes.trim() || undefined,
-          promoCode: appliedPromoCode || undefined, userAddressId: selectedAddress?.id || undefined,
+          promoCode: appliedPromoCode || undefined,
           storeLocation: storeLocation || undefined,
         })
         orderPayload = r.data
       }
       if (paymentMethod === 'online') {
-        setPendingOnlineOrder(orderPayload); setOnlinePaymentStatus('Redirecting you to Razorpay...')
+        setPendingOnlineOrder(orderPayload)
+        if (!orderPayload?.razorpay?.orderId) {
+          setError(orderPayload?.paymentError?.message || 'Could not start Razorpay payment. Please retry or choose cash at pickup.')
+          setOnlinePaymentStatus(
+            orderPayload?.order?.orderNumber
+              ? `Order ${orderPayload.order.orderNumber} is awaiting payment. Tap once to reopen Razorpay safely.`
+              : '',
+          )
+          return
+        }
+        setOnlinePaymentStatus('Redirecting you to Razorpay...')
         const vo = await openRazorpayCheckout({ order: orderPayload.order, razorpay: orderPayload.razorpay, customer, checkoutLoader, onStatusChange: setOnlinePaymentStatus })
         setOrderResult(vo); setPendingOnlineOrder(null); setOnlinePaymentStatus('')
       } else {
@@ -354,12 +322,15 @@ export default function OrderPage() {
   }
 
   const goToStep2 = () => {
-    if (!formData.name.trim() || !formData.phone.trim()) { setError('Please fill name and phone'); return }
+    const phone = normalizePhoneNumber(formData.phone)
+    const whatsapp = normalizePhoneNumber(formData.whatsapp)
+    if (!formData.name.trim() || !phone) { setError('Please fill name and phone'); return }
+    if (!/^\d{10}$/.test(phone)) { setError('Please enter a valid 10-digit phone number'); return }
+    if (whatsapp && !/^\d{10}$/.test(whatsapp)) { setError('Please enter a valid 10-digit WhatsApp number'); return }
     setError(''); setCheckoutStep(2)
   }
   const goToStep3 = () => {
     if (!storeLocation) { setError('Please select a store location'); return }
-    if (!usingSavedAddress && !formData.address.trim()) { setError('Please select or enter a delivery address'); return }
     setError(''); setCheckoutStep(3)
   }
 
@@ -374,22 +345,22 @@ export default function OrderPage() {
               <CheckCircle2 className="h-8 w-8 text-emerald-400" />
             </div>
             <p className="mt-4 text-[28px] font-bold text-[#F8F1DE] sm:text-[34px]" style={{ fontFamily: 'Playfair Display, serif' }}>Order Confirmed</p>
-            <p className="mt-2 text-[14px] text-[#8A8060]" style={{ fontFamily: 'DM Sans, sans-serif' }}>Your order is being prepared. Track it live in your account.</p>
+            <p className="mt-2 text-[14px] text-[#8A8060]" style={{ fontFamily: 'DM Sans, sans-serif' }}>Your order is being prepared for pickup. Track it with your order number and phone.</p>
           </div>
 
           {/* Order number card */}
           <div className="mt-6 rounded-[14px] border border-[#F0A500]/25 bg-[#F0A500]/5 p-4 text-center">
             <p className="text-[10px] font-bold uppercase tracking-wider text-[#F0A500]/60" style={{ fontFamily: 'DM Sans, sans-serif' }}>Order Number</p>
             <p className="mt-1 text-[18px] font-bold text-[#F0A500] sm:text-[20px]" style={{ fontFamily: 'DM Sans, sans-serif' }}>{orderResult.orderNumber}</p>
-            <p className="mt-1 text-[11px] uppercase tracking-wider text-[#8A8060]">{orderResult.paymentMethod === 'online' ? 'Paid Online' : 'Cash on Delivery'}</p>
+            <p className="mt-1 text-[11px] uppercase tracking-wider text-[#8A8060]">{orderResult.paymentMethod === 'online' ? 'Paid Online' : 'Cash at Pickup'}</p>
           </div>
 
           {/* Details grid */}
           <div className="mt-4 grid grid-cols-2 gap-3">
             <div className="rounded-[14px] border border-[#2E2B1F] bg-[#1A1810] p-3.5">
-              <p className="text-[10px] font-bold uppercase tracking-wider text-[#8A8060]" style={{ fontFamily: 'DM Sans, sans-serif' }}>Customer</p>
-              <p className="mt-1.5 text-[14px] font-semibold text-white" style={{ fontFamily: 'DM Sans, sans-serif' }}>{orderResult.customer?.name}</p>
-              <p className="mt-0.5 text-[12px] text-[#8A8060]">{orderResult.customer?.phone}</p>
+              <p className="text-[10px] font-bold uppercase tracking-wider text-[#8A8060]" style={{ fontFamily: 'DM Sans, sans-serif' }}>Payment</p>
+              <p className="mt-1.5 text-[14px] font-semibold capitalize text-white" style={{ fontFamily: 'DM Sans, sans-serif' }}>{orderResult.paymentMethod}</p>
+              <p className="mt-0.5 text-[12px] capitalize text-[#8A8060]">{orderResult.paymentStatus}</p>
             </div>
             <div className="rounded-[14px] border border-[#2E2B1F] bg-[#1A1810] p-3.5">
               <p className="text-[10px] font-bold uppercase tracking-wider text-[#8A8060]" style={{ fontFamily: 'DM Sans, sans-serif' }}>Total</p>
@@ -398,13 +369,10 @@ export default function OrderPage() {
             </div>
           </div>
 
-          {/* Delivery address */}
-          {orderResult.customer?.address && (
-            <div className="mt-3 rounded-[14px] border border-[#2E2B1F] bg-[#1A1810] p-3.5">
-              <p className="text-[10px] font-bold uppercase tracking-wider text-[#8A8060]" style={{ fontFamily: 'DM Sans, sans-serif' }}>Delivery Address</p>
-              <p className="mt-1.5 text-[13px] leading-[1.6] text-[#B0A880]" style={{ fontFamily: 'DM Sans, sans-serif' }}>{orderResult.customer.address}</p>
-            </div>
-          )}
+          <div className="mt-3 rounded-[14px] border border-[#2E2B1F] bg-[#1A1810] p-3.5">
+            <p className="text-[10px] font-bold uppercase tracking-wider text-[#8A8060]" style={{ fontFamily: 'DM Sans, sans-serif' }}>Pickup Store</p>
+            <p className="mt-1.5 text-[13px] leading-[1.6] text-[#B0A880]" style={{ fontFamily: 'DM Sans, sans-serif' }}>{getStoreLocationLabel(orderResult.storeLocation)}</p>
+          </div>
 
           {/* Order items */}
           <div className="mt-3 rounded-[14px] border border-[#2E2B1F] bg-[#1A1810] p-3.5">
@@ -413,8 +381,8 @@ export default function OrderPage() {
               <span className="text-[11px] text-[#8A8060]">{orderResult.items?.length || 0} items</span>
             </div>
             <div className="mt-3 space-y-2.5">
-              {orderResult.items?.map((item) => (
-                <div key={item.id} className="flex items-center justify-between gap-3">
+              {orderResult.items?.map((item, index) => (
+                <div key={`${item.name}-${index}`} className="flex items-center justify-between gap-3">
                   <div className="min-w-0">
                     <p className="truncate text-[14px] font-medium text-white" style={{ fontFamily: 'DM Sans, sans-serif' }}>{item.name}</p>
                     <p className="text-[12px] text-[#8A8060]">{item.quantity} x {formatCurrency(item.unitPrice)}</p>
@@ -426,7 +394,6 @@ export default function OrderPage() {
             <div className="mt-3 border-t border-[#2E2B1F] pt-3 space-y-1.5 text-[13px]" style={{ fontFamily: 'DM Sans, sans-serif' }}>
               <div className="flex justify-between"><span className="text-[#8A8060]">Subtotal</span><span className="text-white">{formatCurrency(orderResult.pricing?.subTotal)}</span></div>
               <div className="flex justify-between"><span className="text-[#8A8060]">Tax</span><span className="text-white">{formatCurrency(orderResult.pricing?.taxAmount)}</span></div>
-              <div className="flex justify-between"><span className="text-[#8A8060]">Delivery</span><span className="text-white">{formatCurrency(orderResult.pricing?.deliveryFee)}</span></div>
               <div className="flex justify-between border-t border-[#2E2B1F] pt-2 text-[15px] font-bold"><span className="text-[#F0A500]">Total</span><span className="text-[#F0A500]">{formatCurrency(orderResult.pricing?.grandTotal)}</span></div>
             </div>
           </div>
@@ -435,7 +402,7 @@ export default function OrderPage() {
           <div className="mt-3 rounded-[14px] border border-[#2E2B1F] bg-[#1A1810] p-3.5">
             <p className="text-[10px] font-bold uppercase tracking-wider text-[#8A8060]" style={{ fontFamily: 'DM Sans, sans-serif' }}>What Happens Next</p>
             <div className="mt-3 space-y-0">
-              {['Kitchen accepts your order', 'Live status updates in your account', 'Delivery partner dispatches'].map((text, i) => (
+              {['Kitchen accepts your order', 'Track status with order number and phone', 'Pick up from the selected store'].map((text, i) => (
                 <div key={i}>
                   <div className="flex items-center gap-3 py-2">
                     <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#F0A500]/15 text-[10px] font-bold text-[#F0A500]">{i + 1}</span>
@@ -451,7 +418,7 @@ export default function OrderPage() {
           <div className="mt-5 space-y-3">
             <button type="button" onClick={() => navigate('/profile?tab=orders', { state: { justOrdered: true } })}
               className="shimmer-btn flex h-[52px] w-full items-center justify-center gap-2 rounded-xl bg-[#F0A500] text-[15px] font-bold text-black active:scale-[0.97]">
-              Open My Orders
+              My Orders
             </button>
             <Link to="/menu" className="flex h-[48px] w-full items-center justify-center rounded-xl border border-[#2E2B1F] text-[14px] font-medium text-[#8A8060] transition hover:border-[#F0A500]/30 hover:text-[#F0A500]">
               Browse Menu
@@ -472,7 +439,6 @@ export default function OrderPage() {
             <p className="mx-auto mt-4 max-w-2xl text-base leading-8 text-text-secondary">Add items from the menu, then return to checkout.</p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
               <Link to="/menu" className="brand-primary-btn px-6 py-4 text-[12px]">Browse Menu</Link>
-              <Link to="/profile?tab=addresses" className="brand-secondary-btn px-6 py-4 text-[12px]">Manage Addresses</Link>
             </div>
           </div>
         </div>
@@ -599,90 +565,32 @@ export default function OrderPage() {
                 <div className="mt-3 grid gap-3 md:grid-cols-2">
                   <label className="space-y-2">
                     <span className="ml-1 font-sans text-[11px] uppercase tracking-[0.08em] text-[var(--text-muted)]">Phone</span>
-                    <input required name="phone" maxLength="10" value={formData.phone} onChange={handleChange} placeholder="10-digit mobile" inputMode="numeric" className="brand-input h-[46px] px-4 py-0" />
+                    <input required type="tel" name="phone" maxLength="20" value={formData.phone} onChange={handleChange} placeholder="10-digit mobile" inputMode="tel" className="brand-input h-[46px] px-4 py-0" />
                   </label>
                   <label className="space-y-2">
                     <span className="ml-1 font-sans text-[11px] uppercase tracking-[0.08em] text-[var(--text-muted)]">WhatsApp</span>
-                    <input name="whatsapp" maxLength="10" value={formData.whatsapp} onChange={handleChange} placeholder="Optional" inputMode="numeric" className="brand-input h-[46px] px-4 py-0" />
+                    <input type="tel" name="whatsapp" maxLength="20" value={formData.whatsapp} onChange={handleChange} placeholder="Optional" inputMode="tel" className="brand-input h-[46px] px-4 py-0" />
                   </label>
                 </div>
-                <StepNav step={1} setStep={setCheckoutStep} canGoNext={goToStep2} nextLabel="Next: Address" submitLabel={submitButtonLabel} isSubmitting={isSubmitting} />
+                <StepNav step={1} setStep={setCheckoutStep} canGoNext={goToStep2} nextLabel="Next: Pickup" submitLabel={submitButtonLabel} isSubmitting={isSubmitting} />
               </section>
             )}
 
-            {/* STEP 2: Address */}
+            {/* STEP 2: Pickup */}
             {checkoutStep === 2 && (
               <section className="step-card animate-auth-step">
-                <SectionHeading eyebrow="Step 2" title="Delivery Address" description="Pick your nearest store, then choose a delivery address."
-                  action={<Link to="/profile?tab=addresses" className="brand-secondary-btn px-5 text-[15px]">Manage Addresses</Link>} />
+                <SectionHeading eyebrow="Step 2" title="Pickup Store" description="Choose where you will collect this order." />
 
                 <div className="mt-4 rounded-[16px] border border-[var(--border)] bg-black/20 p-[18px]">
                   <LocationPicker selected={storeLocation} onSelect={setStoreLocation} />
                 </div>
 
-                {savedAddresses.length === 0 && (
-                  <div className="mt-4 flex items-start gap-3 rounded-[16px] border border-dashed border-gold/30 bg-gold/5 px-5 py-4 font-sans text-[13px] leading-6 text-[var(--text-muted)]">
-                    <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-gold" />
-                    <div>
-                      <p className="font-medium text-white">No saved addresses yet</p>
-                      <p>Enter the delivery address below, or save one in your profile for faster checkout next time.</p>
-                      <Link to="/profile?tab=addresses" className="mt-2 inline-flex text-gold underline-offset-4 hover:underline">+ Add to Profile</Link>
-                    </div>
-                  </div>
-                )}
-
-                {savedAddresses.length > 0 && (
-                  <div className="mt-4 grid gap-3">
-                    {savedAddresses.map((address) => (
-                      <AddressOption key={address.id} address={address} isSelected={selectedAddressId === address.id}
-                        onSelect={() => {
-                          setUseOneTimeAddress(false); setSelectedAddressId(address.id)
-                          setFormData((c) => ({ ...c, phone: c.phone || address.phone || '', address: c.address || address.fullAddress || '', city: c.city || address.city || '' }))
-                        }} />
-                    ))}
-                    <button type="button" onClick={() => { setUseOneTimeAddress(true); setSelectedAddressId(null) }}
-                      className={`w-full rounded-[24px] border px-4 py-4 text-left transition ${useOneTimeAddress ? 'border-gold bg-gold/10' : 'border-gold/10 bg-black/20 hover:border-gold/30'}`}>
-                      <p className="font-semibold text-text-primary">Use a one-time address</p>
-                      <p className="mt-2 text-sm text-text-secondary">Use a different address for this order.</p>
-                    </button>
-                  </div>
-                )}
-
-                {usingSavedAddress ? (
-                  <div className="mt-4 rounded-[16px] border border-[var(--border)] bg-black/20 p-[18px]">
-                    <p className="font-sans text-[11px] font-medium uppercase tracking-[0.16em] text-[var(--text-subtle)]">Selected Address</p>
-                    <div className="mt-4 rounded-[16px] border border-[var(--border)] bg-[var(--input-bg)] px-4 py-4">
-                      <p className="font-semibold text-text-primary">Selected: {selectedAddress.label || 'Saved Address'}</p>
-                      <p className="mt-2 text-sm text-text-secondary">{selectedAddress.recipientName} | {selectedAddress.phone}</p>
-                      <p className="mt-3 flex items-start gap-2 text-sm leading-7 text-text-secondary"><MapPin className="mt-1 h-4 w-4 shrink-0 text-gold/60" /><span>{selectedAddress.fullAddress}</span></p>
-                    </div>
-                    <label className="mt-3 block space-y-2">
-                      <span className="ml-1 font-sans text-[11px] uppercase tracking-[0.08em] text-[var(--text-muted)]">Order Notes</span>
-                      <input name="notes" value={formData.notes} onChange={handleChange} placeholder="Optional cooking or delivery note" className="brand-input h-[46px] py-0" />
-                    </label>
-                  </div>
-                ) : (
-                  <div className="mt-4 rounded-[16px] border border-[var(--border)] bg-black/20 p-[18px]">
-                    <div className="grid gap-3">
-                      <label className="space-y-2">
-                        <span className="ml-1 font-sans text-[11px] uppercase tracking-[0.08em] text-[var(--text-muted)]">Delivery Address</span>
-                        <div>
-                          <textarea required rows="4" name="address" value={formData.address} onChange={handleChange} placeholder="Street, area, landmark" className="brand-input min-h-20 resize-none py-4 px-4"></textarea>
-                        </div>
-                      </label>
-                      <div className="grid gap-3 md:grid-cols-[1fr_1.4fr]">
-                        <label className="space-y-2">
-                          <span className="ml-1 font-sans text-[11px] uppercase tracking-[0.08em] text-[var(--text-muted)]">City</span>
-                          <input name="city" value={formData.city} onChange={handleChange} placeholder="Optional" className="brand-input h-[46px] py-0" />
-                        </label>
-                        <label className="space-y-2">
-                          <span className="ml-1 font-sans text-[11px] uppercase tracking-[0.08em] text-[var(--text-muted)]">Order Notes</span>
-                          <input name="notes" value={formData.notes} onChange={handleChange} placeholder="Optional cooking or delivery note" className="brand-input h-[46px] py-0" />
-                        </label>
-                      </div>
-                    </div>
-                  </div>
-                )}
+                <div className="mt-4 rounded-[16px] border border-[var(--border)] bg-black/20 p-[18px]">
+                  <label className="block space-y-2">
+                    <span className="ml-1 font-sans text-[11px] uppercase tracking-[0.08em] text-[var(--text-muted)]">Order Notes</span>
+                    <input name="notes" value={formData.notes} onChange={handleChange} placeholder="Optional cooking or pickup note" className="brand-input h-[46px] py-0" />
+                  </label>
+                </div>
 
                 <StepNav step={2} setStep={setCheckoutStep} canGoNext={goToStep3} nextLabel="Next: Payment" submitLabel={submitButtonLabel} isSubmitting={isSubmitting} />
               </section>
@@ -704,8 +612,8 @@ export default function OrderPage() {
                     className={`w-full rounded-[14px] border text-left transition-all duration-200 ${paymentMethod === 'cod' ? 'border-[#F0A500] border-l-[3px] bg-[#F0A500]/[0.025]' : 'border-[#2E2B1F] bg-[#1C1A14] hover:border-[#3A3520]'}`} style={{ padding: '18px 16px' }}>
                     <div className="flex items-start justify-between gap-3">
                       <div>
-                        <p className="text-[15px] font-semibold text-white" style={{ fontFamily: 'DM Sans, sans-serif' }}>Cash on Delivery</p>
-                        <p className="mt-1 text-[12px] text-[#8A8060]" style={{ fontFamily: 'DM Sans, sans-serif' }}>Pay when your order arrives.</p>
+                        <p className="text-[15px] font-semibold text-white" style={{ fontFamily: 'DM Sans, sans-serif' }}>Cash at Pickup</p>
+                        <p className="mt-1 text-[12px] text-[#8A8060]" style={{ fontFamily: 'DM Sans, sans-serif' }}>Pay at the counter when you collect your order.</p>
                       </div>
                       <span className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 border-[#F0A500] transition-all duration-200 ${paymentMethod === 'cod' ? 'bg-[#F0A500]' : 'bg-transparent'}`}>
                         {paymentMethod === 'cod' && <Check className="h-3 w-3 text-white" />}
@@ -755,7 +663,7 @@ export default function OrderPage() {
 
                 {pendingOnlineOrder?.order?.orderNumber && paymentMethod === 'online' && (
                   <div className="mt-3 rounded-[14px] border border-[#F0A500]/20 bg-[#F0A500]/5 px-4 py-3 text-[13px] text-[#F0A500]" style={{ fontFamily: 'DM Sans, sans-serif' }}>
-                    Pending order <span className="font-bold">{pendingOnlineOrder.order.orderNumber}</span> — tap below to reopen payment.
+                    Pending order <span className="font-bold">{pendingOnlineOrder.order.orderNumber}</span> - tap below to reopen payment.
                   </div>
                 )}
 
@@ -842,13 +750,8 @@ export default function OrderPage() {
                   <div className="flex justify-between text-[13px]"><span className="text-[#4CAF50]">Promo{appliedPromoCode ? ` (${appliedPromoCode})` : ''}</span><span className="text-[#4CAF50]">- {formatCurrency(orderPreview.discountAmount)}</span></div>
                 )}
                 <div className="flex justify-between text-[13px]"><span className="text-[#B0A880]">Tax ({taxPercent}%)</span><span className="text-white">{formatCurrency(orderPreview.taxAmount)}</span></div>
-                <div className="flex justify-between text-[13px]"><span className="text-[#B0A880]">Delivery</span><span className="text-white">{formatCurrency(orderPreview.deliveryFee || 0)}</span></div>
                 <div className="flex justify-between border-t border-[#2E2B1F] pt-3 mt-1 text-[16px] font-bold"><span className="text-[#F0A500]">Total</span><span className="text-[#F0A500]">{formatCurrency(orderPreview.grandTotal)}</span></div>
               </div>
-
-              {deliveryFee > 0 && (
-                <div className="px-5 pb-3"><p className="text-[11px] text-[#8A8060]">Delivery fee {formatCurrency(deliveryFee)} applies below {formatCurrency(freeDeliveryThreshold)}.</p></div>
-              )}
 
               {/* Back to menu */}
               <div className="border-t border-[#2E2B1F] px-5 py-3">
@@ -861,7 +764,7 @@ export default function OrderPage() {
           <div className="mx-auto max-w-[600px]">
             {checkoutStep === 1 && (
               <button type="button" onClick={goToStep2} className="shimmer-btn flex h-[52px] w-full items-center justify-center gap-2 rounded-xl bg-[#F0A500] text-[15px] font-bold text-black active:scale-[0.97]">
-                Next: Address <ArrowRight className="h-4 w-4" />
+                Next: Pickup <ArrowRight className="h-4 w-4" />
               </button>
             )}
             {checkoutStep === 2 && (

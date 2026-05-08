@@ -1,12 +1,12 @@
 import { StatusCodes } from "http-status-codes";
 
 import {
-  createRazorpayOrderForExistingOrder,
+  createRazorpayOrderForVerifiedOrder,
   verifyRazorpayPayment,
 } from "../services/payment.service.js";
 
 export async function createRazorpayOrderHandler(req, res) {
-  const data = await createRazorpayOrderForExistingOrder(req.body.orderId);
+  const data = await createRazorpayOrderForVerifiedOrder(req.body);
 
   res.status(StatusCodes.OK).json({
     success: true,

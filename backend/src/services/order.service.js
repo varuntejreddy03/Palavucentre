@@ -7,9 +7,12 @@ import { calculateTotals } from "../utils/amounts.js";
 import { generateOrderNumber } from "../utils/order-number.js";
 import { getPagination } from "../utils/pagination.js";
 import { serializeOrder } from "../utils/serializers.js";
-import { createRazorpayOrderForPayment } from "./payment.service.js";
+import { serializePublicOrder } from "../serializers/order.public.serializer.js";
+import { serializePublicRazorpayOrder } from "../serializers/payment.public.serializer.js";
+import { assertRazorpayPaymentAmount, createRazorpayOrderForPayment } from "./payment.service.js";
 import { resolvePromoCodeForOrder } from "./promocode.service.js";
 import { getOrderConfig } from "./site-settings.service.js";
+import { STORE_LOCATIONS } from "../../../shared/store-locations.js";
 
 const orderIncludes = {
   user: true,
@@ -31,65 +34,28 @@ async function createUniqueOrderNumber() {
   return orderNumber;
 }
 
-function buildAddress(customer, savedAddress) {
-  if (savedAddress) {
-    return {
-      addressLine1: savedAddress.addressLine1,
-      addressLine2: savedAddress.addressLine2,
-      landmark: savedAddress.landmark,
-      city: savedAddress.city,
-      state: savedAddress.state,
-      postalCode: savedAddress.postalCode,
-      fullAddress: savedAddress.fullAddress,
-    };
-  }
-
-  const addressLine1 = customer.addressLine1 || customer.address;
-  const fullAddress =
-    customer.address ||
-    [customer.addressLine1, customer.addressLine2, customer.landmark, customer.city, customer.state, customer.postalCode]
-      .filter(Boolean)
-      .join(", ");
+function buildPickupAddress(storeLocation) {
+  const location = STORE_LOCATIONS.find((currentLocation) => currentLocation.id === storeLocation);
+  const pickupLabel = location ? `Pickup: ${location.name}` : "Pickup from selected store";
 
   return {
-    addressLine1,
-    addressLine2: customer.addressLine2,
-    landmark: customer.landmark,
-    city: customer.city,
-    state: customer.state,
-    postalCode: customer.postalCode,
-    fullAddress,
+    addressLine1: pickupLabel,
+    addressLine2: undefined,
+    landmark: undefined,
+    city: undefined,
+    state: undefined,
+    postalCode: undefined,
+    fullAddress: location?.address || pickupLabel,
   };
-}
-
-async function resolveSavedAddress({ user, userAddressId }) {
-  if (!userAddressId) {
-    return null;
-  }
-
-  if (!user) {
-    throw new ApiError(StatusCodes.BAD_REQUEST, "Sign in to use a saved address");
-  }
-
-  const savedAddress = await withReadDbRetry(() =>
-    prisma.userAddress.findFirst({
-      where: {
-        id: userAddressId,
-        userId: user.id,
-      },
-    }),
-  );
-
-  if (!savedAddress) {
-    throw new ApiError(StatusCodes.NOT_FOUND, "Saved address not found");
-  }
-
-  return savedAddress;
 }
 
 export async function createOrder(payload, { user } = {}) {
   if (payload.paymentMethod === "online" && !isRazorpayConfigured) {
     throw new ApiError(StatusCodes.SERVICE_UNAVAILABLE, "Online payments are not configured");
+  }
+
+  if (payload.userAddressId) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, "Delivery addresses are disabled while pickup-only ordering is active");
   }
 
   const itemIds = [...new Set(payload.items.map((item) => item.menuItemId || item.id))];
@@ -124,90 +90,121 @@ export async function createOrder(payload, { user } = {}) {
   });
 
   const subtotalPaise = orderItems.reduce((total, item) => total + item.lineTotalPaise, 0);
-  const selectedAddress = await resolveSavedAddress({ user, userAddressId: payload.userAddressId });
   const promoResolution = await resolvePromoCodeForOrder(payload.promoCode, subtotalPaise);
   const discountPaise = promoResolution?.discountPaise || 0;
   const orderConfig = await getOrderConfig();
   const totals = calculateTotals({
     subtotalPaise: Math.max(subtotalPaise - discountPaise, 0),
     taxPercent: orderConfig.taxPercent,
-    deliveryFeePaise: orderConfig.deliveryFeePaise,
-    freeDeliveryThresholdPaise: orderConfig.freeDeliveryThresholdPaise,
+    deliveryFeePaise: 0,
+    freeDeliveryThresholdPaise: 0,
   });
+
+  if (payload.paymentMethod === "online") {
+    assertRazorpayPaymentAmount(totals.grandTotalPaise);
+  }
+
   const orderNumber = await createUniqueOrderNumber();
-  const address = buildAddress(payload.customer, selectedAddress);
+  const address = buildPickupAddress(payload.storeLocation);
 
-  const order = await prisma.$transaction(async (tx) => {
-    if (promoResolution?.promoCode) {
-      await tx.promoCode.update({
-        where: { id: promoResolution.promoCode.id },
-        data: {
-          usedCount: {
-            increment: 1,
-          },
-        },
-      });
-    }
-
-    return tx.order.create({
-      data: {
-        userId: user?.id,
-        userAddressId: selectedAddress?.id,
-        promoCodeId: promoResolution?.promoCode?.id,
-        orderNumber,
-        customerName: payload.customer.name,
-        phone: payload.customer.phone,
-        whatsapp: payload.customer.whatsapp,
-        email: payload.customer.email || user?.email,
-        addressLine1: address.addressLine1,
-        addressLine2: address.addressLine2,
-        landmark: address.landmark,
-        city: address.city,
-        state: address.state,
-        postalCode: address.postalCode,
-        fullAddress: address.fullAddress,
-        notes: payload.notes,
-        storeLocation: payload.storeLocation,
-        source: payload.source ?? "web",
-        paymentMethod: payload.paymentMethod,
-        paymentStatus: payload.paymentMethod === "cod" ? "unpaid" : "pending",
-        orderStatus: "pending",
-        subtotalPaise,
-        discountPaise,
-        deliveryFeePaise: totals.deliveryFeePaise,
-        promoCode: promoResolution?.promoCode?.code,
-        taxPercent: totals.taxPercent,
-        taxPaise: totals.taxPaise,
-        grandTotalPaise: totals.grandTotalPaise,
-        currency: orderConfig.currency,
-        items: {
-          create: orderItems,
-        },
-        payments: {
-          create: {
-            provider: payload.paymentMethod === "online" ? "razorpay" : "cod",
-            status: payload.paymentMethod === "online" ? "pending" : "unpaid",
-            amountPaise: totals.grandTotalPaise,
-            currency: orderConfig.currency,
-          },
+  const orderCreateOperation = prisma.order.create({
+    data: {
+      userId: user?.id,
+      promoCodeId: promoResolution?.promoCode?.id,
+      orderNumber,
+      customerName: payload.customer.name,
+      phone: payload.customer.phone,
+      whatsapp: payload.customer.whatsapp,
+      email: payload.customer.email || user?.email,
+      addressLine1: address.addressLine1,
+      addressLine2: address.addressLine2,
+      landmark: address.landmark,
+      city: address.city,
+      state: address.state,
+      postalCode: address.postalCode,
+      fullAddress: address.fullAddress,
+      notes: payload.notes,
+      storeLocation: payload.storeLocation,
+      source: payload.source ?? "web",
+      paymentMethod: payload.paymentMethod,
+      paymentStatus: payload.paymentMethod === "cod" ? "unpaid" : "pending",
+      orderStatus: "pending",
+      subtotalPaise,
+      discountPaise,
+      deliveryFeePaise: totals.deliveryFeePaise,
+      promoCode: promoResolution?.promoCode?.code,
+      taxPercent: totals.taxPercent,
+      taxPaise: totals.taxPaise,
+      grandTotalPaise: totals.grandTotalPaise,
+      currency: orderConfig.currency,
+      items: {
+        create: orderItems,
+      },
+      payments: {
+        create: {
+          provider: payload.paymentMethod === "online" ? "razorpay" : "cod",
+          status: payload.paymentMethod === "online" ? "pending" : "unpaid",
+          amountPaise: totals.grandTotalPaise,
+          currency: orderConfig.currency,
         },
       },
-      include: orderIncludes,
-    });
+    },
+    include: orderIncludes,
   });
+
+  const orderOperations = promoResolution?.promoCode
+    ? [
+        prisma.promoCode.update({
+          where: { id: promoResolution.promoCode.id },
+          data: {
+            usedCount: {
+              increment: 1,
+            },
+          },
+        }),
+        orderCreateOperation,
+      ]
+    : [orderCreateOperation];
+
+  const orderResults = await prisma.$transaction(orderOperations);
+  const order = orderResults[orderResults.length - 1];
 
   if (payload.paymentMethod === "cod") {
     return {
-      order: serializeOrder(order),
+      order: serializePublicOrder(order),
     };
   }
 
-  const gatewayOrder = await createRazorpayOrderForPayment(order.payments[0].id);
+  const pendingPayment = order.payments.find((payment) => payment.provider === "razorpay" && payment.status === "pending");
+
+  if (!pendingPayment) {
+    throw new ApiError(StatusCodes.INTERNAL_SERVER_ERROR, "Payment record was not created for this order");
+  }
+
+  let gatewayOrder;
+
+  try {
+    gatewayOrder = await createRazorpayOrderForPayment(pendingPayment.id);
+  } catch (error) {
+    if (error instanceof ApiError && error.statusCode < StatusCodes.INTERNAL_SERVER_ERROR) {
+      throw error;
+    }
+
+    return {
+      order: serializePublicOrder(order),
+      paymentError: {
+        message:
+          error instanceof ApiError
+            ? error.message
+            : "Could not start Razorpay payment. Please retry or choose cash at pickup.",
+        retryable: true,
+      },
+    };
+  }
 
   return {
-    order: serializeOrder(order),
-    payment: gatewayOrder.payment,
-    razorpay: gatewayOrder.razorpay,
+    order: serializePublicOrder(order),
+    razorpay: serializePublicRazorpayOrder(gatewayOrder.razorpay),
   };
 }
 
@@ -281,7 +278,7 @@ export async function trackOrder({ orderNumber, phone }) {
     throw new ApiError(StatusCodes.NOT_FOUND, "Order not found for the provided order number and phone");
   }
 
-  return serializeOrder(order);
+  return serializePublicOrder(order);
 }
 
 export async function updateOrder(id, payload) {

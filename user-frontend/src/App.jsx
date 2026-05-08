@@ -8,7 +8,6 @@ import { useAccount } from './context/AccountContext'
 import Home from './pages/Home'
 import MenuPage from './pages/MenuPage'
 import OrderPage from './pages/OrderPage'
-import TrackOrderPage from './pages/TrackOrderPage'
 import GalleryPage from './pages/GalleryPage'
 import CateringPage from './pages/CateringPage'
 import FranchisePage from './pages/FranchisePage'
@@ -64,7 +63,6 @@ function AppContent() {
           <Route path="/catering" element={<CateringPage />} />
           <Route path="/franchise" element={<FranchisePage />} />
           <Route path="/contact" element={<ContactPage />} />
-          <Route path="/track-order" element={<TrackOrderPage />} />
           <Route path="/story" element={<StoryPage />} />
           <Route path="/login" element={<AuthPage mode="login" />} />
           <Route path="/signup" element={<AuthPage mode="signup" />} />

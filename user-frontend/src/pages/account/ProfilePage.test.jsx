@@ -86,13 +86,15 @@ beforeEach(() => {
 })
 
 describe('ProfilePage', () => {
-  it('opens the orders tab from the overview track action without leaving the page', async () => {
+  it('keeps order tracking visible while the address book is hidden', async () => {
     const user = userEvent.setup()
 
     renderProfile()
+    expect(screen.queryByText(/^Addresses$/)).toBeNull()
+
     await user.click(screen.getByRole('button', { name: 'Track' }))
 
     expect(screen.getByText('Live Orders')).toBeTruthy()
-    expect(screen.getByText('Past Orders')).toBeTruthy()
+    expect(screen.getByText('Your items are being prepared.')).toBeTruthy()
   })
 })

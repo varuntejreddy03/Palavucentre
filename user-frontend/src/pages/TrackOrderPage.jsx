@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useState } from 'react'
-import { CheckCircle2, Clock3, PackageCheck, Phone, RefreshCw, Search, ShoppingBag, Truck, XCircle } from 'lucide-react'
+import { CheckCircle2, Clock3, PackageCheck, Phone, RefreshCw, Search, ShoppingBag, XCircle } from 'lucide-react'
 import { Link, useLocation } from 'react-router-dom'
 
 import { useSiteSettings } from '../context/SiteContext'
 import { publicApi } from '../lib/api'
 import { formatCurrency, formatDateTime, normalizePhoneNumber } from '../lib/formatters'
+import { STORE_LOCATIONS } from '../../../shared/store-locations'
 
 const LAST_ORDER_STORAGE_KEY = 'palavu:last-order-tracking'
 const orderTimeline = ['pending', 'accepted', 'preparing', 'ready', 'delivered']
@@ -41,6 +42,10 @@ function writeStoredTrackingOrder(orderNumber, phone) {
   }
 }
 
+function getStoreLocationLabel(locationId) {
+  return STORE_LOCATIONS.find((location) => location.id === locationId)?.name || 'Selected store'
+}
+
 function getStatusMeta(status) {
   const map = {
     pending: {
@@ -60,13 +65,13 @@ function getStatusMeta(status) {
     },
     ready: {
       label: 'Ready',
-      description: 'The order is ready for pickup or dispatch.',
+      description: 'The order is ready for pickup.',
       icon: PackageCheck,
     },
     delivered: {
-      label: 'Delivered',
-      description: 'The order has been completed.',
-      icon: Truck,
+      label: 'Completed',
+      description: 'The order has been picked up.',
+      icon: CheckCircle2,
     },
     cancelled: {
       label: 'Cancelled',
@@ -277,7 +282,7 @@ export default function TrackOrderPage() {
                   <h3 className="mt-6 text-[32px] text-gold-bright">Order Status Will Show Here</h3>
                   <p className="mt-3 max-w-xl text-sm leading-7 text-text-secondary">
                     Once you search with the right order number and phone, this page will show the current status,
-                    order total, items, and time-based updates.
+                    order total, items, and pickup updates.
                   </p>
                 </div>
               ) : (
@@ -356,8 +361,8 @@ export default function TrackOrderPage() {
                     <div className="rounded-[28px] border border-gold/10 bg-black/20 p-5">
                       <p className="text-[11px] font-black uppercase tracking-[3px] text-gold/70">Items</p>
                       <div className="mt-4 space-y-3">
-                        {(order.items || []).map((item) => (
-                          <div key={item.id} className="flex items-center justify-between gap-4 rounded-[20px] border border-gold/10 bg-[#120907] p-4">
+                        {(order.items || []).map((item, index) => (
+                          <div key={`${item.name}-${index}`} className="flex items-center justify-between gap-4 rounded-[20px] border border-gold/10 bg-[#120907] p-4">
                             <div className="min-w-0">
                               <p className="font-semibold text-text-primary">{item.name}</p>
                               <p className="mt-1 text-sm text-text-secondary">
@@ -398,9 +403,11 @@ export default function TrackOrderPage() {
                       </div>
 
                       <div className="rounded-[28px] border border-gold/10 bg-black/20 p-5">
-                        <p className="text-[11px] font-black uppercase tracking-[3px] text-gold/70">Delivery</p>
-                        <p className="mt-4 font-semibold text-text-primary">{order.customer?.name}</p>
-                        <p className="mt-2 text-sm leading-7 text-text-secondary">{order.customer?.address}</p>
+                        <p className="text-[11px] font-black uppercase tracking-[3px] text-gold/70">Pickup</p>
+                        <p className="mt-4 font-semibold text-text-primary">{getStoreLocationLabel(order.storeLocation)}</p>
+                        {order.pickupLocation?.address && (
+                          <p className="mt-2 text-sm leading-7 text-text-secondary">{order.pickupLocation.address}</p>
+                        )}
                         <div className="mt-4 flex flex-wrap gap-3">
                           <a href={`tel:${contactPhone}`} className="brand-primary-btn px-4 py-3 text-[11px]">
                             <Phone className="h-4 w-4" />

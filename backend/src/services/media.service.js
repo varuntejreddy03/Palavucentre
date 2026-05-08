@@ -12,14 +12,13 @@ import { ApiError } from "../utils/ApiError.js";
 const allowedUploadFolders = new Set(["general", "menu", "gallery", "offers", "settings"]);
 const uploadsRootResolved = path.resolve(uploadsRootDir);
 const targetUploadSizeBytes = env.MAX_UPLOAD_FILE_SIZE_MB * 1024 * 1024;
-const passthroughMimeTypes = new Set(["image/svg+xml", "image/gif"]);
+const passthroughMimeTypes = new Set(["image/gif"]);
 
 const mimeExtensionMap = {
   "image/jpeg": ".jpg",
   "image/png": ".png",
   "image/webp": ".webp",
   "image/gif": ".gif",
-  "image/svg+xml": ".svg",
   "image/avif": ".avif",
 };
 
@@ -76,7 +75,7 @@ function getFileExtension(file) {
   }
 
   const originalExtension = path.extname(file?.originalname || "").toLowerCase();
-  if ([".jpg", ".jpeg", ".png", ".webp", ".gif", ".svg", ".avif"].includes(originalExtension)) {
+  if ([".jpg", ".jpeg", ".png", ".webp", ".gif", ".avif"].includes(originalExtension)) {
     return originalExtension;
   }
 
@@ -90,6 +89,10 @@ function buildUploadUrl(publicId) {
 async function optimizeImageBuffer(file) {
   if (!file?.buffer?.length) {
     throw new ApiError(StatusCodes.BAD_REQUEST, "Image file is required");
+  }
+
+  if (file.mimetype === "image/svg+xml") {
+    throw new ApiError(StatusCodes.BAD_REQUEST, "SVG uploads are not supported");
   }
 
   if (file.size <= targetUploadSizeBytes) {

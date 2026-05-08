@@ -11,10 +11,10 @@ const upload = multer({
     files: 1,
   },
   fileFilter(_req, file, callback) {
-    if (!file.mimetype?.startsWith("image/")) {
+    if (!file.mimetype?.startsWith("image/") || file.mimetype === "image/svg+xml") {
       callback(
         new ApiError(StatusCodes.BAD_REQUEST, "File validation error", {
-          reason: "Only image uploads are supported",
+          reason: file.mimetype === "image/svg+xml" ? "SVG uploads are not supported" : "Only image uploads are supported",
         }),
       );
       return;

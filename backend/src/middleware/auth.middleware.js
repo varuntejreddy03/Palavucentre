@@ -14,8 +14,14 @@ export async function requireAdminAuth(req, _res, next) {
     }
 
     const payload = jwt.verify(token, env.JWT_SECRET);
+    const adminId = Number(payload?.sub);
+
+    if (payload?.role !== "admin" || !Number.isInteger(adminId) || adminId <= 0) {
+      throw new ApiError(StatusCodes.UNAUTHORIZED, "Invalid admin session");
+    }
+
     const admin = await prisma.admin.findUnique({
-      where: { id: Number(payload.sub) },
+      where: { id: adminId },
       select: {
         id: true,
         email: true,
