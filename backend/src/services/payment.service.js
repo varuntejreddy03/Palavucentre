@@ -252,17 +252,27 @@ export async function createRazorpayOrderForVerifiedOrder({ orderNumber }, { use
   assertRazorpayPaymentAmount(order.grandTotalPaise);
 
   const reusablePayment = order.payments.find((payment) => payment.status === "pending" && !payment.providerOrderId);
-  const payment =
-    reusablePayment ||
-    (await prisma.payment.create({
-      data: {
-        orderId: order.id,
-        provider: "razorpay",
-        status: "pending",
-        amountPaise: order.grandTotalPaise,
-        currency: order.currency,
-      },
-    }));
+
+  // Re-sync payment amount in case order total changed (e.g. admin edit)
+  let payment;
+  if (reusablePayment && reusablePayment.amountPaise !== order.grandTotalPaise) {
+    payment = await prisma.payment.update({
+      where: { id: reusablePayment.id },
+      data: { amountPaise: order.grandTotalPaise },
+    });
+  } else {
+    payment =
+      reusablePayment ||
+      (await prisma.payment.create({
+        data: {
+          orderId: order.id,
+          provider: "razorpay",
+          status: "pending",
+          amountPaise: order.grandTotalPaise,
+          currency: order.currency,
+        },
+      }));
+  }
 
   const gatewayOrder = await createRazorpayOrderForPayment(payment.id);
 
