@@ -16,6 +16,7 @@ import { doubleCsrfProtection } from "./middleware/csrf.middleware.js";
 import { errorHandler } from "./middleware/error.middleware.js";
 import { notFoundHandler } from "./middleware/not-found.middleware.js";
 import { securityHeaders, sanitizeResponses, apiAbuseProtection } from "./middleware/security.middleware.js";
+import { prisma } from "./config/prisma.js";
 import { apiRouter } from "./routes/index.js";
 
 const RAZORPAY_WEBHOOK_PATH = "/api/payments/razorpay/webhook";
@@ -93,6 +94,15 @@ export function createApp() {
       success: true,
       message: "RajaMahendravaram PalavuCentre backend is running",
     });
+  });
+
+  app.get("/health", async (_req, res) => {
+    try {
+      await prisma.$queryRaw`SELECT 1`;
+      res.json({ success: true, db: "connected", uptime: process.uptime() });
+    } catch {
+      res.status(503).json({ success: false, db: "disconnected" });
+    }
   });
 
   app.use(doubleCsrfProtection);

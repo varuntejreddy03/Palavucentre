@@ -1,4 +1,4 @@
-import { STORE_LOCATIONS } from "../../../shared/store-locations.js";
+import { STORE_LOCATIONS } from "../constants/store-locations.js";
 import { paiseToRupees } from "../utils/amounts.js";
 
 function getPickupLocation(storeLocation) {

@@ -12,7 +12,7 @@ import { serializePublicRazorpayOrder } from "../serializers/payment.public.seri
 import { assertRazorpayPaymentAmount, createRazorpayOrderForPayment } from "./payment.service.js";
 import { resolvePromoCodeForOrder } from "./promocode.service.js";
 import { getOrderConfig } from "./site-settings.service.js";
-import { STORE_LOCATIONS } from "../../../shared/store-locations.js";
+import { STORE_LOCATIONS } from "../constants/store-locations.js";
 
 const orderIncludes = {
   user: true,
